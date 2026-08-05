@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# build output
+dist/
+build/
+**/dist/
+**/build/
+
+# env / secrets
+.env
+.env.local
+*.local
+API_Access.rtf
+*.rtf
+
+# local duplicates / archives (not part of the app)
+files/
+files.zip
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# docker volumes (if bind-mounted locally)
+pgdata/

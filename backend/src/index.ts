@@ -1,0 +1,65 @@
+import express from 'express';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import connectPgSimple from 'connect-pg-simple';
+import { config } from './config';
+import { pool } from './db/pool';
+import { authRouter } from './routes/auth';
+import { itemsRouter } from './routes/items';
+import { enrichRouter } from './routes/enrich';
+import { searchRouter } from './routes/search';
+import { importRouter } from './routes/importCsv';
+
+const app = express();
+app.set('trust proxy', 1); // correct secure-cookie handling behind a reverse proxy
+
+app.use(express.json({ limit: '1mb' }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: config.appOrigin,
+    credentials: true,
+  })
+);
+
+const PgStore = connectPgSimple(session);
+app.use(
+  session({
+    store: new PgStore({ pool, tableName: 'session', createTableIfMissing: false }),
+    name: 'mv.sid',
+    secret: config.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: config.isProd,
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    },
+  })
+);
+
+// Health check.
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+app.use('/api/auth', authRouter);
+app.use('/api/items', itemsRouter);
+app.use('/api/enrich', enrichRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/import', importRouter);
+
+// Fallback error handler.
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('[error]', err);
+  res.status(500).json({ error: 'internal server error' });
+});
+
+app.listen(config.port, () => {
+  console.log(`[media-vault] API listening on :${config.port}`);
+  console.log(
+    `[media-vault] sources → IGDB:${config.igdb.enabled ? 'on' : 'off'} ` +
+      `TMDB:${config.tmdb.enabled ? 'on' : 'off'} ` +
+      `Discogs:${config.discogs.enabled ? 'on' : 'off'}`
+  );
+});

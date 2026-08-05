@@ -1,0 +1,58 @@
+# media-vault — one-command self-host stack.
+#   cp .env.example .env   # then fill in your keys
+#   docker compose up --build
+# Frontend on http://localhost:${FRONTEND_PORT} (default 8080).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      BACKEND_PORT: ${BACKEND_PORT}
+      SESSION_SECRET: ${SESSION_SECRET}
+      APP_ORIGIN: ${APP_ORIGIN}
+      NODE_ENV: ${NODE_ENV}
+      IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
+      IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
+      TMDB_ACCESS_TOKEN: ${TMDB_ACCESS_TOKEN}
+      DISCOGS_TOKEN: ${DISCOGS_TOKEN}
+      DISCOGS_USER_AGENT: ${DISCOGS_USER_AGENT}
+      SEED_CSV: /app/seed/master_game_list.csv
+    volumes:
+      # Canonical seed list, mounted read-only (no duplication in the image).
+      - ./master_game_list.csv:/app/seed/master_game_list.csv:ro
+    # On boot: apply schema, seed the 513-game list (idempotent), then start the API.
+    command: sh -c "node dist/db/migrate.js && node dist/db/seed.js && node dist/index.js"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT}:80"
+
+volumes:
+  pgdata:

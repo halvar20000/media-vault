@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shelf — physical media archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1B2430; --bg-2:#222D3B; --surface:#F3EEE3; --ink:#232A31; --muted:#7A8794;
+    --accent:#E0A126;
+    --t-game:#4C9A5A; --t-movie:#3E7CB1; --t-lp:#C8681E; --t-single:#A24E8F;
+    --line:rgba(243,238,227,.14);
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--surface);
+    font-family:"IBM Plex Sans",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent); color:var(--ink)}
+  a{color:inherit}
+  button{font-family:inherit; cursor:pointer}
+
+  /* ---------- header ---------- */
+  header{
+    padding:22px 28px 18px; border-bottom:1px solid var(--line);
+    display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    position:sticky; top:0; background:rgba(27,36,48,.92); backdrop-filter:blur(8px); z-index:20;
+  }
+  .brand{display:flex; align-items:baseline; gap:14px}
+  .brand h1{
+    font-family:"Archivo",sans-serif; font-weight:900; font-size:26px; letter-spacing:-.02em;
+    margin:0; line-height:1;
+  }
+  .brand .dot{color:var(--accent)}
+  .brand .sub{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase}
+  .searchwrap{flex:1; min-width:220px; max-width:460px; position:relative}
+  .searchwrap input{
+    width:100%; padding:11px 14px 11px 38px; border-radius:var(--radius);
+    border:1px solid var(--line); background:var(--bg-2); color:var(--surface);
+    font-size:14px; font-family:inherit;
+  }
+  .searchwrap input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:transparent}
+  .searchwrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.5}
+  .addbtn{
+    background:var(--accent); color:var(--ink); border:none; font-weight:700;
+    padding:11px 16px; border-radius:var(--radius); font-family:"Archivo",sans-serif;
+    letter-spacing:.01em; font-size:14px; white-space:nowrap;
+  }
+  .addbtn:hover{filter:brightness(1.06)}
+
+  /* ---------- stats strip ---------- */
+  .stats{
+    display:flex; gap:0; flex-wrap:wrap; border-bottom:1px solid var(--line);
+    font-family:"IBM Plex Mono",monospace;
+  }
+  .stat{padding:12px 24px; border-right:1px solid var(--line); display:flex; align-items:baseline; gap:8px}
+  .stat b{font-family:"Archivo",sans-serif; font-weight:900; font-size:22px; letter-spacing:-.02em}
+  .stat span{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+  .stat .swatch{width:9px; height:9px; border-radius:2px; align-self:center}
+
+  /* ---------- controls ---------- */
+  .controls{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 28px 6px; flex-wrap:wrap;
+  }
+  .filters{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{
+    background:transparent; border:1px solid var(--line); color:var(--surface);
+    padding:7px 13px; border-radius:100px; font-size:12.5px; font-weight:500;
+    display:flex; align-items:center; gap:7px; transition:background .15s,border-color .15s;
+  }
+  .chip .sw{width:8px; height:8px; border-radius:2px}
+  .chip[aria-pressed="true"]{background:var(--surface); color:var(--ink); border-color:var(--surface)}
+  .chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .viewtoggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .viewtoggle button{
+    background:transparent; color:var(--muted); border:none; padding:8px 14px; font-size:12.5px;
+    font-family:"Archivo",sans-serif; font-weight:700; letter-spacing:.02em;
+  }
+  .viewtoggle button[aria-pressed="true"]{background:var(--bg-2); color:var(--surface)}
+
+  /* ---------- SHELF (signature) ---------- */
+  .shelfscroll{padding:20px 28px 60px; overflow-x:auto}
+  .shelf{
+    display:flex; align-items:flex-end; gap:3px; min-height:230px;
+    padding:0 0 14px; border-bottom:6px solid #0e141c;
+    box-shadow:0 14px 20px -14px rgba(0,0,0,.6);
+  }
+  .spine{
+    --c:var(--muted);
+    position:relative; flex:0 0 auto; width:30px; height:210px;
+    background:linear-gradient(180deg,var(--c) 0 34px, #EDE7DA 34px 100%);
+    border-radius:2px 2px 1px 1px; border:1px solid rgba(0,0,0,.25);
+    color:var(--ink); cursor:pointer; padding:0; overflow:hidden;
+    transition:transform .16s ease, height .16s ease;
+    box-shadow:inset -3px 0 6px -3px rgba(0,0,0,.35), inset 3px 0 4px -3px rgba(255,255,255,.5);
+  }
+  .spine:hover,.spine:focus-visible{transform:translateY(-12px); height:224px; outline:none; z-index:3}
+  .spine:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+  .spine .stitle{
+    position:absolute; top:44px; left:50%; transform:translateX(-50%) rotate(90deg);
+    transform-origin:center; width:150px; text-align:left;
+    font-family:"Archivo",sans-serif; font-weight:700; font-size:11px; line-height:1.05;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .spine .splat{
+    position:absolute; top:9px; left:0; right:0; text-align:center;
+    font-family:"IBM Plex Mono",monospace; font-size:7.5px; font-weight:500;
+    color:#fff; letter-spacing:.02em; opacity:.92;
+  }
+  .spine .sid{
+    position:absolute; bottom:6px; left:0; right:0; text-align:center;
+    font-family:"IBM Plex Mono",monospace; font-size:6.5px; color:var(--muted);
+  }
+  .shelfhint{color:var(--muted); font-size:12px; margin:10px 28px 0; font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- GRID (gallery) ---------- */
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px;
+    padding:20px 28px 60px;
+  }
+  .card{
+    background:var(--surface); color:var(--ink); border-radius:var(--radius); overflow:hidden;
+    cursor:pointer; transition:transform .15s; display:flex; flex-direction:column;
+  }
+  .card:hover{transform:translateY(-4px)}
+  .card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .cover{
+    aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; padding:14px;
+    text-align:center; position:relative; color:#fff;
+  }
+  .cover .ct{font-family:"Archivo",sans-serif; font-weight:900; font-size:15px; line-height:1.1; text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .cover .badge{
+    position:absolute; top:8px; left:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:9px; background:rgba(0,0,0,.35); padding:2px 6px; border-radius:3px; letter-spacing:.04em;
+  }
+  .card .meta{padding:9px 11px 12px}
+  .card .meta .mt{font-weight:600; font-size:12.5px; line-height:1.2; margin:0 0 3px}
+  .card .meta .ms{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--muted); display:flex; justify-content:space-between}
+
+  .empty{padding:60px 28px; text-align:center; color:var(--muted)}
+  .empty b{color:var(--surface); font-family:"Archivo",sans-serif; display:block; font-size:18px; margin-bottom:6px}
+
+  /* ---------- detail drawer ---------- */
+  .scrim{position:fixed; inset:0; background:rgba(10,14,20,.55); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .2s; z-index:40}
+  .scrim.open{opacity:1; pointer-events:auto}
+  .drawer{
+    position:fixed; right:0; top:0; height:100%; width:min(420px,92vw); background:var(--bg-2);
+    border-left:1px solid var(--line); transform:translateX(100%); transition:transform .24s ease;
+    z-index:50; display:flex; flex-direction:column; box-shadow:-20px 0 40px -20px rgba(0,0,0,.7);
+  }
+  .drawer.open{transform:none}
+  .drawer .dhead{padding:22px 22px 0}
+  .drawer .dcover{height:190px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:#fff; text-align:center; padding:18px; font-family:"Archivo",sans-serif; font-weight:900; font-size:22px; line-height:1.05; text-shadow:0 1px 4px rgba(0,0,0,.4)}
+  .drawer h2{font-family:"Archivo",sans-serif; font-weight:900; font-size:22px; margin:18px 22px 2px; letter-spacing:-.01em; line-height:1.1}
+  .drawer .dtype{margin:0 22px 16px; font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.06em}
+  .drawer dl{margin:0; padding:0 22px; border-top:1px solid var(--line)}
+  .drawer .row{display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px}
+  .drawer .row dt{color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; align-self:center}
+  .drawer .row dd{margin:0; font-weight:500; text-align:right}
+  .drawer .close{position:absolute; top:16px; right:16px; background:rgba(0,0,0,.25); border:none; color:var(--surface); width:32px; height:32px; border-radius:50%; font-size:18px; line-height:1}
+  .tagpill{display:inline-block; font-size:11px; font-family:"IBM Plex Mono",monospace; padding:3px 9px; border-radius:100px; margin-top:2px}
+
+  /* ---------- add modal ---------- */
+  .modal{position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; padding:20px}
+  .modal.open{display:flex}
+  .modal .box{background:var(--bg-2); border:1px solid var(--line); border-radius:8px; width:min(560px,100%); overflow:hidden}
+  .modal .mtop{padding:20px 22px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center}
+  .modal h3{font-family:"Archivo",sans-serif; font-weight:900; margin:0; font-size:19px}
+  .methods{display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--line)}
+  .method{background:var(--bg-2); border:none; color:var(--surface); padding:22px 14px; text-align:left; display:flex; flex-direction:column; gap:8px}
+  .method:hover{background:#26313f}
+  .method .mi{font-size:22px}
+  .method .mh{font-family:"Archivo",sans-serif; font-weight:700; font-size:14px}
+  .method .md{font-size:11.5px; color:var(--muted); line-height:1.35}
+  .modal .mnote{padding:16px 22px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); line-height:1.5}
+  .modal .mnote b{color:var(--surface)}
+  .api{font-family:"IBM Plex Mono",monospace; color:var(--accent)}
+
+  @media (max-width:640px){
+    header{padding:16px}
+    .controls{padding:14px 16px 4px}
+    .shelfscroll,.grid{padding-left:16px; padding-right:16px}
+    .stat{padding:10px 16px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Shelf<span class="dot">.</span></h1>
+    <span class="sub">physical media archive</span>
+  </div>
+  <div class="searchwrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" type="search" placeholder="Search across games, films, vinyl…" aria-label="Search collection">
+  </div>
+  <button class="addbtn" id="openAdd">+ Add item</button>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<div class="controls">
+  <div class="filters" id="filters"></div>
+  <div class="viewtoggle" role="group" aria-label="View">
+    <button id="viewShelf" aria-pressed="true">Shelf</button>
+    <button id="viewGrid" aria-pressed="false">Gallery</button>
+  </div>
+</div>
+
+<div id="shelfView">
+  <div class="shelfscroll"><div class="shelf" id="shelf"></div></div>
+  <p class="shelfhint">↔ scroll the shelf · click a spine for details · coloured band = platform / format</p>
+</div>
+<div id="gridView" style="display:none"><div class="grid" id="grid"></div></div>
+
+<!-- detail drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Item details">
+  <button class="close" id="closeDrawer" aria-label="Close">×</button>
+  <div class="dhead"><div class="dcover" id="dCover"></div></div>
+  <h2 id="dTitle"></h2>
+  <p class="dtype" id="dType"></p>
+  <dl id="dMeta"></dl>
+</aside>
+
+<!-- add modal -->
+<div class="modal" id="addModal" role="dialog" aria-modal="true" aria-label="Add item">
+  <div class="box">
+    <div class="mtop"><h3>Add to the archive</h3><button class="close" id="closeAdd" style="position:static">×</button></div>
+    <div class="methods">
+      <button class="method"><span class="mi">📷</span><span class="mh">Scan barcode</span><span class="md">Point your phone camera at the EAN/UPC — the app routes it to the right database.</span></button>
+      <button class="method"><span class="mi">⌨︎</span><span class="mh">Search title</span><span class="md">Type a name, pick the match, cover art &amp; metadata fill in automatically.</span></button>
+      <button class="method"><span class="mi">⇪</span><span class="mh">Bulk import</span><span class="md">Drop a CSV — your 513-game list imports in one pass.</span></button>
+    </div>
+    <p class="mnote">Metadata is fetched per media type from the right source, then unified into one shelf:
+      Games → <span class="api">IGDB</span> · Films → <span class="api">TMDB</span> · Vinyl LPs &amp; Singles → <span class="api">Discogs</span>.
+      <br><b>This is a concept preview</b> — the buttons are stubs. Say the word and I'll wire up the real barcode scanner &amp; APIs in the self-hosted build.</p>
+  </div>
+</div>
+
+<script>
+const TYPE = {
+  game:{label:"Game", color:"var(--t-game)", raw:"#4C9A5A"},
+  movie:{label:"Film", color:"var(--t-movie)", raw:"#3E7CB1"},
+  lp:{label:"Vinyl LP", color:"var(--t-lp)", raw:"#C8681E"},
+  single:{label:"Single", color:"var(--t-single)", raw:"#A24E8F"},
+};
+// Seeded from the real collection (games) + example music/film rows to prove multi-media.
+const DATA = [
+  // --- games (real) ---
+  {type:"game", title:"Gran Turismo 4", plat:"PS2", year:2004, id:"SCES-51719", loc:"Cabinet A · shelf 3", status:"Emulates great"},
+  {type:"game", title:"Metal Gear Solid 2", plat:"PS2", year:2001, id:"SLES-56383", loc:"Cabinet A · shelf 3", status:"Emulates great"},
+  {type:"game", title:"God of War", plat:"PS4", year:2018, id:"CUSA-07408", loc:"Cabinet B · shelf 1", status:"Console only"},
+  {type:"game", title:"Bloodborne", plat:"PS4", year:2015, id:"CUSA-00207", loc:"Cabinet B · shelf 1", status:"Console only"},
+  {type:"game", title:"Red Dead Redemption II", plat:"PS4", year:2018, id:"CUSA-08519", loc:"Cabinet B · shelf 2", status:"Console only"},
+  {type:"game", title:"Halo 3", plat:"Xbox 360", year:2007, id:"HND-00051", loc:"Cabinet C · shelf 1", status:"Emulates (variable)"},
+  {type:"game", title:"Gears of War", plat:"Xbox 360", year:2006, id:"", loc:"Cabinet C · shelf 1", status:"Emulates (variable)"},
+  {type:"game", title:"Forza Motorsport 4", plat:"Xbox 360", year:2011, id:"5FG-00009", loc:"Cabinet C · shelf 2", status:"Emulates (variable)"},
+  {type:"game", title:"Fable", plat:"Xbox", year:2004, id:"V07-00024", loc:"Cabinet C · shelf 3", status:"Emulates (xemu)"},
+  {type:"game", title:"Halo 2", plat:"Xbox", year:2004, id:"M41-00037", loc:"Cabinet C · shelf 3", status:"Emulates (xemu)"},
+  {type:"game", title:"God of War III", plat:"PS3", year:2010, id:"BCES-00510", loc:"Cabinet D · shelf 1", status:"RPCS3 · playable"},
+  {type:"game", title:"Uncharted 3", plat:"PS3", year:2011, id:"BCES-01175", loc:"Cabinet D · shelf 1", status:"RPCS3 · playable"},
+  {type:"game", title:"Gran Turismo (PSP)", plat:"PSP", year:2009, id:"UCES-01245", loc:"Drawer · handhelds", status:"Emulates great"},
+  {type:"game", title:"Tekken: Dark Resurrection", plat:"PSP", year:2006, id:"UCES-00356", loc:"Drawer · handhelds", status:"Emulates great"},
+  {type:"game", title:"Zelda: Tears of the Kingdom", plat:"Switch", year:2023, id:"", loc:"Cabinet E · shelf 1", status:"Console only"},
+  {type:"game", title:"Super Mario Bros. 3", plat:"NES", year:1990, id:"NES-UM-SCN", loc:"Display · cartridges", status:"Emulates great"},
+  {type:"game", title:"The Witcher 3", plat:"PS4", year:2015, id:"CUSA-00527", loc:"Cabinet B · shelf 1", status:"Console only"},
+  {type:"game", title:"Cyberpunk 2077: Ultimate", plat:"Switch 2", year:2025, id:"", loc:"Cabinet E · shelf 2", status:"Console only"},
+  // --- films (examples) ---
+  {type:"movie", title:"Blade Runner 2049", plat:"4K UHD", year:2017, id:"", loc:"Film wall · row 2", status:"Owned"},
+  {type:"movie", title:"Dune", plat:"Blu-ray", year:2021, id:"", loc:"Film wall · row 2", status:"Owned"},
+  {type:"movie", title:"Interstellar", plat:"Blu-ray", year:2014, id:"", loc:"Film wall · row 1", status:"Owned"},
+  {type:"movie", title:"Mad Max: Fury Road", plat:"4K UHD", year:2015, id:"", loc:"Film wall · row 1", status:"Owned"},
+  {type:"movie", title:"The Grand Budapest Hotel", plat:"DVD", year:2014, id:"", loc:"Film wall · row 3", status:"Owned"},
+  // --- vinyl LPs (examples) ---
+  {type:"lp", title:"Pink Floyd — The Wall", plat:"2×LP", year:1979, id:"1C 198-63 410", loc:"Records · A–F", status:"VG+"},
+  {type:"lp", title:"Supertramp — Crime of the Century", plat:"LP", year:1974, id:"AMLS 68258", loc:"Records · P–S", status:"NM"},
+  {type:"lp", title:"Daft Punk — Random Access Memories", plat:"2×LP", year:2013, id:"88883716861", loc:"Records · A–F", status:"NM"},
+  {type:"lp", title:"Fleetwood Mac — Rumours", plat:"LP", year:1977, id:"K 56344", loc:"Records · A–F", status:"VG"},
+  // --- singles (examples) ---
+  {type:"single", title:"New Order — Blue Monday", plat:"12″", year:1983, id:"FAC 73", loc:"Singles · box 1", status:"VG+"},
+  {type:"single", title:"Kate Bush — Running Up That Hill", plat:"7″", year:1985, id:"KB 1", loc:"Singles · box 2", status:"VG"},
+];
+DATA.forEach((d,i)=>d._i=i);
+
+let active = "all";
+let view = "shelf";
+let query = "";
+
+const platColor = t => TYPE[t].raw;
+
+function filtered(){
+  return DATA.filter(d=>{
+    if(active!=="all" && d.type!==active) return false;
+    if(query){
+      const q=query.toLowerCase();
+      if(!(d.title.toLowerCase().includes(q)||d.plat.toLowerCase().includes(q)||(d.id||"").toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+}
+
+function renderStats(){
+  const el=document.getElementById("stats");
+  const counts={all:DATA.length};
+  for(const k in TYPE) counts[k]=DATA.filter(d=>d.type===k).length;
+  el.innerHTML =
+    `<div class="stat"><b>${counts.all}</b><span>items total</span></div>` +
+    Object.keys(TYPE).map(k=>
+      `<div class="stat"><span class="swatch" style="background:${TYPE[k].raw}"></span><b>${counts[k]}</b><span>${TYPE[k].label}${counts[k]===1?"":"s"}</span></div>`
+    ).join("");
+}
+
+function renderFilters(){
+  const el=document.getElementById("filters");
+  const mk=(key,label,color)=>`<button class="chip" data-f="${key}" aria-pressed="${active===key}">${color?`<span class="sw" style="background:${color}"></span>`:""}${label}</button>`;
+  el.innerHTML = mk("all","All",null) + Object.keys(TYPE).map(k=>mk(k,TYPE[k].label+"s",TYPE[k].raw)).join("");
+  el.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{active=c.dataset.f; renderFilters(); renderBody();});
+}
+
+function shortId(d){ return d.id || "—"; }
+
+function renderBody(){
+  const items=filtered();
+  const shelf=document.getElementById("shelf");
+  const grid=document.getElementById("grid");
+  if(!items.length){
+    const msg=`<div class="empty"><b>Nothing here yet</b>Adjust the filter or add an item to this shelf.</div>`;
+    shelf.innerHTML=""; document.querySelector(".shelfscroll").innerHTML=msg; grid.innerHTML=msg; return;
+  }
+  // shelf
+  document.querySelector(".shelfscroll").innerHTML=`<div class="shelf" id="shelf"></div>`;
+  const shelfEl=document.getElementById("shelf");
+  shelfEl.innerHTML=items.map(d=>`
+    <button class="spine" style="--c:${platColor(d.type)}" data-i="${d._i}" title="${d.title}">
+      <span class="splat">${d.plat}</span>
+      <span class="stitle">${d.title}</span>
+      <span class="sid">${shortId(d)}</span>
+    </button>`).join("");
+  shelfEl.querySelectorAll(".spine").forEach(s=>s.onclick=()=>openDrawer(DATA[+s.dataset.i]));
+  // grid
+  grid.innerHTML=items.map(d=>`
+    <button class="card" data-i="${d._i}">
+      <div class="cover" style="background:${platColor(d.type)}">
+        <span class="badge">${TYPE[d.type].label}</span>
+        <span class="ct">${d.title}</span>
+      </div>
+      <div class="meta"><p class="mt">${d.title}</p><div class="ms"><span>${d.plat}</span><span>${d.year||""}</span></div></div>
+    </button>`).join("");
+  grid.querySelectorAll(".card").forEach(c=>c.onclick=()=>openDrawer(DATA[+c.dataset.i]));
+}
+
+function openDrawer(d){
+  document.getElementById("dCover").style.background=platColor(d.type);
+  document.getElementById("dCover").textContent=d.title;
+  document.getElementById("dTitle").textContent=d.title;
+  document.getElementById("dType").textContent=TYPE[d.type].label;
+  const rows=[
+    ["Format", d.plat],
+    ["Year", d.year||"—"],
+    ["Catalog no.", shortId(d)],
+    ["Location", d.loc||"—"],
+  ];
+  let html=rows.map(r=>`<div class="row"><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("");
+  html+=`<div class="row"><dt>Status</dt><dd><span class="tagpill" style="background:${platColor(d.type)}22;color:${platColor(d.type)}">${d.status}</span></dd></div>`;
+  document.getElementById("dMeta").innerHTML=html;
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("drawer").setAttribute("aria-hidden","false");
+  document.getElementById("scrim").classList.add("open");
+}
+function closeDrawer(){
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("drawer").setAttribute("aria-hidden","true");
+  document.getElementById("scrim").classList.remove("open");
+}
+
+document.getElementById("closeDrawer").onclick=closeDrawer;
+document.getElementById("scrim").onclick=closeDrawer;
+document.getElementById("search").oninput=e=>{query=e.target.value; renderBody();};
+document.getElementById("viewShelf").onclick=()=>setView("shelf");
+document.getElementById("viewGrid").onclick=()=>setView("grid");
+function setView(v){
+  view=v;
+  document.getElementById("shelfView").style.display=v==="shelf"?"":"none";
+  document.getElementById("gridView").style.display=v==="grid"?"":"none";
+  document.getElementById("viewShelf").setAttribute("aria-pressed",v==="shelf");
+  document.getElementById("viewGrid").setAttribute("aria-pressed",v==="grid");
+}
+// add modal
+document.getElementById("openAdd").onclick=()=>document.getElementById("addModal").classList.add("open");
+document.getElementById("closeAdd").onclick=()=>document.getElementById("addModal").classList.remove("open");
+document.getElementById("addModal").onclick=e=>{if(e.target.id==="addModal")e.target.classList.remove("open");};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();document.getElementById("addModal").classList.remove("open");}});
+
+renderStats(); renderFilters(); renderBody();
+</script>
+</body>
+</html>
