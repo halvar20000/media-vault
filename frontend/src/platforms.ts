@@ -3,12 +3,12 @@ import { TYPE_META, type MediaType } from './types';
 // Authentic-ish platform/format colours so the shelf reads like real
 // platform-coloured spines (PlayStation blue, Xbox green, Nintendo red…).
 const C = {
-  playstation: '#1C4F9C',
+  playstation: '#1E73D8', // bright PlayStation azure
   xbox: '#107C10',
   nintendo: '#C4162A',
   sega: '#0098A6',
   pc: '#2A2E37',
-  bluray: '#123FA6',
+  bluray: '#0E1C6B', // deep Blu-ray navy (distinct from PlayStation blue)
   uhd: '#0C0C0C',
   dvd: '#39393B',
   vhs: '#5A4632',
