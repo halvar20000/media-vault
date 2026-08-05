@@ -179,9 +179,9 @@ header {
   --c: var(--muted);
   position: relative;
   flex: 0 0 auto;
-  width: 30px;
+  width: 34px;
   height: 210px;
-  background: linear-gradient(180deg, var(--c) 0 34px, #ede7da 34px 100%);
+  background: #ede7da;
   border-radius: 2px 2px 1px 1px;
   border: 1px solid rgba(0, 0, 0, 0.25);
   color: var(--ink);
@@ -195,11 +195,11 @@ header {
 .spine:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
 .spine .stitle {
   position: absolute;
-  top: 44px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%) rotate(90deg);
   transform-origin: center;
-  width: 150px;
+  width: 140px;
   text-align: left;
   font-family: "Archivo", sans-serif;
   font-weight: 700;
@@ -209,18 +209,31 @@ header {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Solid coloured header band at the top of EVERY spine — the console/format label,
+   like the platform banner on a real game/disc spine. Always readable. */
 .spine .splat {
   position: absolute;
-  top: 9px;
+  top: 0;
   left: 0;
   right: 0;
-  text-align: center;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 7.5px;
-  font-weight: 500;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c);
   color: #fff;
-  letter-spacing: 0.02em;
-  opacity: 0.92;
+  font-family: "Archivo", sans-serif;
+  font-weight: 700;
+  font-size: 8.5px;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-align: center;
+  padding: 3px 2px;
+  overflow: hidden;
+  word-break: break-word;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  z-index: 3;
 }
 .spine .sid {
   position: absolute;
@@ -232,17 +245,17 @@ header {
   font-size: 6.5px;
   color: var(--muted);
 }
-/* spine with real cover art behind the label band */
+/* spine with real cover art below the coloured header band */
 .spine.hasart { background: #ede7da; }
 .spine.hasart .art {
   position: absolute;
-  inset: 34px 0 0 0;
+  inset: 32px 0 0 0;
   width: 100%;
-  height: calc(100% - 34px);
+  height: calc(100% - 32px);
   object-fit: cover;
   opacity: 0.96;
 }
-.spine.hasart .stitle { top: 42px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); z-index: 2; }
+.spine.hasart .stitle { top: 50px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); z-index: 2; }
 .spine.hasart .sid { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); z-index: 2; }
 .shelfhint { color: var(--muted); font-size: 12px; margin: 10px 28px 0; font-family: "IBM Plex Mono", monospace; }
 
