@@ -1,12 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import type { Item } from '../types';
 import { TYPE_META } from '../types';
 
 export function Shelf({ items, onOpen }: { items: Item[]; onOpen: (i: Item) => void }) {
+  const { t } = useTranslation();
   if (!items.length) {
     return (
       <div className="empty">
-        <b>Nothing here yet</b>
-        Adjust the filter or add an item to this shelf.
+        <b>{t('shelf.emptyTitle')}</b>
+        {t('shelf.emptyBody')}
       </div>
     );
   }
@@ -25,7 +27,7 @@ export function Shelf({ items, onOpen }: { items: Item[]; onOpen: (i: Item) => v
                 title={d.title}
                 onClick={() => onOpen(d)}
               >
-                <span className="splat">{d.format || TYPE_META[d.type].label}</span>
+                <span className="splat">{d.format || t(`types.${d.type}`)}</span>
                 {hasArt && <img className="art" src={d.cover_url!} alt="" loading="lazy" />}
                 <span className="stitle">{d.title}</span>
                 <span className="sid">{d.catalog_no || '—'}</span>
@@ -34,9 +36,7 @@ export function Shelf({ items, onOpen }: { items: Item[]; onOpen: (i: Item) => v
           })}
         </div>
       </div>
-      <p className="shelfhint">
-        ↔ scroll the shelf · click a spine for details · coloured band = platform / format
-      </p>
+      <p className="shelfhint">{t('shelf.hint')}</p>
     </>
   );
 }

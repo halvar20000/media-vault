@@ -21,6 +21,10 @@ export const config = {
   // Where downloaded cover images are cached (persisted via a mounted volume).
   coversDir: env('COVERS_DIR', ''), // falls back to <cwd>/data/covers when blank
 
+  // When set, the backend also serves the built SPA from this dir (single-image
+  // deploy). Left blank in dev, where Vite serves the frontend on its own port.
+  frontendDir: env('FRONTEND_DIR', ''),
+
   db: {
     host: env('POSTGRES_HOST', 'localhost'),
     port: parseInt(env('POSTGRES_PORT', '5432'), 10),

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from './api';
+import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
 import { Auth } from './components/Auth';
@@ -11,6 +13,7 @@ import { AddModal } from './components/AddModal';
 const NO_SOURCES: EnrichStatus['sources'] = { igdb: false, tmdb: false, discogs: false };
 
 export default function App() {
+  const { t, i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -133,7 +136,7 @@ export default function App() {
   useEffect(() => () => { if (pollRef.current) window.clearInterval(pollRef.current); }, []);
 
   async function deleteItem(item: Item) {
-    if (!confirm(`Delete “${item.title}”?`)) return;
+    if (!confirm(t('drawer.confirmDelete', { title: item.title }))) return;
     await api.deleteItem(item.id);
     setSelected(null);
     await refresh();
@@ -147,7 +150,7 @@ export default function App() {
   }
 
   if (loading) {
-    return <div className="authwrap"><div className="authsub">Loading…</div></div>;
+    return <div className="authwrap"><div className="authsub">{t('common.loading')}</div></div>;
   }
   if (!user) return <Auth onAuthed={setUser} />;
 
@@ -163,7 +166,7 @@ export default function App() {
       <header>
         <div className="brand">
           <h1>media-vault<span className="dot">.</span></h1>
-          <span className="sub">physical media archive</span>
+          <span className="sub">{t('brand.sub')}</span>
         </div>
         <div className="searchwrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -172,36 +175,44 @@ export default function App() {
           </svg>
           <input
             type="search"
-            placeholder="Search across games, films, vinyl…"
-            aria-label="Search collection"
+            placeholder={t('header.searchPlaceholder')}
+            aria-label={t('common.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
         <div className="headerbtns">
-          <button className="addbtn" onClick={() => setAddOpen(true)}>+ Add item</button>
-          <button className="ghostbtn" onClick={logout}>Sign out</button>
+          <button className="addbtn" onClick={() => setAddOpen(true)}>{t('header.addItem')}</button>
+          <select
+            className="langsel"
+            aria-label="Language"
+            value={i18n.resolvedLanguage}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+          >
+            {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+          </select>
+          <button className="ghostbtn" onClick={logout}>{t('header.signOut')}</button>
         </div>
       </header>
 
       <div className="stats">
-        <div className="stat"><b>{stats?.total ?? 0}</b><span>items total</span></div>
-        {TYPE_ORDER.map((t) => (
-          <div className="stat" key={t}>
-            <span className="swatch" style={{ background: TYPE_META[t].color }} />
-            <b>{counts[t] ?? 0}</b>
-            <span>{TYPE_META[t].label}{(counts[t] ?? 0) === 1 ? '' : 's'}</span>
+        <div className="stat"><b>{stats?.total ?? 0}</b><span>{t('stats.itemsTotal')}</span></div>
+        {TYPE_ORDER.map((mt) => (
+          <div className="stat" key={mt}>
+            <span className="swatch" style={{ background: TYPE_META[mt].color }} />
+            <b>{counts[mt] ?? 0}</b>
+            <span>{t(`types_plural.${mt}`)}</span>
           </div>
         ))}
       </div>
 
       <div className="controls">
         <div className="filters">
-          <button className="chip" aria-pressed={active === 'all'} onClick={() => setActive('all')}>All</button>
-          {TYPE_ORDER.map((t) => (
-            <button className="chip" key={t} aria-pressed={active === t} onClick={() => setActive(t)}>
-              <span className="sw" style={{ background: TYPE_META[t].color }} />
-              {TYPE_META[t].label}s
+          <button className="chip" aria-pressed={active === 'all'} onClick={() => setActive('all')}>{t('filters.all')}</button>
+          {TYPE_ORDER.map((mt) => (
+            <button className="chip" key={mt} aria-pressed={active === mt} onClick={() => setActive(mt)}>
+              <span className="sw" style={{ background: TYPE_META[mt].color }} />
+              {t(`types_plural.${mt}`)}
             </button>
           ))}
         </div>
@@ -212,14 +223,14 @@ export default function App() {
               className="enrichbtn"
               onClick={startEnrich}
               disabled={enriching || !anySource}
-              title={anySource ? 'Fetch covers, ratings & descriptions' : 'No metadata sources configured'}
+              title={anySource ? t('controls.enrichTitle') : t('controls.enrichNoSource')}
             >
-              {enriching ? 'Enriching…' : '✦ Enrich collection'}
+              {enriching ? t('controls.enriching') : t('controls.enrich')}
             </button>
           </div>
           <div className="viewtoggle" role="group" aria-label="View">
-            <button aria-pressed={view === 'shelf'} onClick={() => setView('shelf')}>Shelf</button>
-            <button aria-pressed={view === 'grid'} onClick={() => setView('grid')}>Gallery</button>
+            <button aria-pressed={view === 'shelf'} onClick={() => setView('shelf')}>{t('controls.shelf')}</button>
+            <button aria-pressed={view === 'grid'} onClick={() => setView('grid')}>{t('controls.gallery')}</button>
           </div>
         </div>
       </div>

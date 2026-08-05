@@ -99,6 +99,12 @@ header {
 }
 .ghostbtn:hover { border-color: var(--surface); }
 .ghostbtn:disabled { opacity: 0.5; cursor: default; }
+.langsel {
+  background: transparent; color: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 11px 8px; font-size: 13px;
+  font-family: "IBM Plex Mono", monospace;
+}
+.langsel option { background: var(--bg-2); color: var(--surface); }
 
 /* ---------- stats strip ---------- */
 .stats { display: flex; gap: 0; flex-wrap: wrap; border-bottom: 1px solid var(--line); font-family: "IBM Plex Mono", monospace; }

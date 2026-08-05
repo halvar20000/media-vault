@@ -44,12 +44,27 @@ Enrichment stays idle for any source whose keys are blank — the app still runs
 
 ```bash
 cp .env.example .env      # then fill in your keys + a SESSION_SECRET
-docker compose up --build
+docker compose up -d      # pulls the prebuilt image (no build step)
 ```
 
-Open **http://localhost:8080**, register a local user, then click **Enrich collection** to
-pull covers/ratings/descriptions. The 513-game seed list (`master_game_list.csv`) is
-imported automatically on first boot.
+Open **http://localhost:8080**, log in as the seed user (`admin@media-vault.local` /
+`SEED_USER_PASSWORD`), then click **Enrich collection** to fetch covers/ratings/descriptions.
+The app is a single image (API + UI on one port) plus a Postgres container.
+
+**Updating** is just a pull — no rebuild:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+Images are published automatically to `ghcr.io/halvar20000/media-vault` on every commit.
+
+### Unraid
+
+Add the template URL in **Docker → Add Container → Template**:
+`https://raw.githubusercontent.com/halvar20000/media-vault/main/unraid-template/media-vault.xml`
+(install a `postgres:16-alpine` container first and point the DB variables at it). Or use the
+**Docker Compose Manager** plugin with the `docker-compose.yml` above.
 
 ## Local development (no Docker)
 

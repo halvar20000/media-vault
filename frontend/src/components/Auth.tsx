@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import type { User } from '../types';
 
 export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [allowRegistration, setAllowRegistration] = useState(false);
 
@@ -26,7 +28,7 @@ export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
           : await api.register(email, password, displayName || undefined);
       onAuthed(user);
     } catch (e: any) {
-      setErr(e.message || 'Something went wrong');
+      setErr(e.message || t('auth.genericError'));
     } finally {
       setBusy(false);
     }
@@ -41,18 +43,18 @@ export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
           </h1>
         </div>
         <p className="authsub">
-          {mode === 'login' ? 'Sign in to your archive' : 'Create your local account'}
+          {mode === 'login' ? t('auth.signInSub') : t('auth.registerSub')}
         </p>
         {err && <div className="err">{err}</div>}
         <form onSubmit={submit}>
           {mode === 'register' && (
             <div className="field">
-              <label htmlFor="dn">Display name (optional)</label>
+              <label htmlFor="dn">{t('auth.displayName')}</label>
               <input id="dn" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
             </div>
           )}
           <div className="field">
-            <label htmlFor="em">Email</label>
+            <label htmlFor="em">{t('auth.email')}</label>
             <input
               id="em"
               type="email"
@@ -63,7 +65,7 @@ export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="pw">Password</label>
+            <label htmlFor="pw">{t('auth.password')}</label>
             <input
               id="pw"
               type="password"
@@ -75,20 +77,20 @@ export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
             />
           </div>
           <button className="primary" type="submit" disabled={busy}>
-            {busy ? '…' : mode === 'login' ? 'Sign in' : 'Create account'}
+            {busy ? '…' : mode === 'login' ? t('auth.signIn') : t('auth.createAccount')}
           </button>
         </form>
         {allowRegistration && (
           <div className="toggle">
             {mode === 'login' ? (
               <>
-                No account yet?{' '}
-                <button onClick={() => { setMode('register'); setErr(null); }}>Register</button>
+                {t('auth.noAccount')}{' '}
+                <button onClick={() => { setMode('register'); setErr(null); }}>{t('auth.register')}</button>
               </>
             ) : (
               <>
-                Already have one?{' '}
-                <button onClick={() => { setMode('login'); setErr(null); }}>Sign in</button>
+                {t('auth.haveAccount')}{' '}
+                <button onClick={() => { setMode('login'); setErr(null); }}>{t('auth.signIn')}</button>
               </>
             )}
           </div>

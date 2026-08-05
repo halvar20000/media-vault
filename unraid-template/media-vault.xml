@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>media-vault</Name>
+  <Repository>ghcr.io/halvar20000/media-vault:latest</Repository>
+  <Registry>https://github.com/halvar20000/media-vault/pkgs/container/media-vault</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/halvar20000/media-vault/issues</Support>
+  <Project>https://github.com/halvar20000/media-vault</Project>
+  <Overview>A self-hosted, open-source catalog for physical media (games, movies, vinyl, CDs) with automatic cover/rating/description enrichment and a signature spine-shelf view.</Overview>
+  <Description>media-vault catalogs your physical media collection and auto-fetches cover art, ratings and descriptions per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD). Requires a separate PostgreSQL 16 container — install one first (recommended image: postgres:16-alpine) and point the DB variables below at it.</Description>
+  <Category>MediaApp:Video MediaApp:Music MediaApp:Other</Category>
+  <WebUI>http://[IP]:[PORT:8080]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/halvar20000/media-vault/main/unraid-template/media-vault.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/frontend/public/favicon.png</Icon>
+  <Requires>A PostgreSQL 16 database. Install a postgres:16-alpine container first (set POSTGRES_USER/PASSWORD/DB) and link it via the DB variables below.</Requires>
+
+  <Config Name="WebUI Port" Target="4000" Default="8080" Mode="tcp" Description="Port the app is reached on." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
+  <Config Name="Covers Volume" Target="/app/data/covers" Default="/mnt/user/appdata/media-vault/covers" Mode="rw" Description="Where cached cover images are stored." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/media-vault/covers</Config>
+
+  <Config Name="DB Host" Target="POSTGRES_HOST" Default="" Mode="" Description="Postgres container IP or hostname." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="DB Port" Target="POSTGRES_PORT" Default="5432" Mode="" Description="Postgres port." Type="Variable" Display="always" Required="true" Mask="false">5432</Config>
+  <Config Name="DB Name" Target="POSTGRES_DB" Default="mediavault" Mode="" Description="Database name." Type="Variable" Display="always" Required="true" Mask="false">mediavault</Config>
+  <Config Name="DB User" Target="POSTGRES_USER" Default="mediavault" Mode="" Description="Database user." Type="Variable" Display="always" Required="true" Mask="false">mediavault</Config>
+  <Config Name="DB Password" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="Database password." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <Config Name="Session Secret" Target="SESSION_SECRET" Default="" Mode="" Description="Long random string for signing session cookies." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="App Origin" Target="APP_ORIGIN" Default="http://localhost:8080" Mode="" Description="Public URL of the app (e.g. http://TOWER-IP:8080)." Type="Variable" Display="always" Required="false" Mask="false">http://localhost:8080</Config>
+  <Config Name="Allow Registration" Target="ALLOW_REGISTRATION" Default="false" Mode="" Description="Let new users self-register. Keep false on an exposed instance." Type="Variable" Display="always" Required="false" Mask="false">false</Config>
+  <Config Name="HTTPS (production cookies)" Target="NODE_ENV" Default="development" Mode="" Description="Set to 'production' ONLY behind HTTPS (reverse proxy); otherwise leave 'development'." Type="Variable" Display="advanced" Required="false" Mask="false">development</Config>
+
+  <Config Name="Seed user email" Target="SEED_USER_EMAIL" Default="admin@media-vault.local" Mode="" Description="Default login created on first boot." Type="Variable" Display="advanced" Required="false" Mask="false">admin@media-vault.local</Config>
+  <Config Name="Seed user password" Target="SEED_USER_PASSWORD" Default="changeme" Mode="" Description="Change this before exposing the instance." Type="Variable" Display="advanced" Required="false" Mask="true">changeme</Config>
+
+  <Config Name="IGDB Client ID" Target="IGDB_CLIENT_ID" Default="" Mode="" Description="Twitch app Client ID (games)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="IGDB Client Secret" Target="IGDB_CLIENT_SECRET" Default="" Mode="" Description="Twitch app Client Secret (games)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="TMDB Access Token" Target="TMDB_ACCESS_TOKEN" Default="" Mode="" Description="TMDB v4 Read Access Token (movies)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="TMDB Language" Target="TMDB_LANGUAGE" Default="en-US" Mode="" Description="Movie metadata language, e.g. de-DE." Type="Variable" Display="advanced" Required="false" Mask="false">en-US</Config>
+  <Config Name="Discogs Key" Target="DISCOGS_KEY" Default="" Mode="" Description="Discogs consumer key (vinyl/CD)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="Discogs Secret" Target="DISCOGS_SECRET" Default="" Mode="" Description="Discogs consumer secret (vinyl/CD)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+</Container>

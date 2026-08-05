@@ -1,4 +1,5 @@
 import express from 'express';
+import { join } from 'path';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -54,6 +55,15 @@ app.use('/api/enrich', enrichRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/import', importRouter);
 app.use('/api/cabinets', cabinetsRouter);
+
+// Single-image deploy: also serve the built SPA + client-side routing fallback.
+if (config.frontendDir) {
+  app.use(express.static(config.frontendDir));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(join(config.frontendDir, 'index.html'));
+  });
+}
 
 // Fallback error handler.
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

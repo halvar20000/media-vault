@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import type { Cabinet, Item, SearchHit } from '../types';
 import { TYPE_META } from '../types';
@@ -50,6 +51,7 @@ function toDraft(i: Item): Draft {
 const fmtDate = (s: string | null) => (s ? s.slice(0, 10) : null);
 
 export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
+  const { t } = useTranslation();
   const open = Boolean(item);
   const meta = item ? TYPE_META[item.type] : null;
 
@@ -105,7 +107,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
     try {
       const { hits } = await api.search(item!.type, matchQ.trim());
       setHits(hits);
-      if (!hits.length) setMatchMsg('No matches found — try a simpler title.');
+      if (!hits.length) setMatchMsg(t('drawer.noMatchTry'));
     } catch (e: any) {
       setMatchMsg(e.message || 'Search failed');
     } finally {
@@ -163,21 +165,21 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
   }
 
   const rows: [string, string | null][] = [
-    ['Format', item.format],
-    ['Year', item.year ? String(item.year) : null],
-    ['Rating', item.rating !== null ? `${Math.round(item.rating)} / 100` : null],
-    ['Catalog no.', item.catalog_no],
-    ['Cabinet', cabinetName],
-    ['Location', item.location],
-    ['Condition', item.condition],
-    ['Discs', item.disc_count != null ? String(item.disc_count) : null],
-    ['Series', item.is_series
-      ? [item.season_count ? `${item.season_count} season(s)` : null, item.episode_count ? `${item.episode_count} ep.` : null].filter(Boolean).join(' · ') || 'Yes'
+    [t('drawer.rowFormat'), item.format],
+    [t('drawer.rowYear'), item.year ? String(item.year) : null],
+    [t('drawer.rowRating'), item.rating !== null ? `${Math.round(item.rating)} / 100` : null],
+    [t('drawer.rowCatalog'), item.catalog_no],
+    [t('drawer.rowCabinet'), cabinetName],
+    [t('drawer.rowLocation'), item.location],
+    [t('drawer.rowCondition'), item.condition],
+    [t('drawer.rowDiscs'), item.disc_count != null ? String(item.disc_count) : null],
+    [t('drawer.rowSeries'), item.is_series
+      ? [item.season_count ? `${item.season_count} ${t('drawer.seasons')}` : null, item.episode_count ? `${item.episode_count} ${t('drawer.episodes')}` : null].filter(Boolean).join(' · ') || '✓'
       : null],
-    ['Lent to', item.lent_to ? `${item.lent_to}${item.lent_since ? ` (since ${fmtDate(item.lent_since)})` : ''}` : null],
-    ['Viewed', item.viewed_at ? fmtDate(item.viewed_at) : null],
-    ['Notes', item.notes],
-    ['Source', item.source ? item.source.toUpperCase() : null],
+    [t('drawer.rowLentTo'), item.lent_to ? `${item.lent_to}${item.lent_since ? ` (${t('drawer.lentSince').toLowerCase()} ${fmtDate(item.lent_since)})` : ''}` : null],
+    [t('drawer.rowViewed'), item.viewed_at ? fmtDate(item.viewed_at) : null],
+    [t('drawer.rowNotes'), item.notes],
+    [t('drawer.rowSource'), item.source ? item.source.toUpperCase() : null],
   ];
 
   return (
@@ -191,17 +193,17 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
           </div>
         </div>
         <h2>{item.title}</h2>
-        <p className="dtype">{meta.label}</p>
+        <p className="dtype">{t(`types.${item.type}`)}</p>
         {item.description && !editing && <p className="ddesc">{item.description}</p>}
 
         {!editing ? (
           <>
             <div className="dactions" style={{ paddingTop: 4 }}>
-              <button className="ghostbtn" onClick={() => setEditing(true)}>Edit</button>
+              <button className="ghostbtn" onClick={() => setEditing(true)}>{t('common.edit')}</button>
               {item.viewed_at
-                ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>Unwatch</button>
-                : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>Mark viewed</button>}
-              {item.lent_to && <button className="ghostbtn" onClick={() => quick({ lent_to: null, lent_since: null })} disabled={busy}>Returned</button>}
+                ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>{t('drawer.unwatch')}</button>
+                : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>{t('drawer.markViewed')}</button>}
+              {item.lent_to && <button className="ghostbtn" onClick={() => quick({ lent_to: null, lent_since: null })} disabled={busy}>{t('drawer.returned')}</button>}
             </div>
             <dl>
               {rows.filter(([, v]) => v).map(([k, v]) => (
@@ -210,11 +212,11 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
             </dl>
             <div className="dactions">
               <button className="ghostbtn" onClick={reenrich} disabled={busy || !sourceOn}
-                title={sourceOn ? 'Auto-fetch artwork, rating & description' : 'Source not configured'}>
-                {busy ? 'Working…' : item.enriched_at ? 'Re-fetch artwork' : 'Fetch artwork'}
+                title={sourceOn ? t('controls.enrichTitle') : t('controls.enrichNoSource')}>
+                {busy ? t('common.working') : item.enriched_at ? t('drawer.refetch') : t('drawer.fetch')}
               </button>
-              <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>Fix match…</button>
-              <button className="ghostbtn" onClick={() => onDelete(item)}>Delete</button>
+              <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>{t('drawer.fixMatch')}</button>
+              <button className="ghostbtn" onClick={() => onDelete(item)}>{t('common.delete')}</button>
             </div>
           </>
         ) : (
@@ -222,10 +224,10 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
             {/* ---- Fix match (search & pick) ---- */}
             {sourceOn && (
               <div className="fixblock">
-                <label className="fixlabel">Re-match from {item.source?.toUpperCase() || meta.label}</label>
+                <label className="fixlabel">{t('drawer.rematchFrom', { source: item.source?.toUpperCase() || t(`types.${item.type}`) })}</label>
                 <form className="rowfields" style={{ gap: 8 }} onSubmit={searchMatches}>
-                  <input style={{ flex: 2 }} value={matchQ} onChange={(e) => setMatchQ(e.target.value)} placeholder="corrected title…" />
-                  <button type="submit" className="ghostbtn" disabled={busy}>Search</button>
+                  <input style={{ flex: 2 }} value={matchQ} onChange={(e) => setMatchQ(e.target.value)} placeholder={t('drawer.correctedTitle')} />
+                  <button type="submit" className="ghostbtn" disabled={busy}>{t('common.search')}</button>
                 </form>
                 {hits.length > 0 && (
                   <div className="hits">
@@ -242,79 +244,79 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
 
             {/* ---- Manual cover ---- */}
             <div className="fixblock">
-              <label className="fixlabel">Manual cover</label>
+              <label className="fixlabel">{t('drawer.manualCover')}</label>
               <div className="rowfields" style={{ gap: 8, alignItems: 'flex-end' }}>
                 <div className="field" style={{ flex: 2, marginBottom: 0 }}>
                   <input ref={fileRef} type="file" accept="image/*" />
                 </div>
-                <button className="ghostbtn" onClick={uploadFile} disabled={busy}>Upload</button>
+                <button className="ghostbtn" onClick={uploadFile} disabled={busy}>{t('drawer.upload')}</button>
               </div>
               <div className="rowfields" style={{ gap: 8, alignItems: 'flex-end', marginTop: 8 }}>
                 <div className="field" style={{ flex: 2, marginBottom: 0 }}>
-                  <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="…or paste an image URL" />
+                  <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder={t('drawer.pasteUrl')} />
                 </div>
-                <button className="ghostbtn" onClick={applyCoverUrl} disabled={busy}>Set</button>
+                <button className="ghostbtn" onClick={applyCoverUrl} disabled={busy}>{t('drawer.set')}</button>
               </div>
             </div>
             {matchMsg && <p className="mnote" style={{ padding: '4px 0 12px', border: 0 }}>{matchMsg}</p>}
 
             {/* ---- Core fields ---- */}
-            <div className="field"><label>Title</label>
+            <div className="field"><label>{t('drawer.title')}</label>
               <input value={d.title} onChange={(e) => set({ title: e.target.value })} /></div>
             <div className="rowfields">
-              <div className="field"><label>Year</label>
+              <div className="field"><label>{t('drawer.year')}</label>
                 <input type="number" value={d.year} onChange={(e) => set({ year: e.target.value })} /></div>
-              <div className="field"><label>Format</label>
+              <div className="field"><label>{t('drawer.format')}</label>
                 <input value={d.format} onChange={(e) => set({ format: e.target.value })} placeholder="PS4 / Blu-Ray…" /></div>
             </div>
 
-            <div className="field"><label>Cabinet</label>
+            <div className="field"><label>{t('drawer.cabinet')}</label>
               <select value={d.cabinet_id} onChange={(e) => set({ cabinet_id: e.target.value })}>
-                <option value="">— none —</option>
+                <option value="">{t('common.none')}</option>
                 {cabinets.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                <option value="__new__">+ New cabinet…</option>
+                <option value="__new__">{t('drawer.newCabinet')}</option>
               </select>
             </div>
             {d.cabinet_id === '__new__' && (
-              <div className="field"><label>New cabinet name</label>
-                <input value={newCabinet} onChange={(e) => setNewCabinet(e.target.value)} placeholder="e.g. Cabinet A · shelf 3" /></div>
+              <div className="field"><label>{t('drawer.newCabinetName')}</label>
+                <input value={newCabinet} onChange={(e) => setNewCabinet(e.target.value)} placeholder="Cabinet A · shelf 3" /></div>
             )}
             <div className="rowfields">
-              <div className="field"><label>Location note</label>
+              <div className="field"><label>{t('drawer.locationNote')}</label>
                 <input value={d.location} onChange={(e) => set({ location: e.target.value })} /></div>
-              <div className="field"><label>Condition</label>
+              <div className="field"><label>{t('drawer.condition')}</label>
                 <input value={d.condition} onChange={(e) => set({ condition: e.target.value })} placeholder="loose / CIB / VG+…" /></div>
             </div>
             <div className="rowfields">
-              <div className="field"><label>Disc count</label>
+              <div className="field"><label>{t('drawer.discCount')}</label>
                 <input type="number" min="0" value={d.disc_count} onChange={(e) => set({ disc_count: e.target.value })} /></div>
               <div className="field" style={{ justifyContent: 'flex-end' }}>
                 <label style={{ display: 'flex', gap: 8, alignItems: 'center', textTransform: 'none' }}>
                   <input type="checkbox" checked={d.is_series} onChange={(e) => set({ is_series: e.target.checked })} style={{ width: 'auto' }} />
-                  Is a series / box set
+                  {t('drawer.isSeries')}
                 </label>
               </div>
             </div>
             {d.is_series && (
               <div className="rowfields">
-                <div className="field"><label>Seasons</label>
+                <div className="field"><label>{t('drawer.seasons')}</label>
                   <input type="number" min="0" value={d.season_count} onChange={(e) => set({ season_count: e.target.value })} /></div>
-                <div className="field"><label>Episodes</label>
+                <div className="field"><label>{t('drawer.episodes')}</label>
                   <input type="number" min="0" value={d.episode_count} onChange={(e) => set({ episode_count: e.target.value })} /></div>
               </div>
             )}
             <div className="rowfields">
-              <div className="field"><label>Lent to</label>
-                <input value={d.lent_to} onChange={(e) => set({ lent_to: e.target.value })} placeholder="friend's name" /></div>
-              <div className="field"><label>Lent since</label>
+              <div className="field"><label>{t('drawer.lentTo')}</label>
+                <input value={d.lent_to} onChange={(e) => set({ lent_to: e.target.value })} /></div>
+              <div className="field"><label>{t('drawer.lentSince')}</label>
                 <input type="date" value={d.lent_since} onChange={(e) => set({ lent_since: e.target.value })} disabled={!d.lent_to} /></div>
             </div>
-            <div className="field"><label>Notes</label>
+            <div className="field"><label>{t('drawer.notes')}</label>
               <textarea rows={2} value={d.notes} onChange={(e) => set({ notes: e.target.value })} /></div>
 
             <div className="dactions" style={{ padding: 0 }}>
-              <button className="primary" onClick={saveEdits} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
-              <button className="ghostbtn" onClick={() => { setEditing(false); setDraft(toDraft(item)); }} disabled={busy}>Cancel</button>
+              <button className="primary" onClick={saveEdits} disabled={busy}>{busy ? t('common.saving') : t('common.save')}</button>
+              <button className="ghostbtn" onClick={() => { setEditing(false); setDraft(toDraft(item)); }} disabled={busy}>{t('common.cancel')}</button>
             </div>
           </div>
         )}

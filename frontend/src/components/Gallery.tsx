@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { Item } from '../types';
 import { TYPE_META } from '../types';
 
@@ -7,11 +8,12 @@ function ratingLabel(r: number | null): string | null {
 }
 
 export function Gallery({ items, onOpen }: { items: Item[]; onOpen: (i: Item) => void }) {
+  const { t } = useTranslation();
   if (!items.length) {
     return (
       <div className="empty">
-        <b>Nothing here yet</b>
-        Adjust the filter or add an item to this shelf.
+        <b>{t('shelf.emptyTitle')}</b>
+        {t('shelf.emptyBody')}
       </div>
     );
   }
@@ -24,7 +26,7 @@ export function Gallery({ items, onOpen }: { items: Item[]; onOpen: (i: Item) =>
           <button key={d.id} className="card" onClick={() => onOpen(d)}>
             <div className="cover" style={{ background: meta.color }}>
               {d.cover_url && <img src={d.cover_url} alt="" loading="lazy" />}
-              <span className="badge">{meta.label}</span>
+              <span className="badge">{t(`types.${d.type}`)}</span>
               {rating && <span className="rate">★ {rating}</span>}
               {!d.cover_url && <span className="ct">{d.title}</span>}
             </div>

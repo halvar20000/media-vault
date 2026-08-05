@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BrowserMultiFormatReader } from '@zxing/browser';
 import { api } from '../api';
-import { TYPE_META, TYPE_ORDER } from '../types';
+import { TYPE_ORDER } from '../types';
 import type { MediaType, SearchHit } from '../types';
 
 type Method = 'search' | 'import' | 'scan';
@@ -19,6 +21,7 @@ function sourceForType(t: MediaType): 'igdb' | 'tmdb' | 'discogs' {
 }
 
 export function AddModal({ open, onClose, onAdded, sources }: Props) {
+  const { t } = useTranslation();
   const [method, setMethod] = useState<Method>('search');
   const [type, setType] = useState<MediaType>('game');
   const [q, setQ] = useState('');
@@ -47,7 +50,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     try {
       const { hits } = await api.search(type, q.trim());
       setHits(hits);
-      if (!hits.length) setMsg('No matches found.');
+      if (!hits.length) setMsg(t('add.noMatches'));
     } catch (e: any) {
       setMsg(e.message || 'Search failed');
     } finally {
@@ -85,7 +88,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     setMsg(null);
     try {
       const r = await api.importCsv(importKind, file);
-      setMsg(`Imported ${r.imported} ${importKind === 'movies' ? 'movies' : 'games'}.`);
+      setMsg(t('add.imported', { count: r.imported, kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) }));
       onAdded();
     } catch (e: any) {
       setMsg(e.message || 'Import failed');
@@ -100,7 +103,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     <div className="modal open" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="box">
         <div className="mtop">
-          <h3>Add to the archive</h3>
+          <h3>{t('add.title')}</h3>
           <button className="close" style={{ position: 'static' }} onClick={onClose}>
             ×
           </button>
@@ -109,18 +112,18 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
         <div className="methods">
           <button className="method" aria-pressed={method === 'search'} onClick={() => setMethod('search')}>
             <span className="mi">⌨︎</span>
-            <span className="mh">Search title</span>
-            <span className="md">Type a name, pick the match — cover art, rating &amp; description fill in.</span>
+            <span className="mh">{t('add.searchTitle')}</span>
+            <span className="md">{t('add.searchDesc')}</span>
           </button>
           <button className="method" aria-pressed={method === 'import'} onClick={() => setMethod('import')}>
             <span className="mi">⇪</span>
-            <span className="mh">Bulk import</span>
-            <span className="md">Drop a games CSV (Title, Platform, EmulationStatus).</span>
+            <span className="mh">{t('add.bulkImport')}</span>
+            <span className="md">{t('add.bulkDesc')}</span>
           </button>
           <button className="method" aria-pressed={method === 'scan'} onClick={() => setMethod('scan')}>
             <span className="mi">📷</span>
-            <span className="mh">Scan barcode</span>
-            <span className="md">Use your device camera (best-effort, where supported).</span>
+            <span className="mh">{t('add.scan')}</span>
+            <span className="md">{t('add.scanDesc')}</span>
           </button>
         </div>
 
@@ -129,28 +132,27 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <>
               <div className="rowfields">
                 <div className="field">
-                  <label>Media type</label>
+                  <label>{t('add.mediaType')}</label>
                   <select value={type} onChange={(e) => setType(e.target.value as MediaType)}>
-                    {TYPE_ORDER.map((t) => (
-                      <option key={t} value={t}>
-                        {TYPE_META[t].label}
+                    {TYPE_ORDER.map((mt) => (
+                      <option key={mt} value={mt}>
+                        {t(`types.${mt}`)}
                       </option>
                     ))}
                   </select>
                 </div>
                 <form className="field" style={{ flex: 2 }} onSubmit={runSearch}>
-                  <label>Title</label>
-                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. Bloodborne" autoFocus />
+                  <label>{t('add.titleLabel')}</label>
+                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('add.titlePlaceholder')} autoFocus />
                 </form>
               </div>
               {!sourceOn && (
                 <p className="mnote" style={{ padding: 0, border: 0 }}>
-                  <b>{sourceForType(type).toUpperCase()}</b> isn’t configured — add its key to your{' '}
-                  <span className="api">.env</span> to search {TYPE_META[type].label}s.
+                  <b>{sourceForType(type).toUpperCase()}</b> {t('add.sourceMissing', { type: t(`types.${type}`) })}
                 </p>
               )}
               <button className="primary" onClick={runSearch} disabled={busy || !sourceOn}>
-                {busy ? 'Searching…' : 'Search'}
+                {busy ? t('common.searching') : t('common.search')}
               </button>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <div className="hits">
@@ -175,28 +177,24 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <>
               <div className="rowfields">
                 <div className="field">
-                  <label>Import type</label>
+                  <label>{t('add.importType')}</label>
                   <select value={importKind} onChange={(e) => setImportKind(e.target.value as 'games' | 'movies')}>
-                    <option value="games">Games list</option>
-                    <option value="movies">Movies (FlickRack export)</option>
+                    <option value="games">{t('add.gamesList')}</option>
+                    <option value="movies">{t('add.moviesList')}</option>
                   </select>
                 </div>
                 <div className="field" style={{ flex: 2 }}>
-                  <label>CSV file</label>
+                  <label>{t('add.csvFile')}</label>
                   <input ref={fileRef} type="file" accept=".csv,text/csv" />
                 </div>
               </div>
               <button className="primary" onClick={doImport} disabled={busy}>
-                {busy ? 'Importing…' : `Import ${importKind}`}
+                {busy ? t('add.importing') : t('add.import', { kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) })}
               </button>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <p className="mnote">
-                {importKind === 'games' ? (
-                  <>Games: columns <span className="api">Title, Platform, EmulationStatus</span>.</>
-                ) : (
-                  <>Movies: a <span className="api">FlickRack</span> export (semicolon-separated; Titel, Format, Release, ASIN…). Titles are cleaned automatically.</>
-                )}{' '}
-                After importing, hit <b>Enrich collection</b> to fetch covers, ratings &amp; descriptions.
+                {importKind === 'games' ? t('add.gamesNote') : t('add.moviesNote')}{' '}
+                {t('add.afterImport')}
               </p>
             </>
           )}
@@ -204,79 +202,48 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
           {method === 'scan' && <BarcodeScan onCode={(code) => { setMethod('search'); setType('cd'); setQ(code); }} />}
         </div>
 
-        <p className="mnote">
-          Metadata is fetched per media type: Games → <span className="api">IGDB</span> · Films →{' '}
-          <span className="api">TMDB</span> · Vinyl / Singles / CD → <span className="api">Discogs</span>.
-        </p>
+        <p className="mnote">{t('add.sourcesNote')}</p>
       </div>
     </div>
   );
 }
 
-// Best-effort barcode scanning via the native BarcodeDetector API.
+// Cross-platform barcode scanning via ZXing (works on iOS Safari too, unlike
+// the native BarcodeDetector API).
 function BarcodeScan({ onCode }: { onCode: (code: string) => void }) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [supported, setSupported] = useState(true);
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
-    let raf = 0;
-    const AnyWin = window as any;
-    if (!('BarcodeDetector' in window)) {
-      setSupported(false);
-      return;
-    }
-    const detector = new AnyWin.BarcodeDetector({
-      formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'],
-    });
+    let controls: { stop: () => void } | null = null;
+    let cancelled = false;
+    const reader = new BrowserMultiFormatReader();
     (async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-        const tick = async () => {
-          if (videoRef.current) {
-            try {
-              const codes = await detector.detect(videoRef.current);
-              if (codes.length) {
-                onCode(codes[0].rawValue);
-                return;
-              }
-            } catch {
-              /* frame not ready */
-            }
+        if (!videoRef.current) return;
+        controls = await reader.decodeFromVideoDevice(undefined, videoRef.current, (result) => {
+          if (result && !cancelled) {
+            cancelled = true;
+            onCode(result.getText());
+            controls?.stop();
           }
-          raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
+        });
       } catch (e: any) {
-        setError(e.message || 'Camera unavailable');
+        setError(e?.message || t('add.scanUnavailable'));
       }
     })();
     return () => {
-      cancelAnimationFrame(raf);
-      stream?.getTracks().forEach((t) => t.stop());
+      cancelled = true;
+      controls?.stop();
     };
   }, [onCode]);
 
-  if (!supported) {
-    return (
-      <p className="mnote" style={{ padding: 0, border: 0 }}>
-        Your browser doesn’t support in-page barcode detection. Use <b>Search title</b> or{' '}
-        <b>Bulk import</b> instead. (Chrome/Edge on Android support this best.)
-      </p>
-    );
-  }
   return (
     <div>
       <video ref={videoRef} style={{ width: '100%', borderRadius: 6, background: '#000' }} muted playsInline />
       {error && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{error}</p>}
-      <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>
-        Point the camera at an EAN/UPC barcode. On detection we’ll drop the code into search.
-      </p>
+      <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{t('add.scanHint')}</p>
     </div>
   );
 }
