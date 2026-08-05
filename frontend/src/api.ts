@@ -65,11 +65,11 @@ export const api = {
   search: (type: MediaType, q: string) =>
     req<{ hits: SearchHit[] }>(`/search/${type}?q=${encodeURIComponent(q)}`),
 
-  // CSV import (multipart)
-  importGames: async (file: File) => {
+  // CSV import (multipart). kind: 'games' | 'movies'
+  importCsv: async (kind: 'games' | 'movies', file: File) => {
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch('/api/import/games', {
+    const res = await fetch(`/api/import/${kind}`, {
       method: 'POST',
       credentials: 'include',
       body: fd,

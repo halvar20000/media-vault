@@ -25,6 +25,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [importKind, setImportKind] = useState<'games' | 'movies'>('games');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const sourceOn = sources[sourceForType(type)];
@@ -83,8 +84,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     setBusy(true);
     setMsg(null);
     try {
-      const r = await api.importGames(file);
-      setMsg(`Imported ${r.imported} games.`);
+      const r = await api.importCsv(importKind, file);
+      setMsg(`Imported ${r.imported} ${importKind === 'movies' ? 'movies' : 'games'}.`);
       onAdded();
     } catch (e: any) {
       setMsg(e.message || 'Import failed');
@@ -172,17 +173,30 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
 
           {method === 'import' && (
             <>
-              <div className="field">
-                <label>Games CSV file</label>
-                <input ref={fileRef} type="file" accept=".csv,text/csv" />
+              <div className="rowfields">
+                <div className="field">
+                  <label>Import type</label>
+                  <select value={importKind} onChange={(e) => setImportKind(e.target.value as 'games' | 'movies')}>
+                    <option value="games">Games list</option>
+                    <option value="movies">Movies (FlickRack export)</option>
+                  </select>
+                </div>
+                <div className="field" style={{ flex: 2 }}>
+                  <label>CSV file</label>
+                  <input ref={fileRef} type="file" accept=".csv,text/csv" />
+                </div>
               </div>
               <button className="primary" onClick={doImport} disabled={busy}>
-                {busy ? 'Importing…' : 'Import games'}
+                {busy ? 'Importing…' : `Import ${importKind}`}
               </button>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <p className="mnote">
-                Expects columns <span className="api">Title, Platform, EmulationStatus</span>. After importing, hit{' '}
-                <b>Enrich collection</b> to fetch covers, ratings &amp; descriptions.
+                {importKind === 'games' ? (
+                  <>Games: columns <span className="api">Title, Platform, EmulationStatus</span>.</>
+                ) : (
+                  <>Movies: a <span className="api">FlickRack</span> export (semicolon-separated; Titel, Format, Release, ASIN…). Titles are cleaned automatically.</>
+                )}{' '}
+                After importing, hit <b>Enrich collection</b> to fetch covers, ratings &amp; descriptions.
               </p>
             </>
           )}

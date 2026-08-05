@@ -3,6 +3,7 @@ import multer from 'multer';
 import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
 import { parseGamesCsv } from '../lib/games-csv';
+import { parseFlickrackCsv } from '../lib/movies-csv';
 
 export const importRouter = Router();
 importRouter.use(requireAuth);
@@ -32,6 +33,32 @@ importRouter.post('/games', upload.single('file'), async (req, res) => {
       `INSERT INTO items (user_id, type, title, format, notes)
        VALUES ($1, 'game', $2, $3, $4)`,
       [uid, g.title, g.format, g.notes]
+    );
+    imported++;
+  }
+  res.status(201).json({ imported, total: rows.length });
+});
+
+// POST /api/import/movies  (multipart form field: "file")
+// Bulk import a FlickRack movie export (EAN;ASIN;Titel;…;Format;Release;…).
+importRouter.post('/movies', upload.single('file'), async (req, res) => {
+  const uid = userId(req);
+  if (!req.file) return res.status(400).json({ error: 'no file uploaded (field "file")' });
+
+  let rows;
+  try {
+    rows = parseFlickrackCsv(req.file.buffer.toString('utf8'));
+  } catch (err: any) {
+    return res.status(400).json({ error: `could not parse CSV: ${err?.message ?? err}` });
+  }
+  if (!rows.length) return res.status(400).json({ error: 'no valid rows found' });
+
+  let imported = 0;
+  for (const m of rows) {
+    await query(
+      `INSERT INTO items (user_id, type, title, format, year, catalog_no, notes)
+       VALUES ($1, 'movie', $2, $3, $4, $5, $6)`,
+      [uid, m.title, m.format, m.year, m.catalog_no, m.notes]
     );
     imported++;
   }

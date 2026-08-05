@@ -46,6 +46,8 @@ export const config = {
   },
   tmdb: {
     accessToken: env('TMDB_ACCESS_TOKEN'),
+    // Language for movie metadata (titles/overviews), e.g. en-US, de-DE.
+    language: env('TMDB_LANGUAGE', 'en-US'),
     get enabled() {
       return Boolean(this.accessToken);
     },

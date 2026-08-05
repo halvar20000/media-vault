@@ -18,6 +18,7 @@ async function apiSearch(title: string): Promise<TmdbMovie[]> {
   const url = new URL('https://api.themoviedb.org/3/search/movie');
   url.searchParams.set('query', title);
   url.searchParams.set('include_adult', 'false');
+  url.searchParams.set('language', config.tmdb.language);
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${config.tmdb.accessToken}`,
