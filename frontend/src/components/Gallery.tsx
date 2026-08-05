@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { Item } from '../types';
 import { TYPE_META } from '../types';
+import { platformBadge } from '../platforms';
 
 function ratingLabel(r: number | null): string | null {
   if (r === null || r === undefined) return null;
@@ -21,12 +22,13 @@ export function Gallery({ items, onOpen }: { items: Item[]; onOpen: (i: Item) =>
     <div className="grid">
       {items.map((d) => {
         const meta = TYPE_META[d.type];
+        const badge = platformBadge(d.format, d.type);
         const rating = ratingLabel(d.rating);
         return (
           <button key={d.id} className="card" onClick={() => onOpen(d)}>
             <div className="cover" style={{ background: meta.color }}>
               {d.cover_url && <img src={d.cover_url} alt="" loading="lazy" />}
-              <span className="badge">{t(`types.${d.type}`)}</span>
+              <span className="badge" style={{ background: badge.color }}>{badge.code || t(`types.${d.type}`)}</span>
               {rating && <span className="rate">★ {rating}</span>}
               {!d.cover_url && <span className="ct">{d.title}</span>}
             </div>
