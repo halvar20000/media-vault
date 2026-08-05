@@ -27,7 +27,7 @@ export function Shelf({ items, onOpen }: { items: Item[]; onOpen: (i: Item) => v
                 title={`${d.title}${d.format ? ` · ${d.format}` : ''}`}
                 onClick={() => onOpen(d)}
               >
-                <span className="splat">{badge.code || t(`types.${d.type}`)}</span>
+                <span className="splat"><span className="splattext">{badge.code || t(`types.${d.type}`)}</span></span>
                 {hasArt && <img className="art" src={d.cover_url!} alt="" loading="lazy" />}
                 <span className="stitle">{d.title}</span>
                 <span className="sid">{d.catalog_no || '—'}</span>
