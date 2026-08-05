@@ -39,4 +39,6 @@
   <Config Name="TMDB Language" Target="TMDB_LANGUAGE" Default="en-US" Mode="" Description="Movie metadata language, e.g. de-DE." Type="Variable" Display="advanced" Required="false" Mask="false">en-US</Config>
   <Config Name="Discogs Key" Target="DISCOGS_KEY" Default="" Mode="" Description="Discogs consumer key (vinyl/CD)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
   <Config Name="Discogs Secret" Target="DISCOGS_SECRET" Default="" Mode="" Description="Discogs consumer secret (vinyl/CD)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="PriceCharting Token" Target="PRICECHARTING_TOKEN" Default="" Mode="" Description="PAID PriceCharting API token for game valuation (optional; music valuation uses Discogs, movies have no price source)." Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+  <Config Name="Valuation Currency" Target="VALUATION_CURRENCY" Default="EUR" Mode="" Description="Currency for Discogs marketplace prices (EUR, USD, GBP…)." Type="Variable" Display="advanced" Required="false" Mask="false">EUR</Config>
 </Container>

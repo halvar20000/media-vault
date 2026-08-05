@@ -65,10 +65,19 @@ itemsRouter.get('/stats', async (req, res) => {
     `SELECT count(*)::int AS enriched FROM items WHERE user_id = $1 AND enriched_at IS NOT NULL`,
     [uid]
   );
+  // Collection value, grouped by currency (games are USD, music EUR, etc.).
+  const valueRows = await query<{ currency: string | null; total: number; n: number }>(
+    `SELECT value_currency AS currency, sum(value)::numeric AS total, count(*)::int AS n
+       FROM items WHERE user_id = $1 AND value IS NOT NULL
+      GROUP BY value_currency ORDER BY sum(value) DESC`,
+    [uid]
+  );
   res.json({
     total: Number(total),
     enriched: Number(enriched),
     byType: Object.fromEntries(byType.map((r) => [r.type, Number(r.count)])),
+    valuedCount: valueRows.reduce((a, r) => a + Number(r.n), 0),
+    totalValue: valueRows.map((r) => ({ currency: r.currency || '?', total: Number(r.total) })),
   });
 });
 
@@ -78,6 +87,8 @@ const EDITABLE = [
   // physical-collector fields
   'disc_count', 'is_series', 'season_count', 'episode_count',
   'lent_to', 'lent_since', 'viewed_at', 'cabinet_id',
+  // valuation (manual entry)
+  'value', 'value_currency',
 ] as const;
 
 // POST /api/items  → create one item
@@ -118,6 +129,14 @@ itemsRouter.patch('/:id', async (req, res) => {
       vals.push(body[f] === '' ? null : body[f]);
       sets.push(`${f} = $${vals.length}`);
     }
+  }
+  // Setting a value by hand marks it manual (so bulk valuation won't overwrite it).
+  if (body.value !== undefined) {
+    const manual = body.value !== '' && body.value !== null;
+    vals.push(manual);
+    sets.push(`value_manual = $${vals.length}`);
+    sets.push(`value_source = ${manual ? `'manual'` : 'NULL'}`);
+    sets.push(`valued_at = ${manual ? 'now()' : 'NULL'}`);
   }
   if (!sets.length) return res.status(400).json({ error: 'no editable fields provided' });
 

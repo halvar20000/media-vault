@@ -1,7 +1,7 @@
 // Discogs (vinyl LP / single / CD) provider. Auth is a personal access token.
 // Docs: https://www.discogs.com/developers
 import { config, type MediaType } from '../config';
-import type { EnrichmentResult, SearchHit } from '../types';
+import type { EnrichmentResult, SearchHit, ValueResult } from '../types';
 
 interface DiscogsSearchResult {
   id: number;
@@ -107,4 +107,21 @@ export async function discogsEnrich(
     description,
     payload: { ...hit, rating, description },
   };
+}
+
+// Market value = lowest current marketplace listing for a release (uses the token).
+export async function discogsMarketValue(releaseId: string): Promise<ValueResult | null> {
+  const curr = config.valuationCurrency;
+  const res = await fetch(
+    `https://api.discogs.com/marketplace/stats/${encodeURIComponent(releaseId)}?curr_abbr=${curr}`,
+    { headers: headers() }
+  );
+  if (!res.ok) return null;
+  const stats = (await res.json()) as {
+    lowest_price?: { value?: number; currency?: string } | null;
+    num_for_sale?: number;
+  };
+  const lp = stats.lowest_price;
+  if (!lp || typeof lp.value !== 'number' || lp.value <= 0) return null;
+  return { source: 'discogs', value: lp.value, currency: lp.currency || curr, note: 'lowest listing' };
 }

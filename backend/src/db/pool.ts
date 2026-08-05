@@ -4,6 +4,8 @@ import { config } from '../config';
 // Return DATE columns (OID 1082) as plain "YYYY-MM-DD" strings, not JS Dates —
 // avoids a timezone shift that would move lending dates by a day.
 types.setTypeParser(1082, (v) => v);
+// Parse NUMERIC (OID 1700) to a JS number so ratings/values are numeric, not strings.
+types.setTypeParser(1700, (v) => (v === null ? null : parseFloat(v)));
 
 // A single shared connection pool for the whole process.
 export const pool = new Pool({

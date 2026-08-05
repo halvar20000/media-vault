@@ -13,6 +13,7 @@ import { enrichRouter } from './routes/enrich';
 import { searchRouter } from './routes/search';
 import { importRouter } from './routes/importCsv';
 import { cabinetsRouter } from './routes/cabinets';
+import { valueRouter } from './routes/value';
 
 const app = express();
 app.set('trust proxy', 1); // correct secure-cookie handling behind a reverse proxy
@@ -55,6 +56,7 @@ app.use('/api/enrich', enrichRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/import', importRouter);
 app.use('/api/cabinets', cabinetsRouter);
+app.use('/api/value', valueRouter);
 
 // Single-image deploy: also serve the built SPA + client-side routing fallback.
 if (config.frontendDir) {

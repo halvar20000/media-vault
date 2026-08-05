@@ -66,6 +66,16 @@ export const config = {
       return Boolean(this.token || (this.key && this.secret));
     },
   },
+  // Game valuation via PriceCharting. NOTE: their API requires a PAID subscription
+  // token — there is no free game-price API. Leave blank to disable game valuation.
+  pricecharting: {
+    token: env('PRICECHARTING_TOKEN'),
+    get enabled() {
+      return Boolean(this.token);
+    },
+  },
+  // Currency for Discogs marketplace prices (music valuation).
+  valuationCurrency: env('VALUATION_CURRENCY', 'EUR'),
 };
 
 export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd';

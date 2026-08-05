@@ -1,4 +1,4 @@
-import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, Stats, User } from './types';
+import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, Stats, User, ValueStatus } from './types';
 
 // All requests share cookies for session auth.
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -60,6 +60,11 @@ export const api = {
   enrichStatus: () => req<EnrichStatus>('/enrich/status'),
   enrichItem: (id: string) =>
     req<{ item: Item }>(`/enrich/item/${id}`, { method: 'POST' }),
+
+  // valuation
+  startValue: () => req<{ status: string }>('/value', { method: 'POST' }),
+  valueStatus: () => req<ValueStatus>('/value/status'),
+  valueItem: (id: string) => req<{ item: Item }>(`/value/item/${id}`, { method: 'POST' }),
 
   // external search
   search: (type: MediaType, q: string) =>

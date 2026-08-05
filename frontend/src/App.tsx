@@ -32,6 +32,9 @@ export default function App() {
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const pollRef = useRef<number | null>(null);
+  const [valueSources, setValueSources] = useState({ pricecharting: false, discogs: false });
+  const [valuing, setValuing] = useState(false);
+  const valuePollRef = useRef<number | null>(null);
 
   // ---- initial session check ----
   useEffect(() => {
@@ -59,6 +62,7 @@ export default function App() {
   useEffect(() => {
     if (!user) return;
     api.enrichStatus().then((s) => setSources(s.sources)).catch(() => {});
+    api.valueStatus().then((s) => setValueSources(s.sources)).catch(() => {});
     api.listCabinets().then((r) => setCabinets(r.cabinets)).catch(() => {});
   }, [user]);
 
@@ -135,6 +139,38 @@ export default function App() {
 
   useEffect(() => () => { if (pollRef.current) window.clearInterval(pollRef.current); }, []);
 
+  // ---- collection valuation (background job + polling) ----
+  async function startValue() {
+    setValuing(true);
+    try {
+      await api.startValue();
+      if (valuePollRef.current) window.clearInterval(valuePollRef.current);
+      valuePollRef.current = window.setInterval(async () => {
+        try {
+          const s = await api.valueStatus();
+          await refresh();
+          if (s.job && !s.job.running) {
+            window.clearInterval(valuePollRef.current!);
+            valuePollRef.current = null;
+            setValuing(false);
+            const sm = s.job.summary as any;
+            if (sm) flash(`Valued ${sm.valued}` + (sm.noMatch ? `, ${sm.noMatch} no price` : '') + (sm.disabled ? `, ${sm.disabled} skipped` : ''));
+          }
+        } catch { /* keep polling */ }
+      }, 1500);
+    } catch (e: any) {
+      setValuing(false);
+      flash(e.message || 'Could not start valuation');
+    }
+  }
+  useEffect(() => () => { if (valuePollRef.current) window.clearInterval(valuePollRef.current); }, []);
+
+  // Format the collection total, e.g. "USD 1,234 · EUR 56".
+  function formatTotals(totals: { currency: string; total: number }[]): string {
+    if (!totals.length) return '—';
+    return totals.map((v) => `${v.currency} ${Math.round(v.total).toLocaleString()}`).join(' · ');
+  }
+
   async function deleteItem(item: Item) {
     if (!confirm(t('drawer.confirmDelete', { title: item.title }))) return;
     await api.deleteItem(item.id);
@@ -157,9 +193,18 @@ export default function App() {
   const sourceForActiveDrawer = selected
     ? sources[selected.type === 'game' ? 'igdb' : selected.type === 'movie' ? 'tmdb' : 'discogs']
     : false;
+  const valueSourceForActiveDrawer = selected
+    ? selected.type === 'game'
+      ? valueSources.pricecharting
+      : selected.type === 'movie'
+        ? false
+        : valueSources.discogs
+    : false;
 
   const counts = stats?.byType ?? {};
   const anySource = sources.igdb || sources.tmdb || sources.discogs;
+  const anyValueSource = valueSources.pricecharting || valueSources.discogs;
+  const hasValue = (stats?.totalValue?.length ?? 0) > 0;
 
   return (
     <>
@@ -204,6 +249,12 @@ export default function App() {
             <span>{t(`types_plural.${mt}`)}</span>
           </div>
         ))}
+        {hasValue && (
+          <div className="stat valuestat">
+            <b>{formatTotals(stats!.totalValue)}</b>
+            <span>{t('stats.collectionValue')}</span>
+          </div>
+        )}
       </div>
 
       <div className="controls">
@@ -227,6 +278,14 @@ export default function App() {
             >
               {enriching ? t('controls.enriching') : t('controls.enrich')}
             </button>
+            <button
+              className="enrichbtn"
+              onClick={startValue}
+              disabled={valuing || !anyValueSource}
+              title={anyValueSource ? t('controls.valueTitle') : t('controls.valueNoSource')}
+            >
+              {valuing ? t('controls.valuing') : t('controls.value')}
+            </button>
           </div>
           <div className="viewtoggle" role="group" aria-label="View">
             <button aria-pressed={view === 'shelf'} onClick={() => setView('shelf')}>{t('controls.shelf')}</button>
@@ -245,6 +304,7 @@ export default function App() {
         item={selected}
         cabinets={cabinets}
         sourceOn={sourceForActiveDrawer}
+        valueSourceOn={valueSourceForActiveDrawer}
         onClose={() => setSelected(null)}
         onUpdated={applyUpdated}
         onDelete={deleteItem}

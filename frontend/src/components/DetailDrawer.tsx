@@ -8,6 +8,7 @@ interface Props {
   item: Item | null;
   cabinets: Cabinet[];
   sourceOn: boolean;
+  valueSourceOn: boolean;
   onClose: () => void;
   onUpdated: (item: Item) => void | Promise<void>;
   onDelete: (item: Item) => void;
@@ -28,6 +29,8 @@ type Draft = {
   lent_to: string;
   lent_since: string;
   cabinet_id: string;
+  value: string;
+  value_currency: string;
 };
 
 function toDraft(i: Item): Draft {
@@ -45,12 +48,14 @@ function toDraft(i: Item): Draft {
     lent_to: i.lent_to ?? '',
     lent_since: i.lent_since ? i.lent_since.slice(0, 10) : '',
     cabinet_id: i.cabinet_id ?? '',
+    value: i.value != null ? String(i.value) : '',
+    value_currency: i.value_currency ?? '',
   };
 }
 
 const fmtDate = (s: string | null) => (s ? s.slice(0, 10) : null);
 
-export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
+export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
   const { t } = useTranslation();
   const open = Boolean(item);
   const meta = item ? TYPE_META[item.type] : null;
@@ -98,6 +103,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
 
   const quick = (patch: Partial<Item>) => run(async () => (await api.updateItem(item!.id, patch)).item);
   const reenrich = () => run(async () => (await api.enrichItem(item!.id)).item);
+  const fetchValue = () => run(async () => (await api.valueItem(item!.id)).item);
 
   async function searchMatches(e?: React.FormEvent) {
     e?.preventDefault();
@@ -153,6 +159,8 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
         lent_to: d.lent_to || null,
         lent_since: d.lent_to ? d.lent_since || null : null,
         cabinet_id: cabinetId,
+        value: d.value ? parseFloat(d.value) : null,
+        value_currency: d.value ? d.value_currency || null : null,
       };
       const { item: updated } = await api.updateItem(item!.id, patch);
       await onUpdated(updated);
@@ -178,6 +186,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
       : null],
     [t('drawer.rowLentTo'), item.lent_to ? `${item.lent_to}${item.lent_since ? ` (${t('drawer.lentSince').toLowerCase()} ${fmtDate(item.lent_since)})` : ''}` : null],
     [t('drawer.rowViewed'), item.viewed_at ? fmtDate(item.viewed_at) : null],
+    [t('drawer.rowValue'), item.value != null ? `${item.value_currency || ''} ${item.value}`.trim() + (item.value_source && item.value_source !== 'manual' ? ` · ${item.value_source}` : '') : null],
     [t('drawer.rowNotes'), item.notes],
     [t('drawer.rowSource'), item.source ? item.source.toUpperCase() : null],
   ];
@@ -215,6 +224,9 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
                 title={sourceOn ? t('controls.enrichTitle') : t('controls.enrichNoSource')}>
                 {busy ? t('common.working') : item.enriched_at ? t('drawer.refetch') : t('drawer.fetch')}
               </button>
+              {valueSourceOn && (
+                <button className="ghostbtn" onClick={fetchValue} disabled={busy}>{t('drawer.fetchValue')}</button>
+              )}
               <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>{t('drawer.fixMatch')}</button>
               <button className="ghostbtn" onClick={() => onDelete(item)}>{t('common.delete')}</button>
             </div>
@@ -310,6 +322,12 @@ export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onD
                 <input value={d.lent_to} onChange={(e) => set({ lent_to: e.target.value })} /></div>
               <div className="field"><label>{t('drawer.lentSince')}</label>
                 <input type="date" value={d.lent_since} onChange={(e) => set({ lent_since: e.target.value })} disabled={!d.lent_to} /></div>
+            </div>
+            <div className="rowfields">
+              <div className="field"><label>{t('drawer.value')}</label>
+                <input type="number" step="0.01" min="0" value={d.value} onChange={(e) => set({ value: e.target.value })} /></div>
+              <div className="field" style={{ maxWidth: 110 }}><label>{t('drawer.currency')}</label>
+                <input value={d.value_currency} onChange={(e) => set({ value_currency: e.target.value })} placeholder="CHF" /></div>
             </div>
             <div className="field"><label>{t('drawer.notes')}</label>
               <textarea rows={2} value={d.notes} onChange={(e) => set({ notes: e.target.value })} /></div>

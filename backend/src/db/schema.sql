@@ -70,6 +70,12 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS viewed_at        TIMESTAMPTZ;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS cabinet_id       UUID REFERENCES cabinets(id) ON DELETE SET NULL;
 -- Cover caching: keep the original remote URL when we download a local copy.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS cover_source_url TEXT;
+-- Valuation.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS value          NUMERIC(10,2);
+ALTER TABLE items ADD COLUMN IF NOT EXISTS value_currency TEXT;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS value_source   TEXT;    -- pricecharting | discogs | manual
+ALTER TABLE items ADD COLUMN IF NOT EXISTS value_manual   BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS valued_at      TIMESTAMPTZ;
 
 -- Session store table for connect-pg-simple.
 CREATE TABLE IF NOT EXISTS session (

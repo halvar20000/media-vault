@@ -112,6 +112,8 @@ header {
 .stat b { font-family: "Archivo", sans-serif; font-weight: 900; font-size: 22px; letter-spacing: -0.02em; }
 .stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
 .stat .swatch { width: 9px; height: 9px; border-radius: 2px; align-self: center; }
+.stat.valuestat { margin-left: auto; }
+.stat.valuestat b { color: var(--accent); font-size: 18px; }
 
 /* ---------- controls ---------- */
 .controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 28px 6px; flex-wrap: wrap; }

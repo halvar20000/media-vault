@@ -29,6 +29,19 @@ export interface Item {
   viewed_at: string | null;
   cabinet_id: string | null;
   cabinet_name?: string | null; // joined from cabinets for convenience
+  // valuation
+  value: number | null;
+  value_currency: string | null;
+  value_source: string | null;
+  value_manual: boolean;
+  valued_at: string | null;
+}
+
+export interface ValueResult {
+  source: 'pricecharting' | 'discogs';
+  value: number;
+  currency: string;
+  note?: string; // e.g. which condition price was used
 }
 
 export interface Cabinet {

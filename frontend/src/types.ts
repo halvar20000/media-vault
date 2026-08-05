@@ -29,6 +29,11 @@ export interface Item {
   viewed_at: string | null;
   cabinet_id: string | null;
   cabinet_name?: string | null;
+  value: number | null;
+  value_currency: string | null;
+  value_source: string | null;
+  value_manual: boolean;
+  valued_at: string | null;
 }
 
 export interface Cabinet {
@@ -47,6 +52,8 @@ export interface Stats {
   total: number;
   enriched: number;
   byType: Partial<Record<MediaType, number>>;
+  valuedCount: number;
+  totalValue: { currency: string; total: number }[];
 }
 
 export interface EnrichJob {
@@ -67,6 +74,11 @@ export interface EnrichJob {
 export interface EnrichStatus {
   job: EnrichJob | null;
   sources: { igdb: boolean; tmdb: boolean; discogs: boolean };
+}
+
+export interface ValueStatus {
+  job: { running: boolean; summary: unknown | null; error: string | null } | null;
+  sources: { pricecharting: boolean; discogs: boolean };
 }
 
 export interface SearchHit {
