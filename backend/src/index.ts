@@ -5,11 +5,13 @@ import cors from 'cors';
 import connectPgSimple from 'connect-pg-simple';
 import { config } from './config';
 import { pool } from './db/pool';
+import { COVERS_DIR } from './lib/covers';
 import { authRouter } from './routes/auth';
 import { itemsRouter } from './routes/items';
 import { enrichRouter } from './routes/enrich';
 import { searchRouter } from './routes/search';
 import { importRouter } from './routes/importCsv';
+import { cabinetsRouter } from './routes/cabinets';
 
 const app = express();
 app.set('trust proxy', 1); // correct secure-cookie handling behind a reverse proxy
@@ -40,6 +42,9 @@ app.use(
   })
 );
 
+// Serve cached cover images (downloaded during enrichment).
+app.use('/api/covers', express.static(COVERS_DIR, { maxAge: '7d', immutable: true }));
+
 // Health check.
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
@@ -48,6 +53,7 @@ app.use('/api/items', itemsRouter);
 app.use('/api/enrich', enrichRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/import', importRouter);
+app.use('/api/cabinets', cabinetsRouter);
 
 // Fallback error handler.
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

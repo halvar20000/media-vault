@@ -29,5 +29,8 @@ npm-debug.log*
 .vscode/
 *.swp
 
-# docker volumes (if bind-mounted locally)
+# docker volumes / runtime data (bind-mounted locally)
 pgdata/
+db_data/
+data/
+

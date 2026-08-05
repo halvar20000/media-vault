@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api';
 import type { User } from '../types';
 
 export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [allowRegistration, setAllowRegistration] = useState(false);
+
+  useEffect(() => {
+    api.authConfig().then((c) => setAllowRegistration(c.allowRegistration)).catch(() => {});
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -73,19 +78,21 @@ export function Auth({ onAuthed }: { onAuthed: (u: User) => void }) {
             {busy ? '…' : mode === 'login' ? 'Sign in' : 'Create account'}
           </button>
         </form>
-        <div className="toggle">
-          {mode === 'login' ? (
-            <>
-              No account yet?{' '}
-              <button onClick={() => { setMode('register'); setErr(null); }}>Register</button>
-            </>
-          ) : (
-            <>
-              Already have one?{' '}
-              <button onClick={() => { setMode('login'); setErr(null); }}>Sign in</button>
-            </>
-          )}
-        </div>
+        {allowRegistration && (
+          <div className="toggle">
+            {mode === 'login' ? (
+              <>
+                No account yet?{' '}
+                <button onClick={() => { setMode('register'); setErr(null); }}>Register</button>
+              </>
+            ) : (
+              <>
+                Already have one?{' '}
+                <button onClick={() => { setMode('login'); setErr(null); }}>Sign in</button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import type { EnrichmentResult, Item, SearchHit } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
 import { tmdbEnrich, tmdbSearch } from './tmdb';
 import { discogsEnrich, discogsSearch } from './discogs';
+import { cacheCover } from '../lib/covers';
 
 export function sourceEnabled(source: 'igdb' | 'tmdb' | 'discogs'): boolean {
   if (source === 'igdb') return config.igdb.enabled;
@@ -79,16 +80,23 @@ export async function enrichItem(item: Item): Promise<EnrichOutcome> {
 
     if (!result) return { status: 'no-match' };
 
+    // Cache the cover locally; fall back to the remote URL if the download fails.
+    const remoteCover = result.coverUrl;
+    let localCover: string | null = null;
+    if (remoteCover) localCover = await cacheCover(remoteCover);
+    const coverToStore = localCover ?? remoteCover;
+
     await query(
       `UPDATE items SET
          cover_url = COALESCE($2, cover_url),
-         rating = $3,
-         description = COALESCE($4, description),
-         source = $5,
-         source_id = $6,
+         cover_source_url = COALESCE($3, cover_source_url),
+         rating = $4,
+         description = COALESCE($5, description),
+         source = $6,
+         source_id = $7,
          enriched_at = now()
        WHERE id = $1`,
-      [item.id, result.coverUrl, result.rating, result.description, source, result.sourceId]
+      [item.id, coverToStore, remoteCover, result.rating, result.description, source, result.sourceId]
     );
 
     return { status: fromCache ? 'cached' : 'enriched' };

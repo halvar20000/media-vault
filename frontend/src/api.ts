@@ -1,4 +1,4 @@
-import type { EnrichStatus, Item, MediaType, SearchHit, Stats, User } from './types';
+import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, Stats, User } from './types';
 
 // All requests share cookies for session auth.
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -22,6 +22,7 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const api = {
   // auth
+  authConfig: () => req<{ allowRegistration: boolean }>('/auth/config'),
   me: () => req<{ user: User }>('/auth/me'),
   login: (email: string, password: string) =>
     req<{ user: User }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
@@ -46,6 +47,12 @@ export const api = {
   updateItem: (id: string, data: Partial<Item>) =>
     req<{ item: Item }>(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteItem: (id: string) => req<{ ok: true }>(`/items/${id}`, { method: 'DELETE' }),
+
+  // cabinets
+  listCabinets: () => req<{ cabinets: Cabinet[] }>('/cabinets'),
+  createCabinet: (name: string) =>
+    req<{ cabinet: Cabinet }>('/cabinets', { method: 'POST', body: JSON.stringify({ name }) }),
+  deleteCabinet: (id: string) => req<{ ok: true }>(`/cabinets/${id}`, { method: 'DELETE' }),
 
   // enrichment
   startEnrich: (force = false) =>

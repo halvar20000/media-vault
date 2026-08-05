@@ -50,6 +50,27 @@ CREATE INDEX IF NOT EXISTS items_user_idx ON items(user_id);
 CREATE INDEX IF NOT EXISTS items_type_idx ON items(type);
 CREATE INDEX IF NOT EXISTS items_title_idx ON items(lower(title));
 
+-- Cabinets: physical storage locations, modelled as entities (shelves, cabinets).
+CREATE TABLE IF NOT EXISTS cabinets (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name       TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS cabinets_user_name_idx ON cabinets(user_id, lower(name));
+
+-- Additive columns for physical-collector features (idempotent on existing DBs).
+ALTER TABLE items ADD COLUMN IF NOT EXISTS disc_count       INT;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS is_series        BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS season_count     INT;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS episode_count    INT;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS lent_to          TEXT;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS lent_since       DATE;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS viewed_at        TIMESTAMPTZ;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS cabinet_id       UUID REFERENCES cabinets(id) ON DELETE SET NULL;
+-- Cover caching: keep the original remote URL when we download a local copy.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS cover_source_url TEXT;
+
 -- Session store table for connect-pg-simple.
 CREATE TABLE IF NOT EXISTS session (
   sid    VARCHAR NOT NULL COLLATE "default",

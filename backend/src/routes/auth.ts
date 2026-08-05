@@ -2,8 +2,14 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { query } from '../db/pool';
 import { requireAuth } from '../middleware/auth';
+import { config } from '../config';
 
 export const authRouter = Router();
+
+// Public: lets the UI know whether to show the Register option.
+authRouter.get('/config', (_req, res) => {
+  res.json({ allowRegistration: config.allowRegistration });
+});
 
 interface UserRow {
   id: string;
@@ -19,6 +25,9 @@ function publicUser(u: UserRow) {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 authRouter.post('/register', async (req, res) => {
+  if (!config.allowRegistration) {
+    return res.status(403).json({ error: 'registration is disabled on this instance' });
+  }
   const email = String(req.body?.email ?? '').trim().toLowerCase();
   const password = String(req.body?.password ?? '');
   const displayName = String(req.body?.displayName ?? '').trim() || null;

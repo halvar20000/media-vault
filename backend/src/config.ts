@@ -14,6 +14,13 @@ export const config = {
   appOrigin: env('APP_ORIGIN', 'http://localhost:8080'),
   sessionSecret: env('SESSION_SECRET', 'dev-insecure-secret-change-me'),
 
+  // Open registration is OFF by default — a seed/admin user always exists, so a
+  // network-exposed instance shouldn't let strangers create accounts.
+  allowRegistration: env('ALLOW_REGISTRATION', 'false').toLowerCase() === 'true',
+
+  // Where downloaded cover images are cached (persisted via a mounted volume).
+  coversDir: env('COVERS_DIR', ''), // falls back to <cwd>/data/covers when blank
+
   db: {
     host: env('POSTGRES_HOST', 'localhost'),
     port: parseInt(env('POSTGRES_PORT', '5432'), 10),

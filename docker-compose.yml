@@ -37,6 +37,8 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
       APP_ORIGIN: ${APP_ORIGIN}
       NODE_ENV: ${NODE_ENV}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-false}
+      COVERS_DIR: /app/data/covers
       IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
       IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
       TMDB_ACCESS_TOKEN: ${TMDB_ACCESS_TOKEN}
@@ -46,6 +48,8 @@ services:
     volumes:
       # Canonical seed list, mounted read-only (no duplication in the image).
       - ./master_game_list.csv:/app/seed/master_game_list.csv:ro
+      # Cached cover images — bind-mounted so they persist and are easy to back up.
+      - ./data/covers:/app/data/covers
     # On boot: apply schema, seed the 513-game list (idempotent), then start the API.
     command: sh -c "node dist/db/migrate.js && node dist/db/seed.js && node dist/index.js"
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from './api';
-import type { EnrichStatus, Item, MediaType, Stats, User } from './types';
+import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
@@ -16,6 +16,7 @@ export default function App() {
 
   const [items, setItems] = useState<Item[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [cabinets, setCabinets] = useState<Cabinet[]>([]);
   const [sources, setSources] = useState<EnrichStatus['sources']>(NO_SOURCES);
 
   const [active, setActive] = useState<'all' | MediaType>('all');
@@ -52,11 +53,35 @@ export default function App() {
     if (user) refresh();
   }, [user, refresh]);
 
-  // Load source availability once signed in.
+  // Load source availability + cabinets once signed in.
   useEffect(() => {
     if (!user) return;
     api.enrichStatus().then((s) => setSources(s.sources)).catch(() => {});
+    api.listCabinets().then((r) => setCabinets(r.cabinets)).catch(() => {});
   }, [user]);
+
+  const refreshCabinets = useCallback(async () => {
+    try { setCabinets((await api.listCabinets()).cabinets); } catch { /* ignore */ }
+  }, []);
+
+  async function saveItem(id: string, patch: Partial<Item>) {
+    const { item: updated } = await api.updateItem(id, patch);
+    // keep the joined cabinet_name in sync client-side
+    updated.cabinet_name = cabinets.find((c) => c.id === updated.cabinet_id)?.name ?? null;
+    setSelected((cur) => (cur && cur.id === id ? updated : cur));
+    await Promise.all([refresh(), refreshCabinets()]);
+  }
+
+  async function createCabinet(name: string) {
+    try {
+      const { cabinet } = await api.createCabinet(name);
+      await refreshCabinets();
+      return cabinet;
+    } catch (e: any) {
+      flash(e.message || 'Could not create cabinet');
+      return null;
+    }
+  }
 
   function flash(msg: string) {
     setToast(msg);
@@ -222,9 +247,12 @@ export default function App() {
 
       <DetailDrawer
         item={selected}
+        cabinets={cabinets}
         onClose={() => setSelected(null)}
         onReenrich={reenrichItem}
         onDelete={deleteItem}
+        onSave={saveItem}
+        onCreateCabinet={createCabinet}
         enriching={itemEnriching}
         sourceOn={sourceForActiveDrawer}
       />

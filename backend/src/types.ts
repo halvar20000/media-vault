@@ -12,12 +12,31 @@ export interface Item {
   condition: string | null;
   notes: string | null;
   cover_url: string | null;
+  cover_source_url: string | null;
   rating: number | null;
   description: string | null;
   source: string | null;
   source_id: string | null;
   enriched_at: string | null;
   created_at: string;
+  // physical-collector fields
+  disc_count: number | null;
+  is_series: boolean;
+  season_count: number | null;
+  episode_count: number | null;
+  lent_to: string | null;
+  lent_since: string | null;
+  viewed_at: string | null;
+  cabinet_id: string | null;
+  cabinet_name?: string | null; // joined from cabinets for convenience
+}
+
+export interface Cabinet {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  item_count?: number;
 }
 
 // What an enrichment provider returns for one item.

@@ -13,21 +13,26 @@ itemsRouter.get('/', async (req, res) => {
   const type = String(req.query.type ?? '').trim();
   const q = String(req.query.q ?? '').trim();
 
-  const where: string[] = ['user_id = $1'];
+  // Columns qualified with i. because we LEFT JOIN cabinets (shared user_id column).
+  const where: string[] = ['i.user_id = $1'];
   const params: any[] = [uid];
 
   if (type && MEDIA_TYPES.includes(type as MediaType)) {
     params.push(type);
-    where.push(`type = $${params.length}`);
+    where.push(`i.type = $${params.length}`);
   }
   if (q) {
     params.push(`%${q.toLowerCase()}%`);
     const p = params.length;
-    where.push(`(lower(title) LIKE $${p} OR lower(coalesce(format,'')) LIKE $${p} OR lower(coalesce(catalog_no,'')) LIKE $${p})`);
+    where.push(`(lower(i.title) LIKE $${p} OR lower(coalesce(i.format,'')) LIKE $${p} OR lower(coalesce(i.catalog_no,'')) LIKE $${p})`);
   }
 
   const items = await query<Item>(
-    `SELECT * FROM items WHERE ${where.join(' AND ')} ORDER BY title ASC`,
+    `SELECT i.*, c.name AS cabinet_name
+       FROM items i
+       LEFT JOIN cabinets c ON c.id = i.cabinet_id
+      WHERE ${where.join(' AND ')}
+      ORDER BY i.title ASC`,
     params
   );
   res.json({ items });
@@ -58,6 +63,9 @@ itemsRouter.get('/stats', async (req, res) => {
 const EDITABLE = [
   'type', 'title', 'format', 'year', 'catalog_no', 'location', 'condition', 'notes',
   'cover_url', 'rating', 'description', 'source', 'source_id',
+  // physical-collector fields
+  'disc_count', 'is_series', 'season_count', 'episode_count',
+  'lent_to', 'lent_since', 'viewed_at', 'cabinet_id',
 ] as const;
 
 // POST /api/items  → create one item
