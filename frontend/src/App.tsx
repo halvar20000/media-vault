@@ -23,6 +23,8 @@ export default function App() {
   const [sources, setSources] = useState<EnrichStatus['sources']>(NO_SOURCES);
 
   const [active, setActive] = useState<'all' | MediaType>('all');
+  const [activeFormat, setActiveFormat] = useState<string>('all');
+  const [formatOptions, setFormatOptions] = useState<{ format: string; count: number }[]>([]);
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelf' | 'grid'>('shelf');
 
@@ -47,12 +49,26 @@ export default function App() {
 
   const refresh = useCallback(async () => {
     const [{ items }, stats] = await Promise.all([
-      api.listItems({ type: active === 'all' ? undefined : active, q: query || undefined }),
+      api.listItems({
+        type: active === 'all' ? undefined : active,
+        q: query || undefined,
+        format: activeFormat === 'all' ? undefined : activeFormat,
+      }),
       api.stats(),
     ]);
     setItems(items);
     setStats(stats);
-  }, [active, query]);
+  }, [active, query, activeFormat]);
+
+  // Load the console/format facet options for the selected media type.
+  useEffect(() => {
+    setActiveFormat('all');
+    if (!user || active === 'all') {
+      setFormatOptions([]);
+      return;
+    }
+    api.formats(active).then((r) => setFormatOptions(r.formats)).catch(() => setFormatOptions([]));
+  }, [active, user]);
 
   useEffect(() => {
     if (user) refresh();
@@ -266,6 +282,23 @@ export default function App() {
               {t(`types_plural.${mt}`)}
             </button>
           ))}
+          {active !== 'all' && formatOptions.length > 0 && (
+            <select
+              className="formatsel"
+              value={activeFormat}
+              onChange={(e) => setActiveFormat(e.target.value)}
+              aria-label={active === 'game' ? t('filters.allPlatforms') : t('filters.allFormats')}
+            >
+              <option value="all">
+                {active === 'game' ? t('filters.allPlatforms') : t('filters.allFormats')}
+              </option>
+              {formatOptions.map((f) => (
+                <option key={f.format} value={f.format}>
+                  {f.format} ({f.count})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div className="rightcontrols">
           <div className="enrich">

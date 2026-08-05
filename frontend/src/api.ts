@@ -34,14 +34,19 @@ export const api = {
   logout: () => req<{ ok: true }>('/auth/logout', { method: 'POST' }),
 
   // items
-  listItems: (params: { type?: string; q?: string } = {}) => {
+  listItems: (params: { type?: string; q?: string; format?: string } = {}) => {
     const qs = new URLSearchParams();
     if (params.type) qs.set('type', params.type);
     if (params.q) qs.set('q', params.q);
+    if (params.format) qs.set('format', params.format);
     const suffix = qs.toString() ? `?${qs}` : '';
     return req<{ items: Item[] }>(`/items${suffix}`);
   },
   stats: () => req<Stats>('/items/stats'),
+  formats: (type?: string) =>
+    req<{ formats: { format: string; count: number }[] }>(
+      `/items/formats${type ? `?type=${type}` : ''}`
+    ),
   createItem: (data: Partial<Item>) =>
     req<{ item: Item }>('/items', { method: 'POST', body: JSON.stringify(data) }),
   updateItem: (id: string, data: Partial<Item>) =>

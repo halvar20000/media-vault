@@ -13,7 +13,7 @@
     "signOut": "Sign out"
   },
   "stats": { "itemsTotal": "items total", "collectionValue": "Collection value" },
-  "filters": { "all": "All" },
+  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats" },
   "controls": {
     "enrich": "✦ Enrich collection",
     "enriching": "Enriching…",

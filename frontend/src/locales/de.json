@@ -13,7 +13,7 @@
     "signOut": "Abmelden"
   },
   "stats": { "itemsTotal": "Einträge gesamt", "collectionValue": "Sammlungswert" },
-  "filters": { "all": "Alle" },
+  "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate" },
   "controls": {
     "enrich": "✦ Sammlung anreichern",
     "enriching": "Anreichern…",

@@ -38,6 +38,11 @@ itemsRouter.get('/', async (req, res) => {
     const p = params.length;
     where.push(`(lower(i.title) LIKE $${p} OR lower(coalesce(i.format,'')) LIKE $${p} OR lower(coalesce(i.catalog_no,'')) LIKE $${p})`);
   }
+  const format = String(req.query.format ?? '').trim();
+  if (format) {
+    params.push(format.toLowerCase());
+    where.push(`lower(coalesce(i.format,'')) = $${params.length}`);
+  }
 
   const items = await query<Item>(
     `SELECT i.*, c.name AS cabinet_name
@@ -79,6 +84,26 @@ itemsRouter.get('/stats', async (req, res) => {
     valuedCount: valueRows.reduce((a, r) => a + Number(r.n), 0),
     totalValue: valueRows.map((r) => ({ currency: r.currency || '?', total: Number(r.total) })),
   });
+});
+
+// GET /api/items/formats?type=game → distinct formats (consoles/formats) + counts
+itemsRouter.get('/formats', async (req, res) => {
+  const uid = userId(req);
+  const type = String(req.query.type ?? '').trim();
+  const params: any[] = [uid];
+  let typeClause = '';
+  if (type && MEDIA_TYPES.includes(type as MediaType)) {
+    params.push(type);
+    typeClause = `AND type = $${params.length}`;
+  }
+  const rows = await query<{ format: string; count: string }>(
+    `SELECT format, count(*)::int AS count
+       FROM items
+      WHERE user_id = $1 AND format IS NOT NULL AND format <> '' ${typeClause}
+      GROUP BY format ORDER BY count DESC, format ASC`,
+    params
+  );
+  res.json({ formats: rows.map((r) => ({ format: r.format, count: Number(r.count) })) });
 });
 
 const EDITABLE = [
