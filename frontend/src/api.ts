@@ -65,6 +65,30 @@ export const api = {
   search: (type: MediaType, q: string) =>
     req<{ hits: SearchHit[] }>(`/search/${type}?q=${encodeURIComponent(q)}`),
 
+  // apply a chosen search hit's artwork/rating/description to an existing item
+  applyMatch: (id: string, hit: SearchHit) =>
+    req<{ item: Item }>(`/items/${id}/apply-match`, {
+      method: 'POST',
+      body: JSON.stringify({
+        source: hit.source,
+        sourceId: hit.sourceId,
+        coverUrl: hit.coverUrl,
+        rating: hit.rating,
+        description: hit.description,
+      }),
+    }),
+
+  // manual cover: upload a file, or set from a URL
+  uploadCover: async (id: string, file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(`/api/items/${id}/cover`, { method: 'POST', credentials: 'include', body: fd });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `${res.status}`);
+    return (await res.json()) as { item: Item };
+  },
+  setCoverUrl: (id: string, url: string) =>
+    req<{ item: Item }>(`/items/${id}/cover`, { method: 'POST', body: JSON.stringify({ url }) }),
+
   // CSV import (multipart). kind: 'games' | 'movies'
   importCsv: async (kind: 'games' | 'movies', file: File) => {
     const fd = new FormData();

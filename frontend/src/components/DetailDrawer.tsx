@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
-import type { Cabinet, Item } from '../types';
+import { useEffect, useRef, useState } from 'react';
+import { api } from '../api';
+import type { Cabinet, Item, SearchHit } from '../types';
 import { TYPE_META } from '../types';
 
 interface Props {
   item: Item | null;
   cabinets: Cabinet[];
-  onClose: () => void;
-  onReenrich: (item: Item) => void;
-  onDelete: (item: Item) => void;
-  onSave: (id: string, patch: Partial<Item>) => Promise<void>;
-  onCreateCabinet: (name: string) => Promise<Cabinet | null>;
-  enriching: boolean;
   sourceOn: boolean;
+  onClose: () => void;
+  onUpdated: (item: Item) => void | Promise<void>;
+  onDelete: (item: Item) => void;
+  onCreateCabinet: (name: string) => Promise<Cabinet | null>;
 }
 
 type Draft = {
+  title: string;
+  year: string;
+  format: string;
   condition: string;
   location: string;
   notes: string;
@@ -29,6 +31,9 @@ type Draft = {
 
 function toDraft(i: Item): Draft {
   return {
+    title: i.title,
+    year: i.year != null ? String(i.year) : '',
+    format: i.format ?? '',
     condition: i.condition ?? '',
     location: i.location ?? '',
     notes: i.notes ?? '',
@@ -42,75 +47,118 @@ function toDraft(i: Item): Draft {
   };
 }
 
-function fmtDate(s: string | null): string | null {
-  if (!s) return null;
-  return s.slice(0, 10);
-}
+const fmtDate = (s: string | null) => (s ? s.slice(0, 10) : null);
 
-export function DetailDrawer({
-  item, cabinets, onClose, onReenrich, onDelete, onSave, onCreateCabinet, enriching, sourceOn,
-}: Props) {
+export function DetailDrawer({ item, cabinets, sourceOn, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
   const open = Boolean(item);
   const meta = item ? TYPE_META[item.type] : null;
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [newCabinet, setNewCabinet] = useState('');
+  // fix-match state
+  const [matchQ, setMatchQ] = useState('');
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [matchMsg, setMatchMsg] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  // Reset edit state whenever the selected item changes.
   useEffect(() => {
     setEditing(false);
     setDraft(item ? toDraft(item) : null);
     setNewCabinet('');
+    setHits([]);
+    setMatchMsg(null);
+    setMatchQ(item?.title ?? '');
+    setCoverUrl('');
   }, [item?.id]);
 
   if (!item || !meta) {
-    return (
-      <>
-        <div className="scrim" onClick={onClose} />
-        <aside className="drawer" aria-hidden="true" />
-      </>
-    );
+    return (<><div className="scrim" onClick={onClose} /><aside className="drawer" aria-hidden="true" /></>);
   }
 
-  const cabinetName =
-    item.cabinet_name ?? cabinets.find((c) => c.id === item.cabinet_id)?.name ?? null;
+  const cabinetName = item.cabinet_name ?? cabinets.find((c) => c.id === item.cabinet_id)?.name ?? null;
+  const d = draft!;
+  const set = (patch: Partial<Draft>) => setDraft({ ...d, ...patch });
 
-  async function quick(patch: Partial<Item>) {
-    setSaving(true);
+  async function run(fn: () => Promise<Item>) {
+    setBusy(true);
     try {
-      await onSave(item!.id, patch);
+      const updated = await fn();
+      await onUpdated(updated);
+    } catch (e: any) {
+      setMatchMsg(e.message || 'Something went wrong');
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   }
 
-  async function saveEdits() {
-    if (!draft) return;
-    setSaving(true);
+  const quick = (patch: Partial<Item>) => run(async () => (await api.updateItem(item!.id, patch)).item);
+  const reenrich = () => run(async () => (await api.enrichItem(item!.id)).item);
+
+  async function searchMatches(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!matchQ.trim()) return;
+    setBusy(true);
+    setMatchMsg(null);
     try {
-      let cabinetId: string | null = draft.cabinet_id || null;
-      if (draft.cabinet_id === '__new__' && newCabinet.trim()) {
+      const { hits } = await api.search(item!.type, matchQ.trim());
+      setHits(hits);
+      if (!hits.length) setMatchMsg('No matches found — try a simpler title.');
+    } catch (e: any) {
+      setMatchMsg(e.message || 'Search failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const applyHit = (hit: SearchHit) => run(async () => {
+    const { item: updated } = await api.applyMatch(item!.id, hit);
+    setHits([]);
+    return updated;
+  });
+
+  const uploadFile = () => {
+    const f = fileRef.current?.files?.[0];
+    if (!f) return;
+    return run(async () => (await api.uploadCover(item!.id, f)).item);
+  };
+  const applyCoverUrl = () => {
+    if (!coverUrl.trim()) return;
+    return run(async () => (await api.setCoverUrl(item!.id, coverUrl.trim())).item);
+  };
+
+  async function saveEdits() {
+    setBusy(true);
+    try {
+      let cabinetId: string | null = d.cabinet_id || null;
+      if (d.cabinet_id === '__new__' && newCabinet.trim()) {
         const created = await onCreateCabinet(newCabinet.trim());
         cabinetId = created?.id ?? null;
       }
       const patch: Partial<Item> = {
-        condition: draft.condition || null,
-        location: draft.location || null,
-        notes: draft.notes || null,
-        disc_count: draft.disc_count ? parseInt(draft.disc_count, 10) : null,
-        is_series: draft.is_series,
-        season_count: draft.is_series && draft.season_count ? parseInt(draft.season_count, 10) : null,
-        episode_count: draft.is_series && draft.episode_count ? parseInt(draft.episode_count, 10) : null,
-        lent_to: draft.lent_to || null,
-        lent_since: draft.lent_to ? draft.lent_since || null : null,
+        title: d.title.trim() || item!.title,
+        year: d.year ? parseInt(d.year, 10) : null,
+        format: d.format || null,
+        condition: d.condition || null,
+        location: d.location || null,
+        notes: d.notes || null,
+        disc_count: d.disc_count ? parseInt(d.disc_count, 10) : null,
+        is_series: d.is_series,
+        season_count: d.is_series && d.season_count ? parseInt(d.season_count, 10) : null,
+        episode_count: d.is_series && d.episode_count ? parseInt(d.episode_count, 10) : null,
+        lent_to: d.lent_to || null,
+        lent_since: d.lent_to ? d.lent_since || null : null,
         cabinet_id: cabinetId,
       };
-      await onSave(item!.id, patch);
+      const { item: updated } = await api.updateItem(item!.id, patch);
+      await onUpdated(updated);
       setEditing(false);
+    } catch (e: any) {
+      setMatchMsg(e.message || 'Could not save');
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   }
 
@@ -124,17 +172,13 @@ export function DetailDrawer({
     ['Condition', item.condition],
     ['Discs', item.disc_count != null ? String(item.disc_count) : null],
     ['Series', item.is_series
-      ? [item.season_count ? `${item.season_count} season(s)` : null,
-         item.episode_count ? `${item.episode_count} ep.` : null].filter(Boolean).join(' · ') || 'Yes'
+      ? [item.season_count ? `${item.season_count} season(s)` : null, item.episode_count ? `${item.episode_count} ep.` : null].filter(Boolean).join(' · ') || 'Yes'
       : null],
     ['Lent to', item.lent_to ? `${item.lent_to}${item.lent_since ? ` (since ${fmtDate(item.lent_since)})` : ''}` : null],
     ['Viewed', item.viewed_at ? fmtDate(item.viewed_at) : null],
     ['Notes', item.notes],
     ['Source', item.source ? item.source.toUpperCase() : null],
   ];
-
-  const d = draft!;
-  const set = (patch: Partial<Draft>) => setDraft({ ...d, ...patch });
 
   return (
     <>
@@ -152,17 +196,12 @@ export function DetailDrawer({
 
         {!editing ? (
           <>
-            {/* quick actions */}
             <div className="dactions" style={{ paddingTop: 4 }}>
               <button className="ghostbtn" onClick={() => setEditing(true)}>Edit</button>
-              {item.viewed_at ? (
-                <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={saving}>Unwatch</button>
-              ) : (
-                <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={saving}>Mark viewed</button>
-              )}
-              {item.lent_to && (
-                <button className="ghostbtn" onClick={() => quick({ lent_to: null, lent_since: null })} disabled={saving}>Returned</button>
-              )}
+              {item.viewed_at
+                ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>Unwatch</button>
+                : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>Mark viewed</button>}
+              {item.lent_to && <button className="ghostbtn" onClick={() => quick({ lent_to: null, lent_since: null })} disabled={busy}>Returned</button>}
             </div>
             <dl>
               {rows.filter(([, v]) => v).map(([k, v]) => (
@@ -170,22 +209,66 @@ export function DetailDrawer({
               ))}
             </dl>
             <div className="dactions">
-              <button
-                className="ghostbtn"
-                onClick={() => onReenrich(item)}
-                disabled={enriching || !sourceOn}
-                title={sourceOn ? 'Fetch artwork, rating & description' : 'Source not configured'}
-              >
-                {enriching ? 'Enriching…' : item.enriched_at ? 'Re-fetch artwork' : 'Fetch artwork'}
+              <button className="ghostbtn" onClick={reenrich} disabled={busy || !sourceOn}
+                title={sourceOn ? 'Auto-fetch artwork, rating & description' : 'Source not configured'}>
+                {busy ? 'Working…' : item.enriched_at ? 'Re-fetch artwork' : 'Fetch artwork'}
               </button>
+              <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>Fix match…</button>
               <button className="ghostbtn" onClick={() => onDelete(item)}>Delete</button>
             </div>
           </>
         ) : (
-          /* ---- edit form ---- */
           <div style={{ padding: '4px 22px 24px' }}>
-            <div className="field">
-              <label>Cabinet</label>
+            {/* ---- Fix match (search & pick) ---- */}
+            {sourceOn && (
+              <div className="fixblock">
+                <label className="fixlabel">Re-match from {item.source?.toUpperCase() || meta.label}</label>
+                <form className="rowfields" style={{ gap: 8 }} onSubmit={searchMatches}>
+                  <input style={{ flex: 2 }} value={matchQ} onChange={(e) => setMatchQ(e.target.value)} placeholder="corrected title…" />
+                  <button type="submit" className="ghostbtn" disabled={busy}>Search</button>
+                </form>
+                {hits.length > 0 && (
+                  <div className="hits">
+                    {hits.map((h) => (
+                      <button className="hit" key={h.source + h.sourceId} onClick={() => applyHit(h)} disabled={busy}>
+                        {h.coverUrl ? <img src={h.coverUrl} alt="" /> : <span className="noart" />}
+                        <span className="hinfo"><b>{h.title}</b><span>{[h.year, h.format, h.rating !== null ? `★ ${Math.round(h.rating)}` : null].filter(Boolean).join(' · ')}</span></span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ---- Manual cover ---- */}
+            <div className="fixblock">
+              <label className="fixlabel">Manual cover</label>
+              <div className="rowfields" style={{ gap: 8, alignItems: 'flex-end' }}>
+                <div className="field" style={{ flex: 2, marginBottom: 0 }}>
+                  <input ref={fileRef} type="file" accept="image/*" />
+                </div>
+                <button className="ghostbtn" onClick={uploadFile} disabled={busy}>Upload</button>
+              </div>
+              <div className="rowfields" style={{ gap: 8, alignItems: 'flex-end', marginTop: 8 }}>
+                <div className="field" style={{ flex: 2, marginBottom: 0 }}>
+                  <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="…or paste an image URL" />
+                </div>
+                <button className="ghostbtn" onClick={applyCoverUrl} disabled={busy}>Set</button>
+              </div>
+            </div>
+            {matchMsg && <p className="mnote" style={{ padding: '4px 0 12px', border: 0 }}>{matchMsg}</p>}
+
+            {/* ---- Core fields ---- */}
+            <div className="field"><label>Title</label>
+              <input value={d.title} onChange={(e) => set({ title: e.target.value })} /></div>
+            <div className="rowfields">
+              <div className="field"><label>Year</label>
+                <input type="number" value={d.year} onChange={(e) => set({ year: e.target.value })} /></div>
+              <div className="field"><label>Format</label>
+                <input value={d.format} onChange={(e) => set({ format: e.target.value })} placeholder="PS4 / Blu-Ray…" /></div>
+            </div>
+
+            <div className="field"><label>Cabinet</label>
               <select value={d.cabinet_id} onChange={(e) => set({ cabinet_id: e.target.value })}>
                 <option value="">— none —</option>
                 {cabinets.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -193,26 +276,18 @@ export function DetailDrawer({
               </select>
             </div>
             {d.cabinet_id === '__new__' && (
-              <div className="field">
-                <label>New cabinet name</label>
-                <input value={newCabinet} onChange={(e) => setNewCabinet(e.target.value)} placeholder="e.g. Cabinet A · shelf 3" autoFocus />
-              </div>
+              <div className="field"><label>New cabinet name</label>
+                <input value={newCabinet} onChange={(e) => setNewCabinet(e.target.value)} placeholder="e.g. Cabinet A · shelf 3" /></div>
             )}
             <div className="rowfields">
-              <div className="field">
-                <label>Location note</label>
-                <input value={d.location} onChange={(e) => set({ location: e.target.value })} />
-              </div>
-              <div className="field">
-                <label>Condition</label>
-                <input value={d.condition} onChange={(e) => set({ condition: e.target.value })} placeholder="loose / CIB / VG+…" />
-              </div>
+              <div className="field"><label>Location note</label>
+                <input value={d.location} onChange={(e) => set({ location: e.target.value })} /></div>
+              <div className="field"><label>Condition</label>
+                <input value={d.condition} onChange={(e) => set({ condition: e.target.value })} placeholder="loose / CIB / VG+…" /></div>
             </div>
             <div className="rowfields">
-              <div className="field">
-                <label>Disc count</label>
-                <input type="number" min="0" value={d.disc_count} onChange={(e) => set({ disc_count: e.target.value })} />
-              </div>
+              <div className="field"><label>Disc count</label>
+                <input type="number" min="0" value={d.disc_count} onChange={(e) => set({ disc_count: e.target.value })} /></div>
               <div className="field" style={{ justifyContent: 'flex-end' }}>
                 <label style={{ display: 'flex', gap: 8, alignItems: 'center', textTransform: 'none' }}>
                   <input type="checkbox" checked={d.is_series} onChange={(e) => set({ is_series: e.target.checked })} style={{ width: 'auto' }} />
@@ -222,33 +297,24 @@ export function DetailDrawer({
             </div>
             {d.is_series && (
               <div className="rowfields">
-                <div className="field">
-                  <label>Seasons</label>
-                  <input type="number" min="0" value={d.season_count} onChange={(e) => set({ season_count: e.target.value })} />
-                </div>
-                <div className="field">
-                  <label>Episodes</label>
-                  <input type="number" min="0" value={d.episode_count} onChange={(e) => set({ episode_count: e.target.value })} />
-                </div>
+                <div className="field"><label>Seasons</label>
+                  <input type="number" min="0" value={d.season_count} onChange={(e) => set({ season_count: e.target.value })} /></div>
+                <div className="field"><label>Episodes</label>
+                  <input type="number" min="0" value={d.episode_count} onChange={(e) => set({ episode_count: e.target.value })} /></div>
               </div>
             )}
             <div className="rowfields">
-              <div className="field">
-                <label>Lent to</label>
-                <input value={d.lent_to} onChange={(e) => set({ lent_to: e.target.value })} placeholder="friend's name" />
-              </div>
-              <div className="field">
-                <label>Lent since</label>
-                <input type="date" value={d.lent_since} onChange={(e) => set({ lent_since: e.target.value })} disabled={!d.lent_to} />
-              </div>
+              <div className="field"><label>Lent to</label>
+                <input value={d.lent_to} onChange={(e) => set({ lent_to: e.target.value })} placeholder="friend's name" /></div>
+              <div className="field"><label>Lent since</label>
+                <input type="date" value={d.lent_since} onChange={(e) => set({ lent_since: e.target.value })} disabled={!d.lent_to} /></div>
             </div>
-            <div className="field">
-              <label>Notes</label>
-              <textarea rows={2} value={d.notes} onChange={(e) => set({ notes: e.target.value })} />
-            </div>
+            <div className="field"><label>Notes</label>
+              <textarea rows={2} value={d.notes} onChange={(e) => set({ notes: e.target.value })} /></div>
+
             <div className="dactions" style={{ padding: 0 }}>
-              <button className="primary" onClick={saveEdits} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
-              <button className="ghostbtn" onClick={() => { setEditing(false); setDraft(toDraft(item)); }} disabled={saving}>Cancel</button>
+              <button className="primary" onClick={saveEdits} disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+              <button className="ghostbtn" onClick={() => { setEditing(false); setDraft(toDraft(item)); }} disabled={busy}>Cancel</button>
             </div>
           </div>
         )}

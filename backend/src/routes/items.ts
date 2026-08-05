@@ -1,11 +1,23 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
 import { MEDIA_TYPES, MediaType } from '../config';
 import type { Item } from '../types';
+import { cacheCover, saveUploadedCover } from '../lib/covers';
 
 export const itemsRouter = Router();
 itemsRouter.use(requireAuth);
+
+const coverUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB
+});
+
+async function ownedItem(id: string, uid: string): Promise<Item | null> {
+  const rows = await query<Item>('SELECT * FROM items WHERE id = $1 AND user_id = $2', [id, uid]);
+  return rows[0] ?? null;
+}
 
 // GET /api/items?type=game&q=zelda
 itemsRouter.get('/', async (req, res) => {
@@ -116,6 +128,60 @@ itemsRouter.patch('/:id', async (req, res) => {
     vals
   );
   if (!rows.length) return res.status(404).json({ error: 'not found' });
+  res.json({ item: rows[0] });
+});
+
+// POST /api/items/:id/apply-match
+// Apply a chosen external search hit's artwork/rating/description to an item.
+itemsRouter.post('/:id/apply-match', async (req, res) => {
+  const uid = userId(req);
+  const item = await ownedItem(req.params.id, uid);
+  if (!item) return res.status(404).json({ error: 'not found' });
+
+  const b = req.body ?? {};
+  const remoteCover: string | null = b.coverUrl ?? null;
+  const local = remoteCover ? await cacheCover(remoteCover) : null;
+  const coverToStore = local ?? remoteCover;
+
+  const rows = await query<Item>(
+    `UPDATE items SET
+       cover_url = COALESCE($2, cover_url),
+       cover_source_url = $3,
+       rating = $4,
+       description = COALESCE($5, description),
+       source = COALESCE($6, source),
+       source_id = COALESCE($7, source_id),
+       enriched_at = now()
+     WHERE id = $1 AND user_id = $8 RETURNING *`,
+    [item.id, coverToStore, remoteCover, b.rating ?? null, b.description ?? null,
+     b.source ?? null, b.sourceId ?? null, uid]
+  );
+  res.json({ item: rows[0] });
+});
+
+// POST /api/items/:id/cover  — manual cover: multipart "file", or JSON/form { url }
+itemsRouter.post('/:id/cover', coverUpload.single('file'), async (req, res) => {
+  const uid = userId(req);
+  const item = await ownedItem(req.params.id, uid);
+  if (!item) return res.status(404).json({ error: 'not found' });
+
+  let localPath: string | null = null;
+  let sourceUrl: string | null = null;
+  if (req.file) {
+    localPath = saveUploadedCover(req.file.buffer, req.file.mimetype);
+    if (!localPath) return res.status(400).json({ error: 'unsupported image type' });
+  } else if (req.body?.url) {
+    sourceUrl = String(req.body.url);
+    localPath = await cacheCover(sourceUrl);
+    if (!localPath) return res.status(400).json({ error: 'could not fetch image from URL' });
+  } else {
+    return res.status(400).json({ error: 'provide an image file or a url' });
+  }
+
+  const rows = await query<Item>(
+    `UPDATE items SET cover_url = $2, cover_source_url = $3 WHERE id = $1 AND user_id = $4 RETURNING *`,
+    [item.id, localPath, sourceUrl, uid]
+  );
   res.json({ item: rows[0] });
 });
 

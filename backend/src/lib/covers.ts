@@ -1,7 +1,7 @@
 // Downloads and caches cover images locally so the app doesn't hot-link
 // third-party hosts (more robust + private). Files are deduped by URL hash and
 // served at /api/covers/<file>.
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { config } from '../config';
@@ -23,6 +23,24 @@ function extFor(url: string, contentType: string | null): string {
   if (ct.includes('jpeg') || ct.includes('jpg')) return '.jpg';
   const m = url.split('?')[0].match(/\.(png|webp|gif|jpe?g)$/i);
   return m ? `.${m[1].toLowerCase().replace('jpeg', 'jpg')}` : '.jpg';
+}
+
+const EXT_BY_MIME: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
+
+// Save a user-uploaded cover image. Returns the local served path.
+export function saveUploadedCover(buf: Buffer, mimeType: string): string | null {
+  const ext = EXT_BY_MIME[(mimeType || '').toLowerCase()];
+  if (!ext || !buf.length) return null;
+  ensureDir();
+  const name = `u_${randomUUID().slice(0, 12)}${ext}`;
+  writeFileSync(join(COVERS_DIR, name), buf);
+  return `${COVERS_ROUTE}/${name}`;
 }
 
 // Download a remote cover into the cache. Returns the local served path, or

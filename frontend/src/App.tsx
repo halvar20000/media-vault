@@ -28,7 +28,6 @@ export default function App() {
   const [enriching, setEnriching] = useState(false);
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [itemEnriching, setItemEnriching] = useState(false);
   const pollRef = useRef<number | null>(null);
 
   // ---- initial session check ----
@@ -64,11 +63,10 @@ export default function App() {
     try { setCabinets((await api.listCabinets()).cabinets); } catch { /* ignore */ }
   }, []);
 
-  async function saveItem(id: string, patch: Partial<Item>) {
-    const { item: updated } = await api.updateItem(id, patch);
-    // keep the joined cabinet_name in sync client-side
+  // Called whenever the drawer changes an item (edit / apply-match / cover).
+  async function applyUpdated(updated: Item) {
     updated.cabinet_name = cabinets.find((c) => c.id === updated.cabinet_id)?.name ?? null;
-    setSelected((cur) => (cur && cur.id === id ? updated : cur));
+    setSelected((cur) => (cur && cur.id === updated.id ? updated : cur));
     await Promise.all([refresh(), refreshCabinets()]);
   }
 
@@ -133,19 +131,6 @@ export default function App() {
   }
 
   useEffect(() => () => { if (pollRef.current) window.clearInterval(pollRef.current); }, []);
-
-  async function reenrichItem(item: Item) {
-    setItemEnriching(true);
-    try {
-      const { item: updated } = await api.enrichItem(item.id);
-      setSelected(updated);
-      await refresh();
-    } catch (e: any) {
-      flash(e.message || 'Enrichment failed');
-    } finally {
-      setItemEnriching(false);
-    }
-  }
 
   async function deleteItem(item: Item) {
     if (!confirm(`Delete “${item.title}”?`)) return;
@@ -248,13 +233,11 @@ export default function App() {
       <DetailDrawer
         item={selected}
         cabinets={cabinets}
-        onClose={() => setSelected(null)}
-        onReenrich={reenrichItem}
-        onDelete={deleteItem}
-        onSave={saveItem}
-        onCreateCabinet={createCabinet}
-        enriching={itemEnriching}
         sourceOn={sourceForActiveDrawer}
+        onClose={() => setSelected(null)}
+        onUpdated={applyUpdated}
+        onDelete={deleteItem}
+        onCreateCabinet={createCabinet}
       />
 
       <AddModal open={addOpen} onClose={() => setAddOpen(false)} onAdded={refresh} sources={sources} />
