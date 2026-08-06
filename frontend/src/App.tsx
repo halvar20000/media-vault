@@ -26,6 +26,7 @@ export default function App() {
   const [activeFormat, setActiveFormat] = useState<string>('all');
   const [formatOptions, setFormatOptions] = useState<{ format: string; count: number }[]>([]);
   const [noBarcode, setNoBarcode] = useState(false);
+  const [wishlistView, setWishlistView] = useState(false);
   const [sort, setSort] = useState('title');
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelf' | 'grid'>('shelf');
@@ -57,12 +58,22 @@ export default function App() {
         format: activeFormat === 'all' ? undefined : activeFormat,
         nobarcode: noBarcode || undefined,
         sort,
+        wishlist: wishlistView || undefined,
       }),
       api.stats(),
     ]);
     setItems(items);
     setStats(stats);
-  }, [active, query, activeFormat, noBarcode, sort]);
+  }, [active, query, activeFormat, noBarcode, sort, wishlistView]);
+
+  function exportCsv() {
+    const a = document.createElement('a');
+    a.href = '/api/items/export';
+    a.download = 'media-vault-export.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 
   // Load the console/format facet options for the selected media type.
   useEffect(() => {
@@ -248,6 +259,7 @@ export default function App() {
         </div>
         <div className="headerbtns">
           <button className="addbtn" onClick={() => setAddOpen(true)}>{t('header.addItem')}</button>
+          <button className="ghostbtn" onClick={exportCsv} title={t('header.export')}>⭳ CSV</button>
           <select
             className="langsel"
             aria-label="Language"
@@ -269,6 +281,13 @@ export default function App() {
             <span>{t(`types_plural.${mt}`)}</span>
           </div>
         ))}
+        {(stats?.wishlist ?? 0) > 0 && (
+          <div className="stat">
+            <span className="swatch" style={{ background: 'var(--accent)' }} />
+            <b>{stats!.wishlist}</b>
+            <span>{t('stats.wishlist')}</span>
+          </div>
+        )}
         {hasValue && (
           <div className="stat valuestat">
             <b>{formatTotals(stats!.totalValue)}</b>
@@ -305,6 +324,9 @@ export default function App() {
           )}
           <button className="chip" aria-pressed={noBarcode} onClick={() => setNoBarcode((v) => !v)} title={t('filters.needsBarcode')}>
             ▯ {t('filters.needsBarcode')}
+          </button>
+          <button className="chip" aria-pressed={wishlistView} onClick={() => setWishlistView((v) => !v)} title={t('filters.wishlist')}>
+            {t('filters.wishlist')}
           </button>
         </div>
         <div className="rightcontrols">

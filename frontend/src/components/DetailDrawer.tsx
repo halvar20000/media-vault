@@ -32,6 +32,7 @@ type Draft = {
   cabinet_id: string;
   value: string;
   value_currency: string;
+  wishlist: boolean;
 };
 
 function toDraft(i: Item): Draft {
@@ -52,6 +53,7 @@ function toDraft(i: Item): Draft {
     cabinet_id: i.cabinet_id ?? '',
     value: i.value != null ? String(i.value) : '',
     value_currency: i.value_currency ?? '',
+    wishlist: i.wishlist,
   };
 }
 
@@ -183,6 +185,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
         cabinet_id: cabinetId,
         value: d.value ? parseFloat(d.value) : null,
         value_currency: d.value ? d.value_currency || null : null,
+        wishlist: d.wishlist,
       };
       const { item: updated } = await api.updateItem(item!.id, patch);
       await onUpdated(updated);
@@ -225,13 +228,17 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
           </div>
         </div>
         <h2>{item.title}</h2>
-        <p className="dtype">{t(`types.${item.type}`)}</p>
+        <p className="dtype">{t(`types.${item.type}`)}{item.wishlist && <span> · ★ {t('wishlist.badge')}</span>}</p>
         {item.description && !editing && <p className="ddesc">{item.description}</p>}
 
         {!editing ? (
           <>
             <div className="dactions" style={{ paddingTop: 4 }}>
               <button className="ghostbtn" onClick={() => setEditing(true)}>{t('common.edit')}</button>
+              {item.wishlist && (
+                <button className="ghostbtn" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                  onClick={() => quick({ wishlist: false })} disabled={busy}>★ {t('wishlist.markOwned')}</button>
+              )}
               {item.viewed_at
                 ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>{t('drawer.unwatch')}</button>
                 : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>{t('drawer.markViewed')}</button>}
@@ -357,6 +364,10 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
             </div>
             <div className="field"><label>{t('drawer.notes')}</label>
               <textarea rows={2} value={d.notes} onChange={(e) => set({ notes: e.target.value })} /></div>
+            <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--muted)', marginBottom: 14 }}>
+              <input type="checkbox" checked={d.wishlist} onChange={(e) => set({ wishlist: e.target.checked })} style={{ width: 'auto' }} />
+              ★ {t('wishlist.moveTo')}
+            </label>
 
             <div className="dactions" style={{ padding: 0 }}>
               <button className="primary" onClick={saveEdits} disabled={busy}>{busy ? t('common.saving') : t('common.save')}</button>

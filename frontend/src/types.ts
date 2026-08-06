@@ -35,6 +35,7 @@ export interface Item {
   value_source: string | null;
   value_manual: boolean;
   valued_at: string | null;
+  wishlist: boolean;
 }
 
 export interface Cabinet {
@@ -51,6 +52,7 @@ export interface User {
 
 export interface Stats {
   total: number;
+  wishlist: number;
   enriched: number;
   byType: Partial<Record<MediaType, number>>;
   valuedCount: number;

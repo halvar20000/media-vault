@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import { stringify } from 'csv-stringify/sync';
 import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
 import { MEDIA_TYPES, MediaType } from '../config';
@@ -46,6 +47,8 @@ itemsRouter.get('/', async (req, res) => {
   if (String(req.query.nobarcode ?? '') === 'true') {
     where.push(`(i.barcode IS NULL OR i.barcode = '')`);
   }
+  // Owned items by default; ?wishlist=true shows only the wishlist.
+  where.push(String(req.query.wishlist ?? '') === 'true' ? 'i.wishlist = true' : 'i.wishlist = false');
 
   // Whitelisted sort orders (never interpolate user input directly).
   const ORDER: Record<string, string> = {
@@ -72,11 +75,15 @@ itemsRouter.get('/', async (req, res) => {
 itemsRouter.get('/stats', async (req, res) => {
   const uid = userId(req);
   const byType = await query<{ type: string; count: string }>(
-    `SELECT type, count(*)::int AS count FROM items WHERE user_id = $1 GROUP BY type`,
+    `SELECT type, count(*)::int AS count FROM items WHERE user_id = $1 AND wishlist = false GROUP BY type`,
     [uid]
   );
   const [{ total }] = await query<{ total: string }>(
-    `SELECT count(*)::int AS total FROM items WHERE user_id = $1`,
+    `SELECT count(*)::int AS total FROM items WHERE user_id = $1 AND wishlist = false`,
+    [uid]
+  );
+  const [{ wishlist }] = await query<{ wishlist: string }>(
+    `SELECT count(*)::int AS wishlist FROM items WHERE user_id = $1 AND wishlist = true`,
     [uid]
   );
   const [{ enriched }] = await query<{ enriched: string }>(
@@ -86,12 +93,13 @@ itemsRouter.get('/stats', async (req, res) => {
   // Collection value, grouped by currency (games are USD, music EUR, etc.).
   const valueRows = await query<{ currency: string | null; total: number; n: number }>(
     `SELECT value_currency AS currency, sum(value)::numeric AS total, count(*)::int AS n
-       FROM items WHERE user_id = $1 AND value IS NOT NULL
+       FROM items WHERE user_id = $1 AND value IS NOT NULL AND wishlist = false
       GROUP BY value_currency ORDER BY sum(value) DESC`,
     [uid]
   );
   res.json({
     total: Number(total),
+    wishlist: Number(wishlist),
     enriched: Number(enriched),
     byType: Object.fromEntries(byType.map((r) => [r.type, Number(r.count)])),
     valuedCount: valueRows.reduce((a, r) => a + Number(r.n), 0),
@@ -127,7 +135,52 @@ const EDITABLE = [
   'lent_to', 'lent_since', 'viewed_at', 'cabinet_id',
   // valuation (manual entry)
   'value', 'value_currency',
+  'wishlist',
 ] as const;
+
+// GET /api/items/export → full collection as a CSV download.
+itemsRouter.get('/export', async (req, res) => {
+  const uid = userId(req);
+  const rows = await query<Item>(
+    `SELECT i.*, c.name AS cabinet_name FROM items i
+       LEFT JOIN cabinets c ON c.id = i.cabinet_id
+      WHERE i.user_id = $1 ORDER BY i.wishlist ASC, i.type ASC, i.title ASC`,
+    [uid]
+  );
+  const records = rows.map((i) => ({
+    type: i.type,
+    title: i.title,
+    format: i.format,
+    year: i.year,
+    catalog_no: i.catalog_no,
+    barcode: i.barcode,
+    condition: i.condition,
+    location: i.location,
+    cabinet: i.cabinet_name ?? null,
+    disc_count: i.disc_count,
+    is_series: i.is_series,
+    season_count: i.season_count,
+    episode_count: i.episode_count,
+    lent_to: i.lent_to,
+    lent_since: i.lent_since,
+    viewed_at: i.viewed_at,
+    rating: i.rating,
+    value: i.value,
+    value_currency: i.value_currency,
+    value_source: i.value_source,
+    wishlist: i.wishlist,
+    source: i.source,
+    source_id: i.source_id,
+    cover_url: i.cover_source_url ?? i.cover_url,
+    notes: i.notes,
+    description: i.description,
+    created_at: i.created_at,
+  }));
+  const csv = stringify(records, { header: true });
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="media-vault-export.csv"');
+  res.send('\uFEFF' + csv); // UTF-8 BOM for Excel
+});
 
 // POST /api/items  → create one item
 itemsRouter.post('/', async (req, res) => {

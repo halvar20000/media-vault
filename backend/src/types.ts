@@ -36,6 +36,7 @@ export interface Item {
   value_source: string | null;
   value_manual: boolean;
   valued_at: string | null;
+  wishlist: boolean;
 }
 
 export interface ValueResult {

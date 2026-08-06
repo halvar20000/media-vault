@@ -10,10 +10,12 @@
   "header": {
     "searchPlaceholder": "Spiele, Filme, Vinyl durchsuchen…",
     "addItem": "+ Eintrag hinzufügen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "export": "CSV exportieren"
   },
-  "stats": { "itemsTotal": "Einträge gesamt", "collectionValue": "Sammlungswert" },
-  "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate", "needsBarcode": "Ohne Barcode" },
+  "stats": { "itemsTotal": "Einträge gesamt", "collectionValue": "Sammlungswert", "wishlist": "auf Wunschliste" },
+  "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate", "needsBarcode": "Ohne Barcode", "wishlist": "★ Wunschliste" },
+  "wishlist": { "add": "Auf die Wunschliste", "markOwned": "Besitze ich jetzt", "moveTo": "Auf Wunschliste verschieben", "badge": "WUNSCHLISTE" },
   "sort": { "label": "Sortieren", "title": "Titel (A–Z)", "added": "Neueste zuerst", "rating": "Bewertung", "value": "Wert", "year": "Jahr" },
   "controls": {
     "enrich": "✦ Sammlung anreichern",

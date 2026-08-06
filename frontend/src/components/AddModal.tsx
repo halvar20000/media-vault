@@ -32,6 +32,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [barcode, setBarcode] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [autoAdd, setAutoAdd] = useState(false);
+  const [wishlist, setWishlist] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
@@ -44,6 +45,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       setBarcode('');
       setShowCamera(false);
       setAutoAdd(false);
+      setWishlist(false);
       setMsg(null);
       setMethod('search');
     }
@@ -103,6 +105,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       source: h.source,
       source_id: h.sourceId,
       barcode: method === 'scan' && barcode ? barcode.replace(/\D/g, '') : undefined,
+      wishlist: wishlist || undefined,
     };
     try {
       await api.createItem(data);
@@ -178,6 +181,12 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
         </div>
 
         <div className="mbody">
+          {(method === 'search' || method === 'scan') && (
+            <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--muted)', marginBottom: 12 }}>
+              <input type="checkbox" checked={wishlist} onChange={(e) => setWishlist(e.target.checked)} style={{ width: 'auto' }} />
+              ★ {t('wishlist.add')}
+            </label>
+          )}
           {method === 'search' && (
             <>
               <div className="rowfields">

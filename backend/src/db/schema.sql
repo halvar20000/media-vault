@@ -73,6 +73,8 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS cover_source_url TEXT;
 -- Barcode (EAN/UPC) — attachable to any item for exact identification.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS barcode TEXT;
 CREATE INDEX IF NOT EXISTS items_barcode_idx ON items(barcode);
+-- Wishlist: items you want but don't own yet (excluded from the owned collection).
+ALTER TABLE items ADD COLUMN IF NOT EXISTS wishlist BOOLEAN NOT NULL DEFAULT false;
 -- Valuation.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS value          NUMERIC(10,2);
 ALTER TABLE items ADD COLUMN IF NOT EXISTS value_currency TEXT;

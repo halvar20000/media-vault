@@ -34,13 +34,14 @@ export const api = {
   logout: () => req<{ ok: true }>('/auth/logout', { method: 'POST' }),
 
   // items
-  listItems: (params: { type?: string; q?: string; format?: string; nobarcode?: boolean; sort?: string } = {}) => {
+  listItems: (params: { type?: string; q?: string; format?: string; nobarcode?: boolean; sort?: string; wishlist?: boolean } = {}) => {
     const qs = new URLSearchParams();
     if (params.type) qs.set('type', params.type);
     if (params.q) qs.set('q', params.q);
     if (params.format) qs.set('format', params.format);
     if (params.nobarcode) qs.set('nobarcode', 'true');
     if (params.sort) qs.set('sort', params.sort);
+    if (params.wishlist) qs.set('wishlist', 'true');
     const suffix = qs.toString() ? `?${qs}` : '';
     return req<{ items: Item[] }>(`/items${suffix}`);
   },

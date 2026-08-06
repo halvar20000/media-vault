@@ -10,10 +10,12 @@
   "header": {
     "searchPlaceholder": "Search across games, films, vinyl…",
     "addItem": "+ Add item",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "export": "Export CSV"
   },
-  "stats": { "itemsTotal": "items total", "collectionValue": "Collection value" },
-  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode" },
+  "stats": { "itemsTotal": "items total", "collectionValue": "Collection value", "wishlist": "on wishlist" },
+  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode", "wishlist": "★ Wishlist" },
+  "wishlist": { "add": "Add to wishlist", "markOwned": "I own this now", "moveTo": "Move to wishlist", "badge": "WISHLIST" },
   "sort": { "label": "Sort", "title": "Title (A–Z)", "added": "Newest added", "rating": "Rating", "value": "Value", "year": "Year" },
   "controls": {
     "enrich": "✦ Enrich collection",
