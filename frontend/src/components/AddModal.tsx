@@ -31,7 +31,9 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [importKind, setImportKind] = useState<'games' | 'movies'>('games');
   const [barcode, setBarcode] = useState('');
   const [showCamera, setShowCamera] = useState(false);
+  const [autoAdd, setAutoAdd] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const barcodeRef = useRef<HTMLInputElement>(null);
 
   const sourceOn = sources[sourceForType(type)];
 
@@ -41,6 +43,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       setQ('');
       setBarcode('');
       setShowCamera(false);
+      setAutoAdd(false);
       setMsg(null);
       setMethod('search');
     }
@@ -67,16 +70,23 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     if (!code) return;
     setBusy(true);
     setMsg(null);
+    let found = false;
     try {
       const { hits, resolvedTitle } = await api.barcodeLookup(type, code);
       setHits(hits);
-      if (!hits.length) {
+      found = hits.length > 0;
+      if (found && autoAdd) {
+        await addHit(hits[0]);
+      } else if (!found) {
         setMsg(resolvedTitle ? t('add.barcodeResolvedNoMatch', { title: resolvedTitle }) : t('add.barcodeNoProduct'));
       }
     } catch (e: any) {
       setMsg(e.message || 'Lookup failed');
     } finally {
       setBusy(false);
+      // Clear + refocus so a USB scanner is immediately ready for the next item.
+      if (found) setBarcode('');
+      barcodeRef.current?.focus();
     }
   }
 
@@ -253,6 +263,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                 <form className="field" style={{ flex: 2 }} onSubmit={(e) => { e.preventDefault(); lookupBarcode(); }}>
                   <label>{t('add.barcode')}</label>
                   <input
+                    ref={barcodeRef}
                     value={barcode}
                     onChange={(e) => setBarcode(e.target.value)}
                     inputMode="numeric"
@@ -261,9 +272,16 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                   />
                 </form>
               </div>
-              <button className="primary" onClick={() => lookupBarcode()} disabled={busy || !sourceOn}>
-                {busy ? t('common.searching') : t('add.lookup')}
-              </button>
+              <p className="mnote" style={{ padding: 0, border: 0, marginTop: 4 }}>{t('add.usbHint')}</p>
+              <div className="rowfields" style={{ alignItems: 'center', marginTop: 8 }}>
+                <button className="primary" onClick={() => lookupBarcode()} disabled={busy || !sourceOn}>
+                  {busy ? t('common.searching') : t('add.lookup')}
+                </button>
+                <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--muted)' }}>
+                  <input type="checkbox" checked={autoAdd} onChange={(e) => setAutoAdd(e.target.checked)} style={{ width: 'auto' }} />
+                  {t('add.autoAdd')}
+                </label>
+              </div>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <div className="hits">
                 {hits.map((h) => (

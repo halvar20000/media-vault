@@ -55,6 +55,8 @@
     "barcode": "Barcode (EAN / UPC)",
     "lookup": "Nachschlagen",
     "scanWithCamera": "Mit Kamera scannen",
+    "usbHint": "Ein USB-Barcodescanner funktioniert hier ebenfalls — Feld anklicken und scannen.",
+    "autoAdd": "Ersten Treffer automatisch hinzufügen (Schnellscan)",
     "barcodeResolvedNoMatch": "„{{title}}“ gefunden, aber kein Treffer — versuche die Titelsuche.",
     "barcodeNoProduct": "Kein Produkt zu diesem Barcode gefunden.",
     "mediaType": "Medientyp",

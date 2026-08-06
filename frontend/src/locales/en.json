@@ -55,6 +55,8 @@
     "barcode": "Barcode (EAN / UPC)",
     "lookup": "Look up",
     "scanWithCamera": "Scan with camera",
+    "usbHint": "A USB barcode scanner works here too — click the field and scan.",
+    "autoAdd": "Auto-add first result (rapid scan)",
     "barcodeResolvedNoMatch": "Found “{{title}}” but no match — try Search title.",
     "barcodeNoProduct": "No product found for that barcode.",
     "mediaType": "Media type",
