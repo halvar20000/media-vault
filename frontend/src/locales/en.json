@@ -13,7 +13,7 @@
     "signOut": "Sign out"
   },
   "stats": { "itemsTotal": "items total", "collectionValue": "Collection value" },
-  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats" },
+  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode" },
   "controls": {
     "enrich": "✦ Enrich collection",
     "enriching": "Enriching…",
@@ -60,6 +60,9 @@
     "mediaType": "Media type",
     "titleLabel": "Title",
     "titlePlaceholder": "e.g. Bloodborne",
+    "added": "Added “{{title}}”.",
+    "duplicateConfirm": "You already have “{{title}}”{{fmt}}. Add it anyway?",
+    "duplicateSkipped": "Skipped — not added.",
     "noMatches": "No matches found.",
     "sourceMissing": "isn’t configured — add its key to your .env to search {{type}}s.",
     "importType": "Import type",

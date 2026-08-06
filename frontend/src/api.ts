@@ -34,11 +34,12 @@ export const api = {
   logout: () => req<{ ok: true }>('/auth/logout', { method: 'POST' }),
 
   // items
-  listItems: (params: { type?: string; q?: string; format?: string } = {}) => {
+  listItems: (params: { type?: string; q?: string; format?: string; nobarcode?: boolean } = {}) => {
     const qs = new URLSearchParams();
     if (params.type) qs.set('type', params.type);
     if (params.q) qs.set('q', params.q);
     if (params.format) qs.set('format', params.format);
+    if (params.nobarcode) qs.set('nobarcode', 'true');
     const suffix = qs.toString() ? `?${qs}` : '';
     return req<{ items: Item[] }>(`/items${suffix}`);
   },
@@ -47,8 +48,22 @@ export const api = {
     req<{ formats: { format: string; count: number }[] }>(
       `/items/formats${type ? `?type=${type}` : ''}`
     ),
-  createItem: (data: Partial<Item>) =>
-    req<{ item: Item }>('/items', { method: 'POST', body: JSON.stringify(data) }),
+  createItem: async (data: Partial<Item>, force = false) => {
+    const res = await fetch(`/api/items${force ? '?force=true' : ''}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.status === 409) {
+      const body = await res.json();
+      const err = new Error('duplicate') as Error & { duplicate?: { id: string; title: string; format: string | null } };
+      err.duplicate = body.existing;
+      throw err;
+    }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `${res.status}`);
+    return (await res.json()) as { item: Item };
+  },
   updateItem: (id: string, data: Partial<Item>) =>
     req<{ item: Item }>(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteItem: (id: string) => req<{ ok: true }>(`/items/${id}`, { method: 'DELETE' }),

@@ -82,22 +82,40 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
 
   async function addHit(h: SearchHit) {
     setBusy(true);
+    const data = {
+      type,
+      title: h.title,
+      year: h.year ?? undefined,
+      format: h.format ?? undefined,
+      cover_url: h.coverUrl ?? undefined,
+      rating: h.rating ?? undefined,
+      description: h.description ?? undefined,
+      source: h.source,
+      source_id: h.sourceId,
+      barcode: method === 'scan' && barcode ? barcode.replace(/\D/g, '') : undefined,
+    };
     try {
-      await api.createItem({
-        type,
-        title: h.title,
-        year: h.year ?? undefined,
-        format: h.format ?? undefined,
-        cover_url: h.coverUrl ?? undefined,
-        rating: h.rating ?? undefined,
-        description: h.description ?? undefined,
-        source: h.source,
-        source_id: h.sourceId,
-      });
-      setMsg(`Added “${h.title}”.`);
+      await api.createItem(data);
+      setMsg(t('add.added', { title: h.title }));
       onAdded();
     } catch (e: any) {
-      setMsg(e.message || 'Could not add item');
+      if (e.duplicate) {
+        const ex = e.duplicate;
+        const fmt = ex.format ? ` (${ex.format})` : '';
+        if (window.confirm(t('add.duplicateConfirm', { title: ex.title, fmt }))) {
+          try {
+            await api.createItem(data, true);
+            setMsg(t('add.added', { title: h.title }));
+            onAdded();
+          } catch (e2: any) {
+            setMsg(e2.message || 'Could not add item');
+          }
+        } else {
+          setMsg(t('add.duplicateSkipped'));
+        }
+      } else {
+        setMsg(e.message || 'Could not add item');
+      }
     } finally {
       setBusy(false);
     }

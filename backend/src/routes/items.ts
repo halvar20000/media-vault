@@ -43,6 +43,9 @@ itemsRouter.get('/', async (req, res) => {
     params.push(format.toLowerCase());
     where.push(`lower(coalesce(i.format,'')) = $${params.length}`);
   }
+  if (String(req.query.nobarcode ?? '') === 'true') {
+    where.push(`(i.barcode IS NULL OR i.barcode = '')`);
+  }
 
   const items = await query<Item>(
     `SELECT i.*, c.name AS cabinet_name
@@ -126,6 +129,31 @@ itemsRouter.post('/', async (req, res) => {
     return res.status(400).json({ error: 'invalid or missing type' });
   }
   if (!title) return res.status(400).json({ error: 'title is required' });
+
+  // Duplicate detection (skip with ?force=true). Matches on barcode, or the
+  // provider's release id, or same type + title + format.
+  if (String(req.query.force ?? '') !== 'true') {
+    const dp: any[] = [uid, type];
+    const conds: string[] = [];
+    const barcode = body.barcode ? String(body.barcode).replace(/\D/g, '') : '';
+    if (barcode) {
+      dp.push(barcode);
+      conds.push(`barcode = $${dp.length}`);
+    }
+    if (body.source && body.source_id) {
+      dp.push(body.source, String(body.source_id));
+      conds.push(`(source = $${dp.length - 1} AND source_id = $${dp.length})`);
+    }
+    dp.push(title.toLowerCase(), String(body.format ?? '').toLowerCase());
+    conds.push(`(lower(title) = $${dp.length - 1} AND lower(coalesce(format,'')) = $${dp.length})`);
+
+    const dup = await query<{ id: string; title: string; format: string | null }>(
+      `SELECT id, title, format FROM items
+        WHERE user_id = $1 AND type = $2 AND (${conds.join(' OR ')}) LIMIT 1`,
+      dp
+    );
+    if (dup.length) return res.status(409).json({ error: 'duplicate', existing: dup[0] });
+  }
 
   const cols = ['user_id'];
   const vals: any[] = [uid];

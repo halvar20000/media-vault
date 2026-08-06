@@ -25,6 +25,7 @@ export default function App() {
   const [active, setActive] = useState<'all' | MediaType>('all');
   const [activeFormat, setActiveFormat] = useState<string>('all');
   const [formatOptions, setFormatOptions] = useState<{ format: string; count: number }[]>([]);
+  const [noBarcode, setNoBarcode] = useState(false);
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelf' | 'grid'>('shelf');
 
@@ -53,12 +54,13 @@ export default function App() {
         type: active === 'all' ? undefined : active,
         q: query || undefined,
         format: activeFormat === 'all' ? undefined : activeFormat,
+        nobarcode: noBarcode || undefined,
       }),
       api.stats(),
     ]);
     setItems(items);
     setStats(stats);
-  }, [active, query, activeFormat]);
+  }, [active, query, activeFormat, noBarcode]);
 
   // Load the console/format facet options for the selected media type.
   useEffect(() => {
@@ -299,6 +301,9 @@ export default function App() {
               ))}
             </select>
           )}
+          <button className="chip" aria-pressed={noBarcode} onClick={() => setNoBarcode((v) => !v)} title={t('filters.needsBarcode')}>
+            ▯ {t('filters.needsBarcode')}
+          </button>
         </div>
         <div className="rightcontrols">
           <div className="enrich">
