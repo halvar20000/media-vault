@@ -194,9 +194,10 @@ itemsRouter.post('/', async (req, res) => {
   if (!title) return res.status(400).json({ error: 'title is required' });
 
   // Duplicate detection (skip with ?force=true). Matches on barcode, or the
-  // provider's release id, or same type + title + format.
+  // provider's release id, or same type + title + format. Owned items and
+  // wishlist items never collide (wishlisting what you own is intentional).
   if (String(req.query.force ?? '') !== 'true') {
-    const dp: any[] = [uid, type];
+    const dp: any[] = [uid, type, Boolean(body.wishlist)];
     const conds: string[] = [];
     const barcode = body.barcode ? String(body.barcode).replace(/\D/g, '') : '';
     if (barcode) {
@@ -212,7 +213,7 @@ itemsRouter.post('/', async (req, res) => {
 
     const dup = await query<{ id: string; title: string; format: string | null }>(
       `SELECT id, title, format FROM items
-        WHERE user_id = $1 AND type = $2 AND (${conds.join(' OR ')}) LIMIT 1`,
+        WHERE user_id = $1 AND type = $2 AND wishlist = $3 AND (${conds.join(' OR ')}) LIMIT 1`,
       dp
     );
     if (dup.length) return res.status(409).json({ error: 'duplicate', existing: dup[0] });
