@@ -70,6 +70,9 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS viewed_at        TIMESTAMPTZ;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS cabinet_id       UUID REFERENCES cabinets(id) ON DELETE SET NULL;
 -- Cover caching: keep the original remote URL when we download a local copy.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS cover_source_url TEXT;
+-- Barcode (EAN/UPC) — attachable to any item for exact identification.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS barcode TEXT;
+CREATE INDEX IF NOT EXISTS items_barcode_idx ON items(barcode);
 -- Valuation.
 ALTER TABLE items ADD COLUMN IF NOT EXISTS value          NUMERIC(10,2);
 ALTER TABLE items ADD COLUMN IF NOT EXISTS value_currency TEXT;

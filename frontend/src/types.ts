@@ -8,6 +8,7 @@ export interface Item {
   format: string | null;
   year: number | null;
   catalog_no: string | null;
+  barcode: string | null;
   location: string | null;
   condition: string | null;
   notes: string | null;

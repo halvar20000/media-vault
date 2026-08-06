@@ -19,6 +19,7 @@ type Draft = {
   title: string;
   year: string;
   format: string;
+  barcode: string;
   condition: string;
   location: string;
   notes: string;
@@ -38,6 +39,7 @@ function toDraft(i: Item): Draft {
     title: i.title,
     year: i.year != null ? String(i.year) : '',
     format: i.format ?? '',
+    barcode: i.barcode ?? '',
     condition: i.condition ?? '',
     location: i.location ?? '',
     notes: i.notes ?? '',
@@ -127,6 +129,25 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
     return updated;
   });
 
+  // Persist the typed barcode on this item, then fetch exact matches by barcode.
+  async function matchByBarcode() {
+    const code = d.barcode.trim().replace(/\D/g, '');
+    if (!code) return;
+    setBusy(true);
+    setMatchMsg(null);
+    try {
+      const { item: saved } = await api.updateItem(item!.id, { barcode: code });
+      await onUpdated(saved);
+      const { hits, resolvedTitle } = await api.barcodeLookup(item!.type, code);
+      setHits(hits);
+      if (!hits.length) setMatchMsg(resolvedTitle || t('add.barcodeNoProduct'));
+    } catch (e: any) {
+      setMatchMsg(e.message || 'Lookup failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const uploadFile = () => {
     const f = fileRef.current?.files?.[0];
     if (!f) return;
@@ -149,6 +170,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
         title: d.title.trim() || item!.title,
         year: d.year ? parseInt(d.year, 10) : null,
         format: d.format || null,
+        barcode: d.barcode.trim() || null,
         condition: d.condition || null,
         location: d.location || null,
         notes: d.notes || null,
@@ -177,6 +199,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
     [t('drawer.rowYear'), item.year ? String(item.year) : null],
     [t('drawer.rowRating'), item.rating !== null ? `${Math.round(item.rating)} / 100` : null],
     [t('drawer.rowCatalog'), item.catalog_no],
+    [t('drawer.rowBarcode'), item.barcode],
     [t('drawer.rowCabinet'), cabinetName],
     [t('drawer.rowLocation'), item.location],
     [t('drawer.rowCondition'), item.condition],
@@ -241,6 +264,10 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
                   <input style={{ flex: 2 }} value={matchQ} onChange={(e) => setMatchQ(e.target.value)} placeholder={t('drawer.correctedTitle')} />
                   <button type="submit" className="ghostbtn" disabled={busy}>{t('common.search')}</button>
                 </form>
+                <form className="rowfields" style={{ gap: 8, marginTop: 8 }} onSubmit={(e) => { e.preventDefault(); matchByBarcode(); }}>
+                  <input style={{ flex: 2 }} value={d.barcode} inputMode="numeric" onChange={(e) => set({ barcode: e.target.value })} placeholder={t('drawer.barcode')} />
+                  <button type="submit" className="ghostbtn" disabled={busy || !d.barcode.trim()}>{t('drawer.matchByBarcode')}</button>
+                </form>
                 {hits.length > 0 && (
                   <div className="hits">
                     {hits.map((h) => (
@@ -281,7 +308,6 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
               <div className="field"><label>{t('drawer.format')}</label>
                 <input value={d.format} onChange={(e) => set({ format: e.target.value })} placeholder="PS4 / Blu-Ray…" /></div>
             </div>
-
             <div className="field"><label>{t('drawer.cabinet')}</label>
               <select value={d.cabinet_id} onChange={(e) => set({ cabinet_id: e.target.value })}>
                 <option value="">{t('common.none')}</option>

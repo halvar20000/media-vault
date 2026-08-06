@@ -107,7 +107,7 @@ itemsRouter.get('/formats', async (req, res) => {
 });
 
 const EDITABLE = [
-  'type', 'title', 'format', 'year', 'catalog_no', 'location', 'condition', 'notes',
+  'type', 'title', 'format', 'year', 'catalog_no', 'barcode', 'location', 'condition', 'notes',
   'cover_url', 'rating', 'description', 'source', 'source_id',
   // physical-collector fields
   'disc_count', 'is_series', 'season_count', 'episode_count',
