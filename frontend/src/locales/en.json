@@ -91,6 +91,7 @@
     "refetch": "Re-fetch artwork",
     "fetch": "Fetch artwork",
     "fetchValue": "Fetch value",
+    "leboncoin": "leboncoin",
     "rowValue": "Value",
     "value": "Value",
     "currency": "Currency",
