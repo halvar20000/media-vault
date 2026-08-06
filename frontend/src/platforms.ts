@@ -71,8 +71,23 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 // raw format text (or nothing) when no rule matches.
 export function platformBadge(format: string | null, type: MediaType): PlatformBadge {
   const f = (format || '').trim();
+  const n = norm(f);
+
+  // Music: the media TYPE is authoritative (Discogs format strings are noisy and
+  // can contain "LP" for a CD, etc.). Only refine LP sub-variants from the format.
+  if (type === 'cd') return { code: 'CD', color: C.cd };
+  if (type === 'lp') {
+    if (/(^|[^0-9])3x|3lp|triple/.test(n)) return { code: '3×LP', color: C.vinyl };
+    if (/2x|2lp|double/.test(n)) return { code: '2×LP', color: C.vinyl };
+    return { code: 'LP', color: C.vinyl };
+  }
+  if (type === 'single') {
+    if (/(^|[^0-9])12(?![0-9])/.test(n)) return { code: '12″', color: C.single };
+    return { code: '7″', color: C.single };
+  }
+
+  // Games / movies: the format IS the platform / disc format — parse it.
   if (f) {
-    const n = norm(f);
     for (const [re, code, color] of RULES) {
       if (re.test(n)) return { code, color };
     }
