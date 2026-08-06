@@ -228,7 +228,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
                 <button className="ghostbtn" onClick={fetchValue} disabled={busy}>{t('drawer.fetchValue')}</button>
               )}
               <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>{t('drawer.fixMatch')}</button>
-              <button className="ghostbtn" onClick={() => onDelete(item)}>{t('common.delete')}</button>
+              <button className="ghostbtn dangerbtn" onClick={() => onDelete(item)}>{t('common.delete')}</button>
             </div>
           </>
         ) : (
