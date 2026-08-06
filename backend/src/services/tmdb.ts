@@ -56,10 +56,12 @@ export interface TmdbHint {
 }
 
 export async function tmdbEnrich(title: string, hint?: TmdbHint): Promise<EnrichmentResult | null> {
-  const results = await apiSearch(title);
+  // Strip a trailing short "(…)" disambiguator ("Taken 3 (2)" → "Taken 3").
+  const q = title.replace(/\s*\((?:[a-z0-9][a-z0-9 \-]{0,6})\)\s*$/i, '').trim() || title;
+  const results = await apiSearch(q);
   if (!results.length) return null;
 
-  const nt = title.toLowerCase().trim();
+  const nt = q.toLowerCase().trim();
   let best = results[0];
   let bestScore = -Infinity;
   results.slice(0, 10).forEach((m, i) => {

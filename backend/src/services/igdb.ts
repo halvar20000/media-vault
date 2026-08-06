@@ -81,6 +81,14 @@ function esc(s: string): string {
   return s.replace(/["\\]/g, ' ').trim();
 }
 
+// Seed titles are disambiguated with short platform/number suffixes like
+// "FIFA 06 (360)", "Assassin's Creed (PS3-2)", "Army of Two (2)". Strip a
+// trailing short "(…)" group for the search query (keeps the display title).
+function stripDisambiguator(title: string): string {
+  const s = title.replace(/\s*\((?:[a-z0-9][a-z0-9 \-]{0,6})\)\s*$/i, '').trim();
+  return s || title;
+}
+
 function norm(s: string): string {
   return s
     .toLowerCase()
@@ -149,14 +157,15 @@ export interface IgdbHint {
 }
 
 export async function igdbEnrich(title: string, hint?: IgdbHint): Promise<EnrichmentResult | null> {
-  // Pull several candidates and choose the best by name + platform.
-  const games = await apiGames(`search "${esc(title)}"; limit 12;`);
+  // Search with the disambiguator stripped ("FIFA 06 (360)" → "FIFA 06").
+  const q = stripDisambiguator(title);
+  const games = await apiGames(`search "${esc(q)}"; limit 12;`);
   if (!games.length) return null;
 
   let best = games[0];
   let bestScore = -Infinity;
   games.forEach((g, i) => {
-    const s = scoreGame(g, title, hint?.platform, i);
+    const s = scoreGame(g, q, hint?.platform, i);
     if (s > bestScore) {
       bestScore = s;
       best = g;
