@@ -14,7 +14,7 @@
     "export": "Export CSV"
   },
   "stats": { "itemsTotal": "items total", "collectionValue": "Collection value", "wishlist": "on wishlist" },
-  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode", "wishlist": "★ Wishlist" },
+  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode", "wishlist": "★ Wishlist", "bundles": "Bundles", "bundlesTitle": "Search leboncoin for bundles/lots of the selected type/platform" },
   "wishlist": { "add": "Add to wishlist", "markOwned": "I own this now", "moveTo": "Move to wishlist", "badge": "WISHLIST" },
   "sort": { "label": "Sort", "title": "Title (A–Z)", "added": "Newest added", "rating": "Rating", "value": "Value", "year": "Year" },
   "controls": {

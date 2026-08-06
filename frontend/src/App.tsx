@@ -4,6 +4,7 @@ import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
+import { leboncoinBundleUrl } from './leboncoin';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -328,6 +329,16 @@ export default function App() {
           <button className="chip" aria-pressed={wishlistView} onClick={() => setWishlistView((v) => !v)} title={t('filters.wishlist')}>
             {t('filters.wishlist')}
           </button>
+          <a
+            className="chip"
+            href={leboncoinBundleUrl(active, activeFormat !== 'all' ? activeFormat : undefined)}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={t('filters.bundlesTitle')}
+            style={{ textDecoration: 'none' }}
+          >
+            🔎 {t('filters.bundles')}
+          </a>
         </div>
         <div className="rightcontrols">
           <div className="enrich">
