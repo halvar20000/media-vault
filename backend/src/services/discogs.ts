@@ -81,6 +81,17 @@ export async function discogsSearch(
   return results.slice(0, limit).map(toHit);
 }
 
+// Look up releases by their barcode (EAN/UPC) — very accurate for music.
+export async function discogsBarcodeSearch(code: string, limit = 8): Promise<SearchHit[]> {
+  const url = new URL('https://api.discogs.com/database/search');
+  url.searchParams.set('barcode', code);
+  url.searchParams.set('type', 'release');
+  const res = await fetch(url, { headers: headers() });
+  if (!res.ok) return [];
+  const json = (await res.json()) as { results?: DiscogsSearchResult[] };
+  return (json.results ?? []).slice(0, limit).map(toHit);
+}
+
 export async function discogsEnrich(
   title: string,
   type?: MediaType

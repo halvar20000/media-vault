@@ -29,6 +29,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [importKind, setImportKind] = useState<'games' | 'movies'>('games');
+  const [barcode, setBarcode] = useState('');
+  const [showCamera, setShowCamera] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const sourceOn = sources[sourceForType(type)];
@@ -37,6 +39,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     if (!open) {
       setHits([]);
       setQ('');
+      setBarcode('');
+      setShowCamera(false);
       setMsg(null);
       setMethod('search');
     }
@@ -53,6 +57,24 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       if (!hits.length) setMsg(t('add.noMatches'));
     } catch (e: any) {
       setMsg(e.message || 'Search failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function lookupBarcode(codeArg?: string) {
+    const code = (codeArg ?? barcode).replace(/\D/g, '');
+    if (!code) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { hits, resolvedTitle } = await api.barcodeLookup(type, code);
+      setHits(hits);
+      if (!hits.length) {
+        setMsg(resolvedTitle ? t('add.barcodeResolvedNoMatch', { title: resolvedTitle }) : t('add.barcodeNoProduct'));
+      }
+    } catch (e: any) {
+      setMsg(e.message || 'Lookup failed');
     } finally {
       setBusy(false);
     }
@@ -199,7 +221,52 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             </>
           )}
 
-          {method === 'scan' && <BarcodeScan onCode={(code) => { setMethod('search'); setType('cd'); setQ(code); }} />}
+          {method === 'scan' && (
+            <>
+              <div className="rowfields">
+                <div className="field">
+                  <label>{t('add.mediaType')}</label>
+                  <select value={type} onChange={(e) => setType(e.target.value as MediaType)}>
+                    {TYPE_ORDER.map((mt) => (
+                      <option key={mt} value={mt}>{t(`types.${mt}`)}</option>
+                    ))}
+                  </select>
+                </div>
+                <form className="field" style={{ flex: 2 }} onSubmit={(e) => { e.preventDefault(); lookupBarcode(); }}>
+                  <label>{t('add.barcode')}</label>
+                  <input
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="0888837168618"
+                    autoFocus
+                  />
+                </form>
+              </div>
+              <button className="primary" onClick={() => lookupBarcode()} disabled={busy || !sourceOn}>
+                {busy ? t('common.searching') : t('add.lookup')}
+              </button>
+              {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
+              <div className="hits">
+                {hits.map((h) => (
+                  <button className="hit" key={h.source + h.sourceId} onClick={() => addHit(h)} disabled={busy}>
+                    {h.coverUrl ? <img src={h.coverUrl} alt="" /> : <span className="noart" />}
+                    <span className="hinfo">
+                      <b>{h.title}</b>
+                      <span>{[h.year, h.format, h.rating !== null ? `★ ${Math.round(h.rating)}` : null].filter(Boolean).join(' · ')}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {showCamera ? (
+                <BarcodeScan onCode={(code) => { setShowCamera(false); setBarcode(code); lookupBarcode(code); }} />
+              ) : (
+                <button className="ghostbtn" style={{ marginTop: 12 }} onClick={() => setShowCamera(true)}>
+                  📷 {t('add.scanWithCamera')}
+                </button>
+              )}
+            </>
+          )}
         </div>
 
         <p className="mnote">{t('add.sourcesNote')}</p>

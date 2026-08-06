@@ -75,6 +75,12 @@ export const api = {
   search: (type: MediaType, q: string) =>
     req<{ hits: SearchHit[] }>(`/search/${type}?q=${encodeURIComponent(q)}`),
 
+  // barcode (EAN/UPC) lookup — manual entry or scan feed the same call
+  barcodeLookup: (type: MediaType, code: string) =>
+    req<{ resolvedTitle: string | null; hits: SearchHit[] }>(
+      `/barcode/${type}/${encodeURIComponent(code)}`
+    ),
+
   // apply a chosen search hit's artwork/rating/description to an existing item
   applyMatch: (id: string, hit: SearchHit) =>
     req<{ item: Item }>(`/items/${id}/apply-match`, {
