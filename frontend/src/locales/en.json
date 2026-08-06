@@ -14,6 +14,7 @@
   },
   "stats": { "itemsTotal": "items total", "collectionValue": "Collection value" },
   "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode" },
+  "sort": { "label": "Sort", "title": "Title (A–Z)", "added": "Newest added", "rating": "Rating", "value": "Value", "year": "Year" },
   "controls": {
     "enrich": "✦ Enrich collection",
     "enriching": "Enriching…",

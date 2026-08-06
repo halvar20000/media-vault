@@ -26,6 +26,7 @@ export default function App() {
   const [activeFormat, setActiveFormat] = useState<string>('all');
   const [formatOptions, setFormatOptions] = useState<{ format: string; count: number }[]>([]);
   const [noBarcode, setNoBarcode] = useState(false);
+  const [sort, setSort] = useState('title');
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelf' | 'grid'>('shelf');
 
@@ -55,12 +56,13 @@ export default function App() {
         q: query || undefined,
         format: activeFormat === 'all' ? undefined : activeFormat,
         nobarcode: noBarcode || undefined,
+        sort,
       }),
       api.stats(),
     ]);
     setItems(items);
     setStats(stats);
-  }, [active, query, activeFormat, noBarcode]);
+  }, [active, query, activeFormat, noBarcode, sort]);
 
   // Load the console/format facet options for the selected media type.
   useEffect(() => {
@@ -325,6 +327,11 @@ export default function App() {
               {valuing ? t('controls.valuing') : t('controls.value')}
             </button>
           </div>
+          <select className="formatsel" value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t('sort.label')}>
+            {['title', 'added', 'rating', 'value', 'year'].map((s) => (
+              <option key={s} value={s}>{t(`sort.${s}`)}</option>
+            ))}
+          </select>
           <div className="viewtoggle" role="group" aria-label="View">
             <button aria-pressed={view === 'shelf'} onClick={() => setView('shelf')}>{t('controls.shelf')}</button>
             <button aria-pressed={view === 'grid'} onClick={() => setView('grid')}>{t('controls.gallery')}</button>

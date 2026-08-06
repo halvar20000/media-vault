@@ -14,6 +14,7 @@
   },
   "stats": { "itemsTotal": "Einträge gesamt", "collectionValue": "Sammlungswert" },
   "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate", "needsBarcode": "Ohne Barcode" },
+  "sort": { "label": "Sortieren", "title": "Titel (A–Z)", "added": "Neueste zuerst", "rating": "Bewertung", "value": "Wert", "year": "Jahr" },
   "controls": {
     "enrich": "✦ Sammlung anreichern",
     "enriching": "Anreichern…",

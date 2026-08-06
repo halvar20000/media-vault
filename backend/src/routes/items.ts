@@ -47,12 +47,22 @@ itemsRouter.get('/', async (req, res) => {
     where.push(`(i.barcode IS NULL OR i.barcode = '')`);
   }
 
+  // Whitelisted sort orders (never interpolate user input directly).
+  const ORDER: Record<string, string> = {
+    title: 'i.title ASC',
+    added: 'i.created_at DESC, i.title ASC',
+    rating: 'i.rating DESC NULLS LAST, i.title ASC',
+    value: 'i.value DESC NULLS LAST, i.title ASC',
+    year: 'i.year DESC NULLS LAST, i.title ASC',
+  };
+  const orderBy = ORDER[String(req.query.sort ?? 'title')] ?? ORDER.title;
+
   const items = await query<Item>(
     `SELECT i.*, c.name AS cabinet_name
        FROM items i
        LEFT JOIN cabinets c ON c.id = i.cabinet_id
       WHERE ${where.join(' AND ')}
-      ORDER BY i.title ASC`,
+      ORDER BY ${orderBy}`,
     params
   );
   res.json({ items });
