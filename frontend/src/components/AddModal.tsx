@@ -33,6 +33,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [showCamera, setShowCamera] = useState(false);
   const [autoAdd, setAutoAdd] = useState(false);
   const [wishlist, setWishlist] = useState(false);
+  const [resolved, setResolved] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +47,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       setShowCamera(false);
       setAutoAdd(false);
       setWishlist(false);
+      setResolved('');
       setMsg(null);
       setMethod('search');
     }
@@ -77,6 +79,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       const { hits, resolvedTitle } = await api.barcodeLookup(type, code);
       setHits(hits);
       found = hits.length > 0;
+      setResolved(resolvedTitle || '');
       if (found && autoAdd) {
         await addHit(hits[0]);
       } else if (!found) {
@@ -292,6 +295,15 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                 </label>
               </div>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
+              {msg && hits.length === 0 && !busy && (
+                <button
+                  className="ghostbtn"
+                  style={{ marginTop: 8 }}
+                  onClick={() => { setMethod('search'); setMsg(null); if (resolved) setQ(resolved); }}
+                >
+                  → {t('add.searchInstead')}
+                </button>
+              )}
               <div className="hits">
                 {hits.map((h) => (
                   <button className="hit" key={h.source + h.sourceId} onClick={() => addHit(h)} disabled={busy}>

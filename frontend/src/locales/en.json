@@ -62,6 +62,7 @@
     "autoAdd": "Auto-add first result (rapid scan)",
     "barcodeResolvedNoMatch": "Found “{{title}}” but no match — try Search title.",
     "barcodeNoProduct": "No product found for that barcode.",
+    "searchInstead": "Search by title instead",
     "mediaType": "Media type",
     "titleLabel": "Title",
     "titlePlaceholder": "e.g. Bloodborne",
