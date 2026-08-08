@@ -46,6 +46,11 @@ export const api = {
     return req<{ items: Item[] }>(`/items${suffix}`);
   },
   stats: () => req<Stats>('/items/stats'),
+  checkBundle: (titles: string, type?: string) =>
+    req<{
+      results: { input: string; status: 'owned' | 'wishlist' | 'new'; match: string | null }[];
+      summary: { total: number; owned: number; wishlist: number; new: number };
+    }>('/items/check', { method: 'POST', body: JSON.stringify({ titles, type }) }),
   formats: (type?: string) =>
     req<{ formats: { format: string; count: number }[] }>(
       `/items/formats${type ? `?type=${type}` : ''}`

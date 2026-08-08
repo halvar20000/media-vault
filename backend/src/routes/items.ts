@@ -6,6 +6,7 @@ import { requireAuth, userId } from '../middleware/auth';
 import { MEDIA_TYPES, MediaType } from '../config';
 import type { Item } from '../types';
 import { cacheCover, saveUploadedCover } from '../lib/covers';
+import { buildCandidate, bestMatch } from '../lib/match';
 
 export const itemsRouter = Router();
 itemsRouter.use(requireAuth);
@@ -137,6 +138,43 @@ const EDITABLE = [
   'value', 'value_currency',
   'wishlist',
 ] as const;
+
+// POST /api/items/check → for a pasted list of titles, report owned/new/wishlist.
+itemsRouter.post('/check', async (req, res) => {
+  const uid = userId(req);
+  const type = String(req.body?.type ?? '').trim();
+  const raw = req.body?.titles;
+  const titles: string[] = (Array.isArray(raw) ? raw : String(raw ?? '').split('\n'))
+    .map((t: string) => String(t).replace(/^\s*[-*\d.)\]]+\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 500);
+  if (!titles.length) return res.json({ results: [], summary: { total: 0, owned: 0, wishlist: 0, new: 0 } });
+
+  const params: any[] = [uid];
+  let typeClause = '';
+  if (type && MEDIA_TYPES.includes(type as MediaType)) {
+    params.push(type);
+    typeClause = 'AND type = $2';
+  }
+  const rows = await query<{ title: string; wishlist: boolean }>(
+    `SELECT title, wishlist FROM items WHERE user_id = $1 ${typeClause}`,
+    params
+  );
+  const candidates = rows.map((r) => buildCandidate(r.title, r.wishlist));
+
+  const results = titles.map((input) => {
+    const m = bestMatch(input, candidates);
+    const status: 'owned' | 'wishlist' | 'new' = !m ? 'new' : m.match.wishlist ? 'wishlist' : 'owned';
+    return { input, status, match: m ? m.match.title : null };
+  });
+  const summary = {
+    total: results.length,
+    owned: results.filter((r) => r.status === 'owned').length,
+    wishlist: results.filter((r) => r.status === 'wishlist').length,
+    new: results.filter((r) => r.status === 'new').length,
+  };
+  res.json({ results, summary });
+});
 
 // GET /api/items/export → full collection as a CSV download.
 itemsRouter.get('/export', async (req, res) => {

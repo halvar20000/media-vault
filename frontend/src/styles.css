@@ -347,6 +347,17 @@ header {
 .primary { background: var(--accent); color: var(--ink); border: none; font-weight: 700; padding: 11px 16px; border-radius: var(--radius); font-family: "Archivo", sans-serif; font-size: 14px; }
 .primary:disabled { opacity: 0.6; cursor: default; }
 
+/* bundle-check results */
+.checkres { display: flex; flex-direction: column; gap: 3px; max-height: 320px; overflow-y: auto; margin-top: 4px; }
+.checkrow { display: flex; gap: 10px; align-items: center; padding: 6px 10px; border-radius: var(--radius); font-size: 13px; background: var(--bg); }
+.checkrow .cstat { width: 16px; text-align: center; font-weight: 700; flex: 0 0 auto; }
+.checkrow.owned { color: var(--muted); }
+.checkrow.owned .cstat { color: var(--t-game); }
+.checkrow.wishlist .cstat { color: var(--accent); }
+.checkrow.new { color: var(--surface); }
+.checkrow.new .cstat { color: var(--surface); }
+.checkrow .ctitle { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* fix-match blocks in the detail drawer */
 .fixblock { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 14px; background: rgba(0, 0, 0, 0.12); }
 .fixlabel { display: block; font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 8px; }

@@ -5,7 +5,13 @@ import { api } from '../api';
 import { TYPE_ORDER } from '../types';
 import type { MediaType, SearchHit } from '../types';
 
-type Method = 'search' | 'import' | 'scan' | 'manual';
+type Method = 'search' | 'import' | 'scan' | 'manual' | 'check';
+
+interface CheckResult {
+  input: string;
+  status: 'owned' | 'wishlist' | 'new';
+  match: string | null;
+}
 
 interface Props {
   open: boolean;
@@ -35,6 +41,9 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [wishlist, setWishlist] = useState(false);
   const [resolved, setResolved] = useState('');
   const [manual, setManual] = useState({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
+  const [checkText, setCheckText] = useState('');
+  const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
+  const [checkSummary, setCheckSummary] = useState<{ total: number; owned: number; wishlist: number; new: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
@@ -50,6 +59,9 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       setWishlist(false);
       setResolved('');
       setManual({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
+      setCheckText('');
+      setCheckResults([]);
+      setCheckSummary(null);
       setMsg(null);
       setMethod('search');
     }
@@ -176,6 +188,43 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     }
   }
 
+  async function runCheck() {
+    if (!checkText.trim()) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { results, summary } = await api.checkBundle(checkText, type);
+      setCheckResults(results);
+      setCheckSummary(summary);
+    } catch (e: any) {
+      setMsg(e.message || 'Check failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function addAllNewToWishlist() {
+    const news = checkResults.filter((r) => r.status === 'new');
+    if (!news.length) return;
+    setBusy(true);
+    try {
+      for (const r of news) {
+        try {
+          await api.createItem({ type, title: r.input, wishlist: true }, true);
+        } catch {
+          /* skip individual failures */
+        }
+      }
+      // mark them as wishlist in the visible results
+      setCheckResults((rs) => rs.map((r) => (r.status === 'new' ? { ...r, status: 'wishlist', match: r.input } : r)));
+      setCheckSummary((s) => (s ? { ...s, wishlist: s.wishlist + news.length, new: 0 } : s));
+      setMsg(t('add.addedNToWishlist', { count: news.length }));
+      onAdded();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function doImport() {
     const file = fileRef.current?.files?.[0];
     if (!file) return;
@@ -224,6 +273,11 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <span className="mi">✎</span>
             <span className="mh">{t('add.manual')}</span>
             <span className="md">{t('add.manualDesc')}</span>
+          </button>
+          <button className="method" aria-pressed={method === 'check'} onClick={() => setMethod('check')}>
+            <span className="mi">✓</span>
+            <span className="mh">{t('add.check')}</span>
+            <span className="md">{t('add.checkDesc')}</span>
           </button>
         </div>
 
@@ -413,6 +467,48 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{t('add.manualNote')}</p>
             </form>
+          )}
+          {method === 'check' && (
+            <>
+              <div className="rowfields">
+                <div className="field">
+                  <label>{t('add.mediaType')}</label>
+                  <select value={type} onChange={(e) => setType(e.target.value as MediaType)}>
+                    {TYPE_ORDER.map((mt) => <option key={mt} value={mt}>{t(`types.${mt}`)}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="field">
+                <label>{t('add.checkLabel')}</label>
+                <textarea rows={6} value={checkText} onChange={(e) => setCheckText(e.target.value)} placeholder={t('add.checkPlaceholder')} autoFocus />
+              </div>
+              <button className="primary" onClick={runCheck} disabled={busy || !checkText.trim()}>
+                {busy ? '…' : t('add.checkBtn')}
+              </button>
+              {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
+              {checkSummary && (
+                <>
+                  <p className="mnote" style={{ padding: '12px 0 6px', border: 0, color: 'var(--surface)' }}>
+                    <b style={{ color: 'var(--t-game)' }}>{checkSummary.owned} {t('add.chkOwned')}</b>
+                    {checkSummary.wishlist > 0 && <> · <b style={{ color: 'var(--accent)' }}>{checkSummary.wishlist} ★</b></>}
+                    {' · '}<b>{checkSummary.new} {t('add.chkNew')}</b> ({t('add.chkOf', { total: checkSummary.total })})
+                  </p>
+                  {checkSummary.new > 0 && (
+                    <button className="ghostbtn" style={{ marginBottom: 8 }} onClick={addAllNewToWishlist} disabled={busy}>
+                      ★ {t('add.addNewToWishlist', { count: checkSummary.new })}
+                    </button>
+                  )}
+                  <div className="checkres">
+                    {checkResults.map((r, i) => (
+                      <div className={`checkrow ${r.status}`} key={i}>
+                        <span className="cstat">{r.status === 'owned' ? '✓' : r.status === 'wishlist' ? '★' : '＋'}</span>
+                        <span className="ctitle">{r.input}{r.match && r.match !== r.input && r.status === 'owned' ? ` → ${r.match}` : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           )}
         </div>
 
