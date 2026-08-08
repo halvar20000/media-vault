@@ -156,6 +156,35 @@ export interface IgdbHint {
   platform?: string | null;
 }
 
+export interface BrowseOpts {
+  platformId: number;
+  region?: number; // IGDB release_dates.region (1 = Europe)
+  q?: string;
+  sort?: string; // popular | rating | name | year
+  limit?: number;
+  offset?: number;
+}
+
+// Browse a platform's game library (optionally region-filtered) for the catalogue.
+export async function igdbBrowse(o: BrowseOpts): Promise<SearchHit[]> {
+  const conds = [`platforms = (${o.platformId})`];
+  if (o.region) conds.push(`release_dates.region = ${o.region}`);
+  if (o.q && o.q.trim()) conds.push(`name ~ *"${esc(o.q)}"*`);
+  const sortMap: Record<string, string> = {
+    popular: 'total_rating_count desc',
+    rating: 'total_rating desc',
+    name: 'name asc',
+    year: 'first_release_date desc',
+  };
+  const sort = sortMap[o.sort ?? 'popular'] ?? sortMap.popular;
+  if (o.sort === 'rating') conds.push('total_rating != null');
+  else if (!o.sort || o.sort === 'popular') conds.push('total_rating_count != null');
+
+  const where = `where ${conds.join(' & ')}; sort ${sort}; limit ${o.limit ?? 40}; offset ${o.offset ?? 0};`;
+  const games = await apiGames(where);
+  return games.map(toHit);
+}
+
 export async function igdbEnrich(title: string, hint?: IgdbHint): Promise<EnrichmentResult | null> {
   // Search with the disambiguator stripped ("FIFA 06 (360)" → "FIFA 06").
   const q = stripDisambiguator(title);

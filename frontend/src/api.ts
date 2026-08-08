@@ -97,6 +97,19 @@ export const api = {
   search: (type: MediaType, q: string) =>
     req<{ hits: SearchHit[] }>(`/search/${type}?q=${encodeURIComponent(q)}`),
 
+  // catalogue: browse a platform's game library with owned/wishlist overlay
+  catalogue: (params: { platform: number; format?: string; q?: string; sort?: string; offset?: number }) => {
+    const qs = new URLSearchParams();
+    qs.set('platform', String(params.platform));
+    if (params.format) qs.set('format', params.format);
+    if (params.q) qs.set('q', params.q);
+    if (params.sort) qs.set('sort', params.sort);
+    if (params.offset) qs.set('offset', String(params.offset));
+    return req<{ games: (SearchHit & { status: 'owned' | 'wishlist' | 'none' })[]; hasMore: boolean; offset: number }>(
+      `/catalogue?${qs}`
+    );
+  },
+
   // barcode (EAN/UPC) lookup — manual entry or scan feed the same call
   barcodeLookup: (type: MediaType, code: string) =>
     req<{ resolvedTitle: string | null; hits: SearchHit[] }>(

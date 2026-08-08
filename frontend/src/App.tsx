@@ -10,6 +10,7 @@ import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
 import { DetailDrawer } from './components/DetailDrawer';
 import { AddModal } from './components/AddModal';
+import { Catalogue } from './components/Catalogue';
 
 const NO_SOURCES: EnrichStatus['sources'] = { igdb: false, tmdb: false, discogs: false };
 
@@ -34,6 +35,7 @@ export default function App() {
 
   const [selected, setSelected] = useState<Item | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [catalogueOpen, setCatalogueOpen] = useState(false);
   const [enriching, setEnriching] = useState(false);
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -369,6 +371,11 @@ export default function App() {
             <button aria-pressed={view === 'shelf'} onClick={() => setView('shelf')}>{t('controls.shelf')}</button>
             <button aria-pressed={view === 'grid'} onClick={() => setView('grid')}>{t('controls.gallery')}</button>
           </div>
+          {sources.igdb && (
+            <button className="ghostbtn" onClick={() => setCatalogueOpen(true)} title={t('catalogue.hint')}>
+              {t('controls.catalogue')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -390,6 +397,12 @@ export default function App() {
       />
 
       <AddModal open={addOpen} onClose={() => setAddOpen(false)} onAdded={refresh} sources={sources} />
+
+      {catalogueOpen && (
+        <div className="catoverlay">
+          <Catalogue onClose={() => setCatalogueOpen(false)} onChanged={refresh} />
+        </div>
+      )}
 
       {toast && <div className="toast">{toast}</div>}
     </>

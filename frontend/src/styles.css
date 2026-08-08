@@ -390,4 +390,24 @@ header {
   .stat { padding: 10px 16px; }
   .methods { grid-template-columns: 1fr; }
 }
+/* ---------- games catalogue ---------- */
+.catoverlay { position: fixed; inset: 0; background: var(--bg); z-index: 60; overflow-y: auto; }
+.catbar { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 16px 28px; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+.catbar select, .catbar input { background: var(--bg); color: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; font-size: 13px; }
+.catbar input { width: 100%; }
+.catbar .ghostbtn { margin-left: auto; }
+.catcard { background: var(--surface); color: var(--ink); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+.catcard.owned { opacity: 0.62; }
+.catcard .cover { aspect-ratio: 3/4; }
+.catbadge { position: absolute; top: 8px; left: 8px; z-index: 3; font-family: "IBM Plex Mono", monospace; font-size: 10px; padding: 3px 7px; border-radius: 3px; letter-spacing: 0.03em; }
+.catbadge.owned { background: #2f7d4f; color: #fff; }
+.catbadge.wish { background: var(--accent); color: var(--ink); font-size: 12px; top: 8px; left: auto; right: 8px; }
+.catadd { position: absolute; bottom: 8px; left: 8px; right: 8px; z-index: 3; background: rgba(10, 14, 20, 0.72); color: #fff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius); padding: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.catadd:hover:not(:disabled) { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+.catadd:disabled { opacity: 0.7; cursor: default; }
+.catcard .meta { padding: 9px 11px 12px; }
+.catcard .meta .mt { font-weight: 600; font-size: 12.5px; line-height: 1.2; margin: 0 0 3px; }
+.catcard .meta .ms { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; }
+
+@media (max-width: 640px) { .catbar { padding: 12px 16px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto; } }

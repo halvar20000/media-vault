@@ -27,7 +27,19 @@
     "valueTitle": "Marktwerte abrufen",
     "valueNoSource": "Keine Wert-Quellen konfiguriert (Spiele brauchen einen kostenpflichtigen PriceCharting-Schlüssel)",
     "shelf": "Regal",
-    "gallery": "Galerie"
+    "gallery": "Galerie",
+    "catalogue": "▤ Katalog"
+  },
+  "catalogue": {
+    "title": "Spiele-Katalog",
+    "searchPlaceholder": "Diese Plattform durchsuchen…",
+    "sortPopular": "Beliebteste",
+    "owned": "Im Besitz",
+    "want": "Wunsch",
+    "more": "Mehr laden",
+    "close": "Schließen",
+    "empty": "Keine Spiele gefunden — andere Plattform oder Suche versuchen.",
+    "hint": "Durchstöbere die Bibliothek einer Plattform. Spiele im Besitz sind markiert; ★ Wunsch fügt zur Wunschliste hinzu."
   },
   "shelf": {
     "hint": "↔ Regal scrollen · Rücken anklicken für Details · farbiges Band = Plattform / Format",

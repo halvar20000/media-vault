@@ -27,7 +27,19 @@
     "valueTitle": "Fetch market values",
     "valueNoSource": "No value sources configured (games need a paid PriceCharting key)",
     "shelf": "Shelf",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "catalogue": "▤ Catalogue"
+  },
+  "catalogue": {
+    "title": "Games catalogue",
+    "searchPlaceholder": "Search this platform…",
+    "sortPopular": "Most popular",
+    "owned": "Owned",
+    "want": "Want",
+    "more": "Load more",
+    "close": "Close",
+    "empty": "No games found — try another platform or search.",
+    "hint": "Browse a platform's library. Games you own are marked; ★ Want adds to your wishlist."
   },
   "shelf": {
     "hint": "↔ scroll the shelf · click a spine for details · coloured band = platform / format",
