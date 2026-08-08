@@ -14,7 +14,7 @@
     "export": "CSV exportieren"
   },
   "stats": { "itemsTotal": "Einträge gesamt", "collectionValue": "Sammlungswert", "wishlist": "auf Wunschliste" },
-  "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate", "needsBarcode": "Ohne Barcode", "wishlist": "★ Wunschliste", "bundles": "Konvolute", "bundlesTitle": "Auf leboncoin nach Konvoluten/Lots des gewählten Typs/der Plattform suchen" },
+  "filters": { "all": "Alle", "allPlatforms": "Alle Plattformen", "allFormats": "Alle Formate", "needsBarcode": "Ohne Barcode", "wishlist": "★ Wunschliste", "bundles": "Konvolute", "bundlesTitle": "Auf {{marketplace}} nach Konvoluten/Lots des gewählten Typs/der Plattform suchen" },
   "wishlist": { "add": "Auf die Wunschliste", "markOwned": "Besitze ich jetzt", "moveTo": "Auf Wunschliste verschieben", "badge": "WUNSCHLISTE" },
   "sort": { "label": "Sortieren", "title": "Titel (A–Z)", "added": "Neueste zuerst", "rating": "Bewertung", "value": "Wert", "year": "Jahr" },
   "controls": {
@@ -118,7 +118,8 @@
     "refetch": "Cover neu holen",
     "fetch": "Cover holen",
     "fetchValue": "Wert holen",
-    "leboncoin": "leboncoin",
+    "marketplace": "Angebot finden",
+    "marketplaceTitle": "Auf {{marketplace}} nach diesem Titel suchen, günstigste zuerst",
     "rowValue": "Wert",
     "value": "Wert",
     "currency": "Währung",

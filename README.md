@@ -64,10 +64,14 @@ Images are published automatically to `ghcr.io/halvar20000/media-vault` on every
 
 ### Unraid
 
-Add the template URL in **Docker → Add Container → Template**:
-`https://raw.githubusercontent.com/halvar20000/media-vault/main/unraid-template/media-vault.xml`
-(install a `postgres:16-alpine` container first and point the DB variables at it). Or use the
-**Docker Compose Manager** plugin with the `docker-compose.yml` above.
+Install a `postgres:16-alpine` container first and point the DB variables at it, then either:
+
+- **Community Applications** — search for *media-vault* in the Apps tab (once listed), or
+- **Docker → Add Container → Template** with:
+  `https://raw.githubusercontent.com/halvar20000/media-vault/main/templates/media-vault.xml`, or
+- the **Docker Compose Manager** plugin with the `docker-compose.yml` above.
+
+The CA store listing is defined by [`ca_profile.xml`](ca_profile.xml) + [`templates/media-vault.xml`](templates/media-vault.xml).
 
 ## Local development (no Docker)
 
@@ -83,6 +87,11 @@ cd frontend && npm install && npm run dev                                     # 
 
 All config is via environment variables — see [`.env.example`](.env.example) for the full
 list (database, session secret, app origin, and the three metadata-source keys).
+
+**`MARKETPLACE`** picks which second-hand marketplace the *find deals / bundles* buttons search,
+so titles and lot phrasing come out in your country's language. One of: `leboncoin` (France,
+default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`, `ebay-fr`, `marktplaats`
+(Netherlands), `wallapop` (Spain), or `none` to hide the buttons.
 
 ## Tech stack
 

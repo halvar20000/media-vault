@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#1b2430"/>
+  <!-- shelf of spines -->
+  <g>
+    <rect x="108" y="120" width="44" height="248" rx="8" fill="#4C9A5A"/>
+    <rect x="160" y="120" width="44" height="248" rx="8" fill="#3E7CB1"/>
+    <rect x="212" y="120" width="44" height="248" rx="8" fill="#C8681E"/>
+    <!-- highlighted gold spine, slightly taller -->
+    <rect x="264" y="104" width="48" height="264" rx="8" fill="#e0a126"/>
+    <rect x="320" y="120" width="44" height="248" rx="8" fill="#A24E8F"/>
+    <rect x="372" y="120" width="32" height="248" rx="8" fill="#3FA9A0"/>
+  </g>
+  <!-- shelf base -->
+  <rect x="92" y="374" width="328" height="26" rx="10" fill="#f3eee3"/>
+  <!-- title band notch on the gold spine -->
+  <rect x="272" y="150" width="32" height="10" rx="5" fill="#1b2430" opacity="0.65"/>
+  <rect x="272" y="318" width="32" height="10" rx="5" fill="#1b2430" opacity="0.65"/>
+</svg>

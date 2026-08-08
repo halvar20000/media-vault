@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import type { Cabinet, Item, SearchHit } from '../types';
 import { TYPE_META } from '../types';
-import { leboncoinSearchUrl } from '../leboncoin';
+import { marketplaceItemUrl, type Marketplace } from '../marketplace';
 
 interface Props {
   item: Item | null;
   cabinets: Cabinet[];
   sourceOn: boolean;
   valueSourceOn: boolean;
+  marketplace: Marketplace | null;
   onClose: () => void;
   onUpdated: (item: Item) => void | Promise<void>;
   onDelete: (item: Item) => void;
@@ -60,7 +61,7 @@ function toDraft(i: Item): Draft {
 
 const fmtDate = (s: string | null) => (s ? s.slice(0, 10) : null);
 
-export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
+export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketplace, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
   const { t } = useTranslation();
   const open = Boolean(item);
   const meta = item ? TYPE_META[item.type] : null;
@@ -240,8 +241,11 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, onClose,
                 <button className="ghostbtn" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
                   onClick={() => quick({ wishlist: false })} disabled={busy}>★ {t('wishlist.markOwned')}</button>
               )}
-              <a className="ghostbtn" href={leboncoinSearchUrl(item)} target="_blank" rel="noopener noreferrer"
-                style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>🔎 {t('drawer.leboncoin')}</a>
+              {marketplace && (
+                <a className="ghostbtn" href={marketplaceItemUrl(marketplace, item)} target="_blank" rel="noopener noreferrer"
+                  title={t('drawer.marketplaceTitle', { marketplace: marketplace.label })}
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>🔎 {t('drawer.marketplace')}</a>
+              )}
               {item.viewed_at
                 ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>{t('drawer.unwatch')}</button>
                 : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>{t('drawer.markViewed')}</button>}

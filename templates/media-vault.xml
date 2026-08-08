@@ -12,8 +12,8 @@
   <Description>media-vault catalogs your physical media collection and auto-fetches cover art, ratings and descriptions per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD). Requires a separate PostgreSQL 16 container — install one first (recommended image: postgres:16-alpine) and point the DB variables below at it.</Description>
   <Category>MediaApp:Video MediaApp:Music MediaApp:Other</Category>
   <WebUI>http://[IP]:[PORT:8080]</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/halvar20000/media-vault/main/unraid-template/media-vault.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/frontend/public/favicon.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/halvar20000/media-vault/main/templates/media-vault.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/icon.png</Icon>
   <Requires>A PostgreSQL 16 database. Install a postgres:16-alpine container first (set POSTGRES_USER/PASSWORD/DB) and link it via the DB variables below.</Requires>
 
   <Config Name="WebUI Port" Target="4000" Default="8080" Mode="tcp" Description="Port the app is reached on." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
@@ -28,6 +28,7 @@
   <Config Name="Session Secret" Target="SESSION_SECRET" Default="" Mode="" Description="Long random string for signing session cookies." Type="Variable" Display="always" Required="true" Mask="true"></Config>
   <Config Name="App Origin" Target="APP_ORIGIN" Default="http://localhost:8080" Mode="" Description="Public URL of the app (e.g. http://TOWER-IP:8080)." Type="Variable" Display="always" Required="false" Mask="false">http://localhost:8080</Config>
   <Config Name="Allow Registration" Target="ALLOW_REGISTRATION" Default="false" Mode="" Description="Let new users self-register. Keep false on an exposed instance." Type="Variable" Display="always" Required="false" Mask="false">false</Config>
+  <Config Name="Marketplace" Target="MARKETPLACE" Default="leboncoin" Mode="" Description="Which second-hand marketplace the 'find deals / bundles' buttons search. One of: leboncoin (France), kleinanzeigen (Germany), ebay-de, ebay-com, ebay-uk, ebay-fr, marktplaats (Netherlands), wallapop (Spain), or none to hide the buttons." Type="Variable" Display="always" Required="false" Mask="false">leboncoin</Config>
   <Config Name="HTTPS (production cookies)" Target="NODE_ENV" Default="development" Mode="" Description="Set to 'production' ONLY behind HTTPS (reverse proxy); otherwise leave 'development'." Type="Variable" Display="advanced" Required="false" Mask="false">development</Config>
 
   <Config Name="Seed user email" Target="SEED_USER_EMAIL" Default="admin@media-vault.local" Mode="" Description="Default login created on first boot." Type="Variable" Display="advanced" Required="false" Mask="false">admin@media-vault.local</Config>

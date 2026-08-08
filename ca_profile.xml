@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<CommunityApplications>
+  <Profile>
+media-vault is a self-hosted, open-source catalog for your **physical media** — video games, movies, vinyl LPs/singles and CDs — all on one shelf.
+
+**Highlights**
+- Automatic artwork: covers, ratings and descriptions fetched per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD).
+- Signature spine-shelf view plus a gallery grid.
+- Barcode add (camera or USB scanner), CSV import/export, wishlist, bundle checker and a games catalogue with ownership overlay.
+- Optional valuation (Discogs marketplace; PriceCharting for games).
+
+**Requires a separate PostgreSQL 16 container** — install `postgres:16-alpine` first, then point media-vault's DB variables at it.
+
+Issues and support: https://github.com/halvar20000/media-vault/issues
+  </Profile>
+  <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/icon.svg</Icon>
+  <WebPage>https://github.com/halvar20000/media-vault</WebPage>
+</CommunityApplications>
