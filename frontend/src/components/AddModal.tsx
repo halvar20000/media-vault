@@ -5,7 +5,7 @@ import { api } from '../api';
 import { TYPE_ORDER } from '../types';
 import type { MediaType, SearchHit } from '../types';
 
-type Method = 'search' | 'import' | 'scan';
+type Method = 'search' | 'import' | 'scan' | 'manual';
 
 interface Props {
   open: boolean;
@@ -34,6 +34,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [autoAdd, setAutoAdd] = useState(false);
   const [wishlist, setWishlist] = useState(false);
   const [resolved, setResolved] = useState('');
+  const [manual, setManual] = useState({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
   const fileRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
@@ -48,6 +49,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       setAutoAdd(false);
       setWishlist(false);
       setResolved('');
+      setManual({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
       setMsg(null);
       setMethod('search');
     }
@@ -95,25 +97,13 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     }
   }
 
-  async function addHit(h: SearchHit) {
-    setBusy(true);
-    const data = {
-      type,
-      title: h.title,
-      year: h.year ?? undefined,
-      format: h.format ?? undefined,
-      cover_url: h.coverUrl ?? undefined,
-      rating: h.rating ?? undefined,
-      description: h.description ?? undefined,
-      source: h.source,
-      source_id: h.sourceId,
-      barcode: method === 'scan' && barcode ? barcode.replace(/\D/g, '') : undefined,
-      wishlist: wishlist || undefined,
-    };
+  // Shared create with duplicate-confirm handling.
+  async function submitItem(data: Record<string, unknown>, successTitle: string): Promise<boolean> {
     try {
       await api.createItem(data);
-      setMsg(t('add.added', { title: h.title }));
+      setMsg(t('add.added', { title: successTitle }));
       onAdded();
+      return true;
     } catch (e: any) {
       if (e.duplicate) {
         const ex = e.duplicate;
@@ -121,8 +111,9 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
         if (window.confirm(t('add.duplicateConfirm', { title: ex.title, fmt }))) {
           try {
             await api.createItem(data, true);
-            setMsg(t('add.added', { title: h.title }));
+            setMsg(t('add.added', { title: successTitle }));
             onAdded();
+            return true;
           } catch (e2: any) {
             setMsg(e2.message || 'Could not add item');
           }
@@ -132,6 +123,54 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
       } else {
         setMsg(e.message || 'Could not add item');
       }
+      return false;
+    }
+  }
+
+  async function addHit(h: SearchHit) {
+    setBusy(true);
+    try {
+      await submitItem(
+        {
+          type,
+          title: h.title,
+          year: h.year ?? undefined,
+          format: h.format ?? undefined,
+          cover_url: h.coverUrl ?? undefined,
+          rating: h.rating ?? undefined,
+          description: h.description ?? undefined,
+          source: h.source,
+          source_id: h.sourceId,
+          barcode: method === 'scan' && barcode ? barcode.replace(/\D/g, '') : undefined,
+          wishlist: wishlist || undefined,
+        },
+        h.title
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function createManual() {
+    const title = manual.title.trim();
+    if (!title) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const ok = await submitItem(
+        {
+          type,
+          title,
+          format: manual.format.trim() || undefined,
+          year: manual.year ? parseInt(manual.year, 10) : undefined,
+          barcode: manual.barcode.replace(/\D/g, '') || undefined,
+          condition: manual.condition.trim() || undefined,
+          notes: manual.notes.trim() || undefined,
+          wishlist: wishlist || undefined,
+        },
+        title
+      );
+      if (ok) setManual({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
     } finally {
       setBusy(false);
     }
@@ -181,10 +220,15 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <span className="mh">{t('add.scan')}</span>
             <span className="md">{t('add.scanDesc')}</span>
           </button>
+          <button className="method" aria-pressed={method === 'manual'} onClick={() => setMethod('manual')}>
+            <span className="mi">✎</span>
+            <span className="mh">{t('add.manual')}</span>
+            <span className="md">{t('add.manualDesc')}</span>
+          </button>
         </div>
 
         <div className="mbody">
-          {(method === 'search' || method === 'scan') && (
+          {(method === 'search' || method === 'scan' || method === 'manual') && (
             <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--muted)', marginBottom: 12 }}>
               <input type="checkbox" checked={wishlist} onChange={(e) => setWishlist(e.target.checked)} style={{ width: 'auto' }} />
               ★ {t('wishlist.add')}
@@ -323,6 +367,52 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                 </button>
               )}
             </>
+          )}
+
+          {method === 'manual' && (
+            <form onSubmit={(e) => { e.preventDefault(); createManual(); }}>
+              <div className="rowfields">
+                <div className="field">
+                  <label>{t('add.mediaType')}</label>
+                  <select value={type} onChange={(e) => setType(e.target.value as MediaType)}>
+                    {TYPE_ORDER.map((mt) => <option key={mt} value={mt}>{t(`types.${mt}`)}</option>)}
+                  </select>
+                </div>
+                <div className="field" style={{ flex: 2 }}>
+                  <label>{t('add.titleLabel')} *</label>
+                  <input value={manual.title} onChange={(e) => setManual({ ...manual, title: e.target.value })} autoFocus />
+                </div>
+              </div>
+              <div className="rowfields">
+                <div className="field">
+                  <label>{t('drawer.format')}</label>
+                  <input value={manual.format} onChange={(e) => setManual({ ...manual, format: e.target.value })} placeholder="Xbox / Xbox 360 / Blu-Ray…" />
+                </div>
+                <div className="field">
+                  <label>{t('drawer.year')}</label>
+                  <input type="number" value={manual.year} onChange={(e) => setManual({ ...manual, year: e.target.value })} />
+                </div>
+              </div>
+              <div className="rowfields">
+                <div className="field" style={{ flex: 2 }}>
+                  <label>{t('add.barcode')}</label>
+                  <input value={manual.barcode} inputMode="numeric" onChange={(e) => setManual({ ...manual, barcode: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t('drawer.condition')}</label>
+                  <input value={manual.condition} onChange={(e) => setManual({ ...manual, condition: e.target.value })} placeholder="loose / CIB / VG+…" />
+                </div>
+              </div>
+              <div className="field">
+                <label>{t('drawer.notes')}</label>
+                <textarea rows={2} value={manual.notes} onChange={(e) => setManual({ ...manual, notes: e.target.value })} />
+              </div>
+              <button className="primary" type="submit" disabled={busy || !manual.title.trim()}>
+                {busy ? '…' : t('add.addManually')}
+              </button>
+              {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
+              <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{t('add.manualNote')}</p>
+            </form>
           )}
         </div>
 
