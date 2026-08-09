@@ -13,6 +13,9 @@ export interface Marketplace {
   label: string;
   lang: Lang;
   build: (query: string) => string;
+  // Shops (fixed catalogue, no classifieds "lots") override the bundle chip to
+  // link at a stable category page instead of a lot search.
+  bundle?: (type: MediaType | 'all', format?: string) => string;
 }
 
 const enc = (s: string) => encodeURIComponent(s.trim());
@@ -49,6 +52,23 @@ const MARKETPLACES: Record<string, Marketplace> = {
     label: 'Wallapop',
     lang: 'es',
     build: (q) => `https://es.wallapop.com/app/search?keywords=${enc(q)}`,
+  },
+  // medimops (momox) — German used-media SHOP, not a classifieds site. Per-item
+  // search uses its own search endpoint; the "bundles" chip links at the stable
+  // category page (medimops has no lots, and only sells used stock anyway).
+  medimops: {
+    id: 'medimops',
+    label: 'medimops',
+    lang: 'de',
+    build: (q) => `https://www.medimops.de/?listtype=search&searchparam=${enc(q)}`,
+    bundle: (type) => {
+      const cat =
+        type === 'game' ? 'spiele-C0300992'
+        : type === 'movie' ? 'filme-C0284266'
+        : type === 'lp' || type === 'single' || type === 'cd' ? 'musik-C0255882'
+        : 'produkte-C0';
+      return `https://www.medimops.de/${cat}/`;
+    },
   },
 };
 
@@ -120,5 +140,6 @@ export function marketplaceBundleUrl(
   type: MediaType | 'all',
   format?: string
 ): string {
+  if (mkt.bundle) return mkt.bundle(type, format);
   return mkt.build(bundleQuery(mkt.lang, type, format));
 }

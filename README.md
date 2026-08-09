@@ -91,7 +91,8 @@ list (database, session secret, app origin, and the three metadata-source keys).
 **`MARKETPLACE`** picks which second-hand marketplace the *find deals / bundles* buttons search,
 so titles and lot phrasing come out in your country's language. One of: `leboncoin` (France,
 default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`, `ebay-fr`, `marktplaats`
-(Netherlands), `wallapop` (Spain), or `none` to hide the buttons.
+(Netherlands), `wallapop` (Spain), `medimops` (German used-media shop), or `none` to hide the
+buttons.
 
 ## Tech stack
 
