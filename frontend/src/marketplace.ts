@@ -79,6 +79,21 @@ export function getMarketplace(id: string | undefined): Marketplace | null {
   return MARKETPLACES[id] ?? MARKETPLACES[DEFAULT_ID];
 }
 
+// Resolve a list of ids to distinct marketplaces (skips "none"/unknown dupes).
+export function getMarketplaces(ids: string[] | undefined): Marketplace[] {
+  const out: Marketplace[] = [];
+  const seen = new Set<string>();
+  for (const id of ids ?? []) {
+    if (id === 'none') continue;
+    const m = MARKETPLACES[id];
+    if (m && !seen.has(m.id)) {
+      seen.add(m.id);
+      out.push(m);
+    }
+  }
+  return out;
+}
+
 // Bundle ("lot"/"Konvolut") search phrasing per marketplace language.
 function bundleQuery(lang: Lang, type: MediaType | 'all', format?: string): string {
   const f = format?.trim();

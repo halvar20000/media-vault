@@ -9,7 +9,7 @@ export const authRouter = Router();
 // Public: lets the UI know whether to show the Register option, and which
 // second-hand marketplace the "find deals" links should target.
 authRouter.get('/config', (_req, res) => {
-  res.json({ allowRegistration: config.allowRegistration, marketplace: config.marketplace });
+  res.json({ allowRegistration: config.allowRegistration, marketplaces: config.marketplaces });
 });
 
 interface UserRow {

@@ -88,11 +88,12 @@ cd frontend && npm install && npm run dev                                     # 
 All config is via environment variables — see [`.env.example`](.env.example) for the full
 list (database, session secret, app origin, and the three metadata-source keys).
 
-**`MARKETPLACE`** picks which second-hand marketplace the *find deals / bundles* buttons search,
-so titles and lot phrasing come out in your country's language. One of: `leboncoin` (France,
-default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`, `ebay-fr`, `marktplaats`
-(Netherlands), `wallapop` (Spain), `medimops` (German used-media shop), or `none` to hide the
-buttons.
+**`MARKETPLACE`** picks which second-hand marketplace(s) the *find deals / bundles* buttons
+search, so titles and lot phrasing come out in each site's language. **Comma-separated** — each
+value adds its own button (e.g. `MARKETPLACE=leboncoin,medimops,kleinanzeigen`). Values:
+`leboncoin` (France, default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`,
+`ebay-fr`, `marktplaats` (Netherlands), `wallapop` (Spain), `medimops` (German used-media shop),
+or `none` to hide the buttons.
 
 ## Tech stack
 

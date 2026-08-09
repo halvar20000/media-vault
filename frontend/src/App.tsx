@@ -4,7 +4,7 @@ import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
-import { getMarketplace, marketplaceBundleUrl, type Marketplace } from './marketplace';
+import { getMarketplaces, marketplaceBundleUrl, type Marketplace } from './marketplace';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -23,7 +23,7 @@ export default function App() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [cabinets, setCabinets] = useState<Cabinet[]>([]);
   const [sources, setSources] = useState<EnrichStatus['sources']>(NO_SOURCES);
-  const [marketplace, setMarketplace] = useState<Marketplace | null>(null);
+  const [marketplaces, setMarketplaces] = useState<Marketplace[]>([]);
 
   const [active, setActive] = useState<'all' | MediaType>('all');
   const [activeFormat, setActiveFormat] = useState<string>('all');
@@ -52,8 +52,8 @@ export default function App() {
       .then(({ user }) => setUser(user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
-    // Public: which second-hand marketplace the "find deals" links target.
-    api.authConfig().then((c) => setMarketplace(getMarketplace(c.marketplace))).catch(() => {});
+    // Public: which second-hand marketplace(s) the "find deals" links target.
+    api.authConfig().then((c) => setMarketplaces(getMarketplaces(c.marketplaces))).catch(() => {});
   }, []);
 
   const refresh = useCallback(async () => {
@@ -334,18 +334,19 @@ export default function App() {
           <button className="chip" aria-pressed={wishlistView} onClick={() => setWishlistView((v) => !v)} title={t('filters.wishlist')}>
             {t('filters.wishlist')}
           </button>
-          {marketplace && (
+          {marketplaces.map((m) => (
             <a
+              key={m.id}
               className="chip"
-              href={marketplaceBundleUrl(marketplace, active, activeFormat !== 'all' ? activeFormat : undefined)}
+              href={marketplaceBundleUrl(m, active, activeFormat !== 'all' ? activeFormat : undefined)}
               target="_blank"
               rel="noopener noreferrer"
-              title={t('filters.bundlesTitle', { marketplace: marketplace.label })}
+              title={t('filters.bundlesTitle', { marketplace: m.label })}
               style={{ textDecoration: 'none' }}
             >
-              🔎 {t('filters.bundles')}
+              🔎 {m.label}
             </a>
-          )}
+          ))}
         </div>
         <div className="rightcontrols">
           <div className="enrich">
@@ -395,7 +396,7 @@ export default function App() {
         cabinets={cabinets}
         sourceOn={sourceForActiveDrawer}
         valueSourceOn={valueSourceForActiveDrawer}
-        marketplace={marketplace}
+        marketplaces={marketplaces}
         onClose={() => setSelected(null)}
         onUpdated={applyUpdated}
         onDelete={deleteItem}
