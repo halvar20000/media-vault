@@ -15,6 +15,7 @@ interface CustomShop {
 interface ShopsConfig {
   enabled: string[]; // built-in preset ids
   easycashStore: string;
+  craigslistSite: string;
   custom: CustomShop[];
 }
 
@@ -23,7 +24,12 @@ const LANGS = ['fr', 'de', 'en', 'nl', 'es'];
 // Defaults come from the environment so an existing env-configured instance keeps
 // working until someone saves settings in the UI.
 function envDefaults(): ShopsConfig {
-  return { enabled: config.marketplaces, easycashStore: config.easycashStore, custom: [] };
+  return {
+    enabled: config.marketplaces,
+    easycashStore: config.easycashStore,
+    craigslistSite: config.craigslistSite,
+    custom: [],
+  };
 }
 
 function sanitize(body: any): ShopsConfig {
@@ -31,6 +37,11 @@ function sanitize(body: any): ShopsConfig {
     ? body.enabled.filter((s: unknown) => typeof s === 'string').map((s: string) => s.trim().toLowerCase()).filter(Boolean)
     : [];
   const easycashStore = typeof body?.easycashStore === 'string' ? body.easycashStore.trim() : '';
+  // Craigslist subdomain only — letters/digits/hyphen (e.g. "newyork", "sfbay").
+  const craigslistSite =
+    typeof body?.craigslistSite === 'string'
+      ? body.craigslistSite.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')
+      : '';
 
   const seen = new Set<string>();
   const custom: CustomShop[] = [];
@@ -48,7 +59,7 @@ function sanitize(body: any): ShopsConfig {
     seen.add(id);
     custom.push({ id, label, url, lang });
   }
-  return { enabled, easycashStore, custom };
+  return { enabled, easycashStore, craigslistSite, custom };
 }
 
 // GET /api/settings/shops → effective shops config (DB row, else env defaults).

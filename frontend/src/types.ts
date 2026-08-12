@@ -105,6 +105,7 @@ export interface CustomShop {
 export interface ShopsConfig {
   enabled: string[]; // built-in preset ids
   easycashStore: string;
+  craigslistSite: string;
   custom: CustomShop[];
 }
 

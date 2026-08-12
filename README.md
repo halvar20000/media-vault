@@ -98,7 +98,8 @@ buttons, so titles and lot phrasing come out in each site's language. **Comma-se
 value adds its own button (e.g. `MARKETPLACE=leboncoin,medimops,kleinanzeigen`). Values:
 `leboncoin` (France, default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`,
 `ebay-fr`, `marktplaats` (Netherlands), `wallapop` (Spain), `medimops` (German used-media shop),
-`easycash` (French used-goods shop), or `none` to hide the buttons.
+`easycash` (French used-goods shop), `gamestop` (US game shop), `craigslist` (US classifieds —
+set `CRAIGSLIST_SITE` to your city, e.g. `newyork`), or `none` to hide the buttons.
 
 ## Tech stack
 

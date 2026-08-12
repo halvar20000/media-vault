@@ -36,6 +36,8 @@
     "intro": "Wähle, welche Shops die \"Angebot finden\"-Buttons durchsuchen. Änderungen gelten sofort — kein Neustart.",
     "easycashStore": "Easy-Cash-Laden (optional)",
     "easycashHint": "Easy Cash auf einen Laden festlegen mit dem exakten Wert, z. B. \"68 - Mulhouse\". Leer = ganz Frankreich.",
+    "craigslistSite": "Craigslist-Stadt",
+    "craigslistHint": "Craigslist ist stadtbezogen — gib deine Subdomain ein, z. B. newyork, sfbay, losangeles. Nötig, damit die Links funktionieren.",
     "customTitle": "Eigene Shops",
     "customName": "Shop-Name",
     "customAdd": "Hinzufügen",

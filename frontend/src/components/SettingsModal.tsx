@@ -26,6 +26,7 @@ export function SettingsModal({
   const { t } = useTranslation();
   const [enabled, setEnabled] = useState<string[]>([]);
   const [easycashStore, setEasycashStore] = useState('');
+  const [craigslistSite, setCraigslistSite] = useState('');
   const [custom, setCustom] = useState<CustomShop[]>([]);
   const [nLabel, setNLabel] = useState('');
   const [nUrl, setNUrl] = useState('');
@@ -38,6 +39,7 @@ export function SettingsModal({
     if (open) {
       setEnabled(config.enabled ?? []);
       setEasycashStore(config.easycashStore ?? '');
+      setCraigslistSite(config.craigslistSite ?? '');
       setCustom(config.custom ?? []);
       setNLabel(''); setNUrl(''); setNLang('en'); setErr(null);
     }
@@ -66,7 +68,7 @@ export function SettingsModal({
     setBusy(true);
     setErr(null);
     try {
-      const saved = await api.saveShops({ enabled, easycashStore: easycashStore.trim(), custom });
+      const saved = await api.saveShops({ enabled, easycashStore: easycashStore.trim(), craigslistSite: craigslistSite.trim(), custom });
       onSaved(saved);
       onClose();
     } catch (e: any) {
@@ -77,6 +79,7 @@ export function SettingsModal({
   }
 
   const easycashOn = enabled.includes('easycash');
+  const craigslistOn = enabled.includes('craigslist');
 
   return (
     <div className="modal open" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -108,6 +111,18 @@ export function SettingsModal({
                 placeholder="68 - Mulhouse"
               />
               <span className="sethint">{t('settings.easycashHint')}</span>
+            </div>
+          )}
+
+          {craigslistOn && (
+            <div className="setfield">
+              <label>{t('settings.craigslistSite')}</label>
+              <input
+                value={craigslistSite}
+                onChange={(e) => setCraigslistSite(e.target.value)}
+                placeholder="newyork"
+              />
+              <span className="sethint">{t('settings.craigslistHint')}</span>
             </div>
           )}
 

@@ -36,6 +36,8 @@
     "intro": "Pick which shops the \"find deal\" buttons search. Changes apply instantly — no restart.",
     "easycashStore": "Easy Cash store (optional)",
     "easycashHint": "Pin Easy Cash to one store using its exact value, e.g. \"68 - Mulhouse\". Blank = all of France.",
+    "craigslistSite": "Craigslist city",
+    "craigslistHint": "Craigslist is per-city — enter your site subdomain, e.g. newyork, sfbay, losangeles. Required for its links to work.",
     "customTitle": "Custom shops",
     "customName": "Shop name",
     "customAdd": "Add",

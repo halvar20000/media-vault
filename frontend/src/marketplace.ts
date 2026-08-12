@@ -31,6 +31,12 @@ export function setEasycashStore(v: string | undefined): void {
   easycashStore = (v || '').trim();
 }
 
+// Craigslist city subdomain (e.g. "newyork"). Blank = Craigslist links hidden.
+let craigslistSite = '';
+export function setCraigslistSite(v: string | undefined): void {
+  craigslistSite = (v || '').trim().toLowerCase();
+}
+
 // Easy Cash catalogue search (hosted on the bons-plans subdomain), optionally
 // pinned to a single physical store via the relatedShops facet.
 const easycashUrl = (q: string) => {
@@ -84,6 +90,26 @@ const MARKETPLACES: Record<string, Marketplace> = {
     lang: 'es',
     build: (q) => `https://es.wallapop.com/app/search?keywords=${enc(q)}`,
   },
+  // GameStop — US game retailer (new + pre-owned). A shop, so the bundle chip
+  // searches a plain category term instead of "lots".
+  gamestop: {
+    id: 'gamestop',
+    label: 'GameStop',
+    lang: 'en',
+    build: (q) => `https://www.gamestop.com/search-new/?q=${enc(q)}`,
+    bundle: (type) =>
+      `https://www.gamestop.com/search-new/?q=${enc(
+        type === 'movie' ? 'movies' : type === 'lp' || type === 'single' || type === 'cd' ? 'music' : 'video games'
+      )}`,
+  },
+  // Craigslist — US classifieds, city-specific (needs a site subdomain, set in
+  // Settings). Skipped entirely when no city is configured.
+  craigslist: {
+    id: 'craigslist',
+    label: 'Craigslist',
+    lang: 'en',
+    build: (q) => `https://${craigslistSite || 'www'}.craigslist.org/search/sss?query=${enc(q)}`,
+  },
   // Easy Cash — French used-goods SHOP chain (easycash.fr; catalogue on the
   // bons-plans subdomain). Per-item search hits its catalogue search; the
   // "bundles" chip searches the plain type term (a shop sells singles, not lots).
@@ -129,6 +155,8 @@ export const PRESETS: { id: string; label: string; country: string }[] = [
   { id: 'kleinanzeigen', label: 'Kleinanzeigen', country: 'Germany' },
   { id: 'ebay-de', label: 'eBay.de', country: 'Germany' },
   { id: 'ebay-com', label: 'eBay.com', country: 'USA' },
+  { id: 'gamestop', label: 'GameStop', country: 'USA' },
+  { id: 'craigslist', label: 'Craigslist', country: 'USA' },
   { id: 'ebay-uk', label: 'eBay.co.uk', country: 'UK' },
   { id: 'marktplaats', label: 'Marktplaats', country: 'Netherlands' },
   { id: 'wallapop', label: 'Wallapop', country: 'Spain' },
@@ -146,6 +174,8 @@ export function buildMarketplaces(cfg: ShopsConfig | null | undefined): Marketpl
   const out: Marketplace[] = [];
   const seen = new Set<string>();
   for (const id of cfg?.enabled ?? []) {
+    // Craigslist needs a city; without one it has no working search, so skip it.
+    if (id === 'craigslist' && !craigslistSite) continue;
     const m = MARKETPLACES[id];
     if (m && !seen.has(m.id)) {
       seen.add(m.id);

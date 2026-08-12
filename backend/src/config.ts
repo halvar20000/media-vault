@@ -102,6 +102,10 @@ export const config = {
   // Optional: restrict Easy Cash results to one physical store. Use the store's
   // exact facet value, e.g. "68 - Mulhouse". Blank = all stores (online catalogue).
   easycashStore: env('EASYCASH_STORE', ''),
+
+  // Craigslist is city-specific: set the site subdomain, e.g. "newyork", "sfbay".
+  // Blank = Craigslist links are hidden (it has no working national search).
+  craigslistSite: env('CRAIGSLIST_SITE', '').trim().toLowerCase(),
 };
 
 export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd';

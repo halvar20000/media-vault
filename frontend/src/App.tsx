@@ -4,7 +4,7 @@ import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, ShopsConfig, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
-import { buildMarketplaces, marketplaceBundleUrl, setEasycashStore, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
+import { buildMarketplaces, marketplaceBundleUrl, setEasycashStore, setCraigslistSite, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
 import { SettingsModal } from './components/SettingsModal';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
@@ -102,13 +102,14 @@ export default function App() {
     api.enrichStatus().then((s) => setSources(s.sources)).catch(() => {});
     api.valueStatus().then((s) => setValueSources(s.sources)).catch(() => {});
     api.listCabinets().then((r) => setCabinets(r.cabinets)).catch(() => {});
-    api.getShops().then((cfg) => { setShops(cfg); setEasycashStore(cfg.easycashStore); setMarketplaces(buildMarketplaces(cfg)); }).catch(() => {});
+    api.getShops().then(applyShops).catch(() => {});
   }, [user]);
 
-  // Apply a saved shops config live (from the Settings modal).
+  // Apply a saved shops config live (initial load + Settings modal save).
   function applyShops(cfg: ShopsConfig) {
     setShops(cfg);
     setEasycashStore(cfg.easycashStore);
+    setCraigslistSite(cfg.craigslistSite);
     setMarketplaces(buildMarketplaces(cfg));
   }
 
@@ -430,7 +431,7 @@ export default function App() {
 
       <SettingsModal
         open={settingsOpen}
-        config={shops ?? { enabled: [], easycashStore: '', custom: [] }}
+        config={shops ?? { enabled: [], easycashStore: '', craigslistSite: '', custom: [] }}
         onClose={() => setSettingsOpen(false)}
         onSaved={applyShops}
       />
