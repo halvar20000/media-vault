@@ -93,7 +93,7 @@ search, so titles and lot phrasing come out in each site's language. **Comma-sep
 value adds its own button (e.g. `MARKETPLACE=leboncoin,medimops,kleinanzeigen`). Values:
 `leboncoin` (France, default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`,
 `ebay-fr`, `marktplaats` (Netherlands), `wallapop` (Spain), `medimops` (German used-media shop),
-or `none` to hide the buttons.
+`easycash` (French used-goods shop), or `none` to hide the buttons.
 
 ## Tech stack
 

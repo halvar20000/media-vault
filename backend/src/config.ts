@@ -80,8 +80,8 @@ export const config = {
   // Which second-hand marketplace(s) the "find deals / bundles" links point at.
   // Comma-separated list — each becomes its own search button. Presets (see
   // frontend/src/marketplace.ts): leboncoin, kleinanzeigen, ebay-de, ebay-com,
-  // ebay-uk, ebay-fr, marktplaats, wallapop, medimops, or "none" to hide the
-  // feature. Defaults to leboncoin (France).
+  // ebay-uk, ebay-fr, marktplaats, wallapop, medimops, easycash, or "none" to
+  // hide the feature. Defaults to leboncoin (France).
   marketplaces: env('MARKETPLACE', 'leboncoin')
     .split(',')
     .map((s) => s.trim().toLowerCase())

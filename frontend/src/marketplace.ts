@@ -24,6 +24,10 @@ const enc = (s: string) => encodeURIComponent(s.trim());
 const ebay = (host: string) => (q: string) =>
   `https://www.${host}/sch/i.html?_nkw=${enc(q)}&_sop=15`;
 
+// Easy Cash catalogue search (hosted on the bons-plans subdomain).
+const easycashUrl = (q: string) =>
+  `https://bons-plans.easycash.fr/catalog/search?searchText=${enc(q)}&q=${enc(q)}`;
+
 const MARKETPLACES: Record<string, Marketplace> = {
   leboncoin: {
     id: 'leboncoin',
@@ -52,6 +56,23 @@ const MARKETPLACES: Record<string, Marketplace> = {
     label: 'Wallapop',
     lang: 'es',
     build: (q) => `https://es.wallapop.com/app/search?keywords=${enc(q)}`,
+  },
+  // Easy Cash — French used-goods SHOP chain (easycash.fr; catalogue on the
+  // bons-plans subdomain). Per-item search hits its catalogue search; the
+  // "bundles" chip searches the plain type term (a shop sells singles, not lots).
+  easycash: {
+    id: 'easycash',
+    label: 'Easy Cash',
+    lang: 'fr',
+    build: easycashUrl,
+    bundle: (type) =>
+      easycashUrl(
+        type === 'game' ? 'jeux video'
+        : type === 'movie' ? 'dvd blu-ray'
+        : type === 'lp' || type === 'single' ? 'vinyle'
+        : type === 'cd' ? 'cd'
+        : 'jeux video'
+      ),
   },
   // medimops (momox) — German used-media SHOP, not a classifieds site. Per-item
   // search uses its own search endpoint; the "bundles" chip links at the stable
