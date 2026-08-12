@@ -12,7 +12,8 @@ export const config = {
 
   port: parseInt(env('BACKEND_PORT', '4000'), 10),
   appOrigin: env('APP_ORIGIN', 'http://localhost:8080'),
-  sessionSecret: env('SESSION_SECRET', 'dev-insecure-secret-change-me'),
+  // Blank → auto-generated & persisted on first boot (see lib/secret.ts).
+  sessionSecret: env('SESSION_SECRET', ''),
 
   // Open registration is OFF by default — a seed/admin user always exists, so a
   // network-exposed instance shouldn't let strangers create accounts.

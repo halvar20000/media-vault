@@ -7,6 +7,7 @@ import connectPgSimple from 'connect-pg-simple';
 import { config } from './config';
 import { pool } from './db/pool';
 import { COVERS_DIR } from './lib/covers';
+import { resolveSessionSecret } from './lib/secret';
 import { authRouter } from './routes/auth';
 import { itemsRouter } from './routes/items';
 import { enrichRouter } from './routes/enrich';
@@ -35,7 +36,7 @@ app.use(
   session({
     store: new PgStore({ pool, tableName: 'session', createTableIfMissing: false }),
     name: 'mv.sid',
-    secret: config.sessionSecret,
+    secret: resolveSessionSecret(config.sessionSecret, COVERS_DIR),
     resave: false,
     saveUninitialized: false,
     cookie: {
