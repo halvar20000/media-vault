@@ -8,8 +8,8 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/halvar20000/media-vault/issues</Support>
   <Project>https://github.com/halvar20000/media-vault</Project>
-  <Overview>A self-hosted, open-source catalog for physical media (games, movies, vinyl, CDs) with automatic cover/rating/description enrichment and a signature spine-shelf view.</Overview>
-  <Description>media-vault catalogs your physical media collection and auto-fetches cover art, ratings and descriptions per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD). Requires a separate PostgreSQL 16 container — install one first (recommended image: postgres:16-alpine) and point the DB variables below at it.</Description>
+  <Overview>&#9888; SETUP FIRST: media-vault needs a separate PostgreSQL 16 database — install a "postgres:16-alpine" container first, then set this container's DB Host/Port/Name/User/Password to point at it.&#13;&#10;&#13;&#10;A self-hosted, open-source catalog for physical media (games, movies, vinyl, CDs) with automatic cover/rating/description enrichment and a signature spine-shelf view.</Overview>
+  <Description>&#9888; REQUIRES A SEPARATE POSTGRESQL 16 CONTAINER. Before installing media-vault, add a "postgres:16-alpine" container (set POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB), then fill in the DB Host/Port/Name/User/Password fields below to match it. media-vault will not start without a reachable database.&#13;&#10;&#13;&#10;media-vault catalogs your physical media collection and auto-fetches cover art, ratings and descriptions per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD).</Description>
   <Category>MediaApp:Video MediaApp:Music MediaApp:Other</Category>
   <WebUI>http://[IP]:[PORT:8080]</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/halvar20000/media-vault/main/templates/media-vault.xml</TemplateURL>

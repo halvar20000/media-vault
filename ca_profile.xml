@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <CommunityApplications>
   <Profile>
+&#9888; **SETUP FIRST — needs a separate PostgreSQL 16 container.** Install a `postgres:16-alpine` container (set POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB), then point media-vault's DB fields at it. It won't start without a reachable database.
+
 media-vault is a self-hosted, open-source catalog for your **physical media** — video games, movies, vinyl LPs/singles and CDs — all on one shelf.
 
 **Highlights**
