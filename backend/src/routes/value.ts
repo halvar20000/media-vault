@@ -44,6 +44,7 @@ valueRouter.get('/status', (req, res) => {
   res.json({
     job: jobs.get(userId(req)) ?? null,
     sources: {
+      ebay: config.ebay.enabled,
       pricecharting: config.pricecharting.enabled,
       discogs: valueSourceEnabled('discogs'),
     },

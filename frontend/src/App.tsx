@@ -41,7 +41,7 @@ export default function App() {
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const pollRef = useRef<number | null>(null);
-  const [valueSources, setValueSources] = useState({ pricecharting: false, discogs: false });
+  const [valueSources, setValueSources] = useState({ ebay: false, pricecharting: false, discogs: false });
   const [valuing, setValuing] = useState(false);
   const valuePollRef = useRef<number | null>(null);
 
@@ -232,7 +232,7 @@ export default function App() {
     : false;
   const valueSourceForActiveDrawer = selected
     ? selected.type === 'game'
-      ? valueSources.pricecharting
+      ? valueSources.ebay || valueSources.pricecharting
       : selected.type === 'movie'
         ? false
         : valueSources.discogs
@@ -240,7 +240,7 @@ export default function App() {
 
   const counts = stats?.byType ?? {};
   const anySource = sources.igdb || sources.tmdb || sources.discogs;
-  const anyValueSource = valueSources.pricecharting || valueSources.discogs;
+  const anyValueSource = valueSources.ebay || valueSources.pricecharting || valueSources.discogs;
   const hasValue = (stats?.totalValue?.length ?? 0) > 0;
 
   return (

@@ -27,8 +27,8 @@ cloud-locked ownership. So this app is one you run on your **own** server, with 
   barcode scan.
 - **Server-side metadata cache** — each title fetched once, respecting API terms.
 - **Valuation** — per-item market value + a collection total, condition-aware. Music via
-  Discogs marketplace (free), games via PriceCharting (**paid API token required**), and
-  manual values for anything else.
+  Discogs marketplace (free), games via **eBay used-listing prices (free API key)** — or
+  PriceCharting if you have a paid token — and manual values for anything else.
 - **Multi-user within one instance** (e.g. a household) via local email + password.
 
 ## Metadata sources (bring your own free keys)

@@ -81,7 +81,7 @@ export interface EnrichStatus {
 
 export interface ValueStatus {
   job: { running: boolean; summary: unknown | null; error: string | null } | null;
-  sources: { pricecharting: boolean; discogs: boolean };
+  sources: { ebay: boolean; pricecharting: boolean; discogs: boolean };
 }
 
 export interface SearchHit {

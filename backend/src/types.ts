@@ -40,7 +40,7 @@ export interface Item {
 }
 
 export interface ValueResult {
-  source: 'pricecharting' | 'discogs';
+  source: 'pricecharting' | 'discogs' | 'ebay';
   value: number;
   currency: string;
   note?: string; // e.g. which condition price was used

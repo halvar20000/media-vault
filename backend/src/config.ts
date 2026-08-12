@@ -74,6 +74,18 @@ export const config = {
       return Boolean(this.token);
     },
   },
+  // Game valuation via the eBay Browse API — FREE (register an app at
+  // developer.ebay.com). Uses active used-listing prices for the chosen
+  // marketplace (EBAY_DE, EBAY_FR, EBAY_GB, EBAY_US, …). When configured it takes
+  // priority over PriceCharting for games. Auth is OAuth2 client-credentials.
+  ebay: {
+    clientId: env('EBAY_CLIENT_ID'),
+    clientSecret: env('EBAY_CLIENT_SECRET'),
+    marketplaceId: env('EBAY_MARKETPLACE_ID', 'EBAY_DE'),
+    get enabled() {
+      return Boolean(this.clientId && this.clientSecret);
+    },
+  },
   // Currency for Discogs marketplace prices (music valuation).
   valuationCurrency: env('VALUATION_CURRENCY', 'EUR'),
 

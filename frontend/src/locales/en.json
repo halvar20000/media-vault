@@ -25,7 +25,7 @@
     "value": "€ Value collection",
     "valuing": "Valuing…",
     "valueTitle": "Fetch market values",
-    "valueNoSource": "No value sources configured (games need a paid PriceCharting key)",
+    "valueNoSource": "No value sources configured (games use a free eBay key or paid PriceCharting; music uses Discogs)",
     "shelf": "Shelf",
     "gallery": "Gallery",
     "catalogue": "▤ Catalogue"

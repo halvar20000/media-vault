@@ -6,17 +6,21 @@ import { query } from '../db/pool';
 import type { Item, ValueResult } from '../types';
 import { priceChartingValue } from './pricecharting';
 import { discogsMarketValue } from './discogs';
+import { ebayValue } from './ebay';
 
-export type ValueSource = 'pricecharting' | 'discogs';
+export type ValueSource = 'pricecharting' | 'discogs' | 'ebay';
 
 export function valueSourceFor(type: MediaType): ValueSource | null {
-  if (type === 'game') return 'pricecharting';
+  // Games: prefer free eBay when configured, else the paid PriceCharting.
+  if (type === 'game') return config.ebay.enabled ? 'ebay' : 'pricecharting';
   if (type === 'lp' || type === 'single' || type === 'cd') return 'discogs';
   return null; // movies have no automatic price source
 }
 
 export function valueSourceEnabled(src: ValueSource): boolean {
-  return src === 'pricecharting' ? config.pricecharting.enabled : config.discogs.enabled;
+  if (src === 'ebay') return config.ebay.enabled;
+  if (src === 'pricecharting') return config.pricecharting.enabled;
+  return config.discogs.enabled;
 }
 
 export interface ValueOutcome {
@@ -33,7 +37,9 @@ export async function valueItem(item: Item, opts: { allowManualOverride?: boolea
 
   try {
     let result: ValueResult | null = null;
-    if (src === 'pricecharting') {
+    if (src === 'ebay') {
+      result = await ebayValue(item.title, item.format);
+    } else if (src === 'pricecharting') {
       result = await priceChartingValue(item.title, item.format, item.condition);
     } else {
       // Discogs needs the release id captured during enrichment.
