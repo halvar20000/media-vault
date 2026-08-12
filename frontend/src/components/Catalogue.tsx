@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
+import { marketplaceItemUrl, type Marketplace } from '../marketplace';
 import type { SearchHit } from '../types';
 
 type Game = SearchHit & { status: 'owned' | 'wishlist' | 'none' };
@@ -29,7 +30,15 @@ const PLATFORMS: { label: string; igdb: number; format: string }[] = [
   { label: 'PC', igdb: 6, format: 'PC' },
 ];
 
-export function Catalogue({ onClose, onChanged }: { onClose: () => void; onChanged: () => void }) {
+export function Catalogue({
+  onClose,
+  onChanged,
+  marketplaces,
+}: {
+  onClose: () => void;
+  onChanged: () => void;
+  marketplaces: Marketplace[];
+}) {
   const { t } = useTranslation();
   const [platform, setPlatform] = useState(PLATFORMS[0]);
   const [q, setQ] = useState('');
@@ -126,6 +135,23 @@ export function Catalogue({ onClose, onChanged }: { onClose: () => void; onChang
             <div className="meta">
               <p className="mt">{g.title}</p>
               <div className="ms"><span>{g.year || ''}</span><span>{g.rating != null ? `★ ${Math.round(g.rating)}` : ''}</span></div>
+              {marketplaces.length > 0 && (
+                <details className="catshops">
+                  <summary>🔎 {t('catalogue.deals')}</summary>
+                  <div className="shops">
+                    {marketplaces.map((m) => (
+                      <a
+                        key={m.id}
+                        href={marketplaceItemUrl(m, { title: g.title, format: platform.format, type: 'game' })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {m.label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              )}
             </div>
           </div>
         ))}

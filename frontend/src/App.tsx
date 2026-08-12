@@ -423,7 +423,7 @@ export default function App() {
 
       {catalogueOpen && (
         <div className="catoverlay">
-          <Catalogue onClose={() => setCatalogueOpen(false)} onChanged={refresh} />
+          <Catalogue onClose={() => setCatalogueOpen(false)} onChanged={refresh} marketplaces={marketplaces} />
         </div>
       )}
 

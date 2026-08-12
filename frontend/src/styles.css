@@ -408,6 +408,13 @@ header {
 .catcard .meta { padding: 9px 11px 12px; }
 .catcard .meta .mt { font-weight: 600; font-size: 12.5px; line-height: 1.2; margin: 0 0 3px; }
 .catcard .meta .ms { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; }
+.catshops { margin-top: 7px; }
+.catshops summary { cursor: pointer; font-size: 11px; color: #6a6152; list-style: none; user-select: none; }
+.catshops summary::-webkit-details-marker { display: none; }
+.catshops[open] summary { color: var(--ink); font-weight: 600; }
+.catshops .shops { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.catshops .shops a { font-size: 10.5px; padding: 2px 7px; border: 1px solid rgba(0, 0, 0, 0.18); border-radius: 3px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.catshops .shops a:hover { border-color: var(--accent); background: rgba(224, 161, 38, 0.14); }
 
 @media (max-width: 640px) { .catbar { padding: 12px 16px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto; } }
