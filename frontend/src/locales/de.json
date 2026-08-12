@@ -31,6 +31,17 @@
     "catalogue": "▤ Katalog",
     "easycashStoreTitle": "Spiele im Easy-Cash-Laden {{store}} durchstöbern, günstigste zuerst (folgt der gewählten Plattform)"
   },
+  "settings": {
+    "title": "Shops & Marktplätze",
+    "intro": "Wähle, welche Shops die \"Angebot finden\"-Buttons durchsuchen. Änderungen gelten sofort — kein Neustart.",
+    "easycashStore": "Easy-Cash-Laden (optional)",
+    "easycashHint": "Easy Cash auf einen Laden festlegen mit dem exakten Wert, z. B. \"68 - Mulhouse\". Leer = ganz Frankreich.",
+    "customTitle": "Eigene Shops",
+    "customName": "Shop-Name",
+    "customAdd": "Hinzufügen",
+    "customHint": "Nutze {query} als Platzhalter für den Suchbegriff, z. B. https://shop.xy/search?q={query}",
+    "customError": "Gib eine http(s)-URL ein, die {query} enthält."
+  },
   "catalogue": {
     "title": "Spiele-Katalog",
     "searchPlaceholder": "Diese Plattform durchsuchen…",

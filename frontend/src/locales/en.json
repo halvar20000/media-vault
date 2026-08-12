@@ -31,6 +31,17 @@
     "catalogue": "▤ Catalogue",
     "easycashStoreTitle": "Browse games in stock at the {{store}} Easy Cash store, cheapest first (follows the selected platform)"
   },
+  "settings": {
+    "title": "Shops & marketplaces",
+    "intro": "Pick which shops the \"find deal\" buttons search. Changes apply instantly — no restart.",
+    "easycashStore": "Easy Cash store (optional)",
+    "easycashHint": "Pin Easy Cash to one store using its exact value, e.g. \"68 - Mulhouse\". Blank = all of France.",
+    "customTitle": "Custom shops",
+    "customName": "Shop name",
+    "customAdd": "Add",
+    "customHint": "Use {query} where the search term goes, e.g. https://shop.xy/search?q={query}",
+    "customError": "Enter an http(s) URL that contains {query}."
+  },
   "catalogue": {
     "title": "Games catalogue",
     "searchPlaceholder": "Search this platform…",

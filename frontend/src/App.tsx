@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from './api';
 import { LANGUAGES } from './i18n';
-import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
+import type { Cabinet, EnrichStatus, Item, MediaType, ShopsConfig, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
-import { getMarketplaces, marketplaceBundleUrl, setEasycashStore, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
+import { buildMarketplaces, marketplaceBundleUrl, setEasycashStore, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
+import { SettingsModal } from './components/SettingsModal';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -24,6 +25,8 @@ export default function App() {
   const [cabinets, setCabinets] = useState<Cabinet[]>([]);
   const [sources, setSources] = useState<EnrichStatus['sources']>(NO_SOURCES);
   const [marketplaces, setMarketplaces] = useState<Marketplace[]>([]);
+  const [shops, setShops] = useState<ShopsConfig | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [active, setActive] = useState<'all' | MediaType>('all');
   const [activeFormat, setActiveFormat] = useState<string>('all');
@@ -52,11 +55,6 @@ export default function App() {
       .then(({ user }) => setUser(user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
-    // Public: which second-hand marketplace(s) the "find deals" links target.
-    api.authConfig().then((c) => {
-      setEasycashStore(c.easycashStore);
-      setMarketplaces(getMarketplaces(c.marketplaces));
-    }).catch(() => {});
   }, []);
 
   const refresh = useCallback(async () => {
@@ -104,7 +102,15 @@ export default function App() {
     api.enrichStatus().then((s) => setSources(s.sources)).catch(() => {});
     api.valueStatus().then((s) => setValueSources(s.sources)).catch(() => {});
     api.listCabinets().then((r) => setCabinets(r.cabinets)).catch(() => {});
+    api.getShops().then((cfg) => { setShops(cfg); setEasycashStore(cfg.easycashStore); setMarketplaces(buildMarketplaces(cfg)); }).catch(() => {});
   }, [user]);
+
+  // Apply a saved shops config live (from the Settings modal).
+  function applyShops(cfg: ShopsConfig) {
+    setShops(cfg);
+    setEasycashStore(cfg.easycashStore);
+    setMarketplaces(buildMarketplaces(cfg));
+  }
 
   const refreshCabinets = useCallback(async () => {
     try { setCabinets((await api.listCabinets()).cabinets); } catch { /* ignore */ }
@@ -277,6 +283,7 @@ export default function App() {
           >
             {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
           </select>
+          <button className="ghostbtn" onClick={() => setSettingsOpen(true)} title={t('settings.title')}>⚙</button>
           <button className="ghostbtn" onClick={logout}>{t('header.signOut')}</button>
         </div>
       </header>
@@ -420,6 +427,13 @@ export default function App() {
       />
 
       <AddModal open={addOpen} onClose={() => setAddOpen(false)} onAdded={refresh} sources={sources} />
+
+      <SettingsModal
+        open={settingsOpen}
+        config={shops ?? { enabled: [], easycashStore: '', custom: [] }}
+        onClose={() => setSettingsOpen(false)}
+        onSaved={applyShops}
+      />
 
       {catalogueOpen && (
         <div className="catoverlay">

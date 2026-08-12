@@ -88,8 +88,13 @@ cd frontend && npm install && npm run dev                                     # 
 All config is via environment variables — see [`.env.example`](.env.example) for the full
 list (database, session secret, app origin, and the three metadata-source keys).
 
-**`MARKETPLACE`** picks which second-hand marketplace(s) the *find deals / bundles* buttons
-search, so titles and lot phrasing come out in each site's language. **Comma-separated** — each
+**Shops** can be configured in-app via the **⚙ Settings** panel — toggle the built-in shops, set
+an Easy Cash store, and add your own custom shops by search-URL (use `{query}` as the placeholder,
+e.g. `https://shop.xy/search?q={query}`). Changes save to the database and apply instantly. The
+env vars below are just the **initial defaults** used until you save settings in the app.
+
+**`MARKETPLACE`** picks the initial second-hand marketplace(s) for the *find deals / bundles*
+buttons, so titles and lot phrasing come out in each site's language. **Comma-separated** — each
 value adds its own button (e.g. `MARKETPLACE=leboncoin,medimops,kleinanzeigen`). Values:
 `leboncoin` (France, default), `kleinanzeigen` (Germany), `ebay-de`, `ebay-com`, `ebay-uk`,
 `ebay-fr`, `marktplaats` (Netherlands), `wallapop` (Spain), `medimops` (German used-media shop),

@@ -16,6 +16,7 @@ import { cabinetsRouter } from './routes/cabinets';
 import { valueRouter } from './routes/value';
 import { barcodeRouter } from './routes/barcode';
 import { catalogueRouter } from './routes/catalogue';
+import { settingsRouter } from './routes/settings';
 
 const app = express();
 app.set('trust proxy', 1); // correct secure-cookie handling behind a reverse proxy
@@ -61,6 +62,7 @@ app.use('/api/cabinets', cabinetsRouter);
 app.use('/api/value', valueRouter);
 app.use('/api/barcode', barcodeRouter);
 app.use('/api/catalogue', catalogueRouter);
+app.use('/api/settings', settingsRouter);
 
 // Single-image deploy: also serve the built SPA + client-side routing fallback.
 if (config.frontendDir) {

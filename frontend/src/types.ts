@@ -95,6 +95,19 @@ export interface SearchHit {
   description: string | null;
 }
 
+export interface CustomShop {
+  id: string;
+  label: string;
+  url: string; // search-URL template containing {query}
+  lang: string; // fr | de | en | nl | es
+}
+
+export interface ShopsConfig {
+  enabled: string[]; // built-in preset ids
+  easycashStore: string;
+  custom: CustomShop[];
+}
+
 export interface TypeMeta {
   label: string;
   color: string;

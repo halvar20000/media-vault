@@ -82,6 +82,13 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS value_source   TEXT;    -- pricechart
 ALTER TABLE items ADD COLUMN IF NOT EXISTS value_manual   BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS valued_at      TIMESTAMPTZ;
 
+-- Instance-wide key/value settings (e.g. the configured shops/marketplaces).
+CREATE TABLE IF NOT EXISTS settings (
+  key        TEXT PRIMARY KEY,
+  value      JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Session store table for connect-pg-simple.
 CREATE TABLE IF NOT EXISTS session (
   sid    VARCHAR NOT NULL COLLATE "default",

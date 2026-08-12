@@ -1,4 +1,4 @@
-import type { Item, MediaType } from './types';
+import type { CustomShop, Item, MediaType, ShopsConfig } from './types';
 
 // The deployer picks which second-hand marketplace the "find deals / bundles"
 // links point at (MARKETPLACE env var). Each preset knows how to build a search
@@ -120,23 +120,42 @@ const MARKETPLACES: Record<string, Marketplace> = {
   },
 };
 
-const DEFAULT_ID = 'leboncoin';
+// Built-in presets shown in the Settings panel, with a display country.
+export const PRESETS: { id: string; label: string; country: string }[] = [
+  { id: 'leboncoin', label: 'leboncoin', country: 'France' },
+  { id: 'easycash', label: 'Easy Cash', country: 'France' },
+  { id: 'ebay-fr', label: 'eBay.fr', country: 'France' },
+  { id: 'medimops', label: 'medimops', country: 'Germany' },
+  { id: 'kleinanzeigen', label: 'Kleinanzeigen', country: 'Germany' },
+  { id: 'ebay-de', label: 'eBay.de', country: 'Germany' },
+  { id: 'ebay-com', label: 'eBay.com', country: 'USA' },
+  { id: 'ebay-uk', label: 'eBay.co.uk', country: 'UK' },
+  { id: 'marktplaats', label: 'Marktplaats', country: 'Netherlands' },
+  { id: 'wallapop', label: 'Wallapop', country: 'Spain' },
+];
 
-export function getMarketplace(id: string | undefined): Marketplace | null {
-  if (!id || id === 'none') return null;
-  return MARKETPLACES[id] ?? MARKETPLACES[DEFAULT_ID];
+// A user-defined custom shop becomes a Marketplace via its {query} URL template.
+function customToMarketplace(c: CustomShop): Marketplace {
+  const lang = (['fr', 'de', 'en', 'nl', 'es'].includes(c.lang) ? c.lang : 'en') as Lang;
+  return { id: c.id, label: c.label, lang, build: (q) => c.url.replace(/\{query\}/g, enc(q)) };
 }
 
-// Resolve a list of ids to distinct marketplaces (skips "none"/unknown dupes).
-export function getMarketplaces(ids: string[] | undefined): Marketplace[] {
+// Resolve a saved shops config to the ordered list of active marketplaces:
+// enabled built-in presets first, then custom shops.
+export function buildMarketplaces(cfg: ShopsConfig | null | undefined): Marketplace[] {
   const out: Marketplace[] = [];
   const seen = new Set<string>();
-  for (const id of ids ?? []) {
-    if (id === 'none') continue;
+  for (const id of cfg?.enabled ?? []) {
     const m = MARKETPLACES[id];
     if (m && !seen.has(m.id)) {
       seen.add(m.id);
       out.push(m);
+    }
+  }
+  for (const c of cfg?.custom ?? []) {
+    if (c.id && c.label && c.url && !seen.has(c.id)) {
+      seen.add(c.id);
+      out.push(customToMarketplace(c));
     }
   }
   return out;

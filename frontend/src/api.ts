@@ -1,4 +1,4 @@
-import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, Stats, User, ValueStatus } from './types';
+import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, ShopsConfig, Stats, User, ValueStatus } from './types';
 
 // All requests share cookies for session auth.
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -75,6 +75,11 @@ export const api = {
   updateItem: (id: string, data: Partial<Item>) =>
     req<{ item: Item }>(`/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteItem: (id: string) => req<{ ok: true }>(`/items/${id}`, { method: 'DELETE' }),
+
+  // shops / marketplaces settings
+  getShops: () => req<ShopsConfig>('/settings/shops'),
+  saveShops: (cfg: ShopsConfig) =>
+    req<ShopsConfig>('/settings/shops', { method: 'PUT', body: JSON.stringify(cfg) }),
 
   // cabinets
   listCabinets: () => req<{ cabinets: Cabinet[] }>('/cabinets'),
