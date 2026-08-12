@@ -98,6 +98,10 @@ export const config = {
     .split(',')
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean),
+
+  // Optional: restrict Easy Cash results to one physical store. Use the store's
+  // exact facet value, e.g. "68 - Mulhouse". Blank = all stores (online catalogue).
+  easycashStore: env('EASYCASH_STORE', ''),
 };
 
 export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd';

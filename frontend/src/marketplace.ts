@@ -24,9 +24,19 @@ const enc = (s: string) => encodeURIComponent(s.trim());
 const ebay = (host: string) => (q: string) =>
   `https://www.${host}/sch/i.html?_nkw=${enc(q)}&_sop=15`;
 
-// Easy Cash catalogue search (hosted on the bons-plans subdomain).
-const easycashUrl = (q: string) =>
-  `https://bons-plans.easycash.fr/catalog/search?searchText=${enc(q)}&q=${enc(q)}`;
+// Optional Easy Cash store filter (exact facet value, e.g. "68 - Mulhouse").
+// Set once from /api/auth/config; blank = the full online catalogue.
+let easycashStore = '';
+export function setEasycashStore(v: string | undefined): void {
+  easycashStore = (v || '').trim();
+}
+
+// Easy Cash catalogue search (hosted on the bons-plans subdomain), optionally
+// pinned to a single physical store via the relatedShops facet.
+const easycashUrl = (q: string) => {
+  const base = `https://bons-plans.easycash.fr/catalog/search?searchText=${enc(q)}&q=${enc(q)}`;
+  return easycashStore ? `${base}&facets%5BrelatedShops%5D%5B%5D=${enc(easycashStore)}` : base;
+};
 
 const MARKETPLACES: Record<string, Marketplace> = {
   leboncoin: {

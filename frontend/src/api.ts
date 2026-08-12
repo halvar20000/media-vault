@@ -22,7 +22,8 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const api = {
   // auth
-  authConfig: () => req<{ allowRegistration: boolean; marketplaces: string[] }>('/auth/config'),
+  authConfig: () =>
+    req<{ allowRegistration: boolean; marketplaces: string[]; easycashStore: string }>('/auth/config'),
   me: () => req<{ user: User }>('/auth/me'),
   login: (email: string, password: string) =>
     req<{ user: User }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),

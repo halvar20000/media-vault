@@ -4,7 +4,7 @@ import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
-import { getMarketplaces, marketplaceBundleUrl, type Marketplace } from './marketplace';
+import { getMarketplaces, marketplaceBundleUrl, setEasycashStore, type Marketplace } from './marketplace';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -53,7 +53,10 @@ export default function App() {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
     // Public: which second-hand marketplace(s) the "find deals" links target.
-    api.authConfig().then((c) => setMarketplaces(getMarketplaces(c.marketplaces))).catch(() => {});
+    api.authConfig().then((c) => {
+      setEasycashStore(c.easycashStore);
+      setMarketplaces(getMarketplaces(c.marketplaces));
+    }).catch(() => {});
   }, []);
 
   const refresh = useCallback(async () => {

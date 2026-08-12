@@ -41,6 +41,7 @@ services:
       NODE_ENV: ${NODE_ENV}
       ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-false}
       MARKETPLACE: ${MARKETPLACE:-leboncoin}
+      EASYCASH_STORE: ${EASYCASH_STORE:-}
       SEED_USER_EMAIL: ${SEED_USER_EMAIL:-admin@media-vault.local}
       SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-changeme}
       SEED_USER_NAME: ${SEED_USER_NAME:-Collector}
