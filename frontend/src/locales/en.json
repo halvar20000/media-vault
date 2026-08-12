@@ -28,7 +28,8 @@
     "valueNoSource": "No value sources configured (games use a free eBay key or paid PriceCharting; music uses Discogs)",
     "shelf": "Shelf",
     "gallery": "Gallery",
-    "catalogue": "▤ Catalogue"
+    "catalogue": "▤ Catalogue",
+    "easycashStoreTitle": "Browse all games in stock at the {{store}} Easy Cash store, cheapest first"
   },
   "catalogue": {
     "title": "Games catalogue",

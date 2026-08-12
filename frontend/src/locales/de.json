@@ -28,7 +28,8 @@
     "valueNoSource": "Keine Wert-Quellen konfiguriert (Spiele: kostenloser eBay-Schlüssel oder kostenpflichtiges PriceCharting; Musik: Discogs)",
     "shelf": "Regal",
     "gallery": "Galerie",
-    "catalogue": "▤ Katalog"
+    "catalogue": "▤ Katalog",
+    "easycashStoreTitle": "Alle Spiele im Easy-Cash-Laden {{store}} durchstöbern, günstigste zuerst"
   },
   "catalogue": {
     "title": "Spiele-Katalog",

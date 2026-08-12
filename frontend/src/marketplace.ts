@@ -38,6 +38,21 @@ const easycashUrl = (q: string) => {
   return easycashStore ? `${base}&facets%5BrelatedShops%5D%5B%5D=${enc(easycashStore)}` : base;
 };
 
+// Human label for the configured store, e.g. "68 - Mulhouse" -> "Mulhouse".
+export function easycashStoreLabel(): string {
+  return easycashStore.replace(/^\s*\d+\s*-\s*/, '').trim();
+}
+
+// Browse everything of a media type in stock at the configured store, cheapest first.
+export function easycashStoreBrowseUrl(type: MediaType | 'all' = 'game'): string {
+  const term =
+    type === 'movie' ? 'dvd blu-ray'
+    : type === 'lp' || type === 'single' ? 'vinyle'
+    : type === 'cd' ? 'cd'
+    : 'jeux video';
+  return `${easycashUrl(term)}&sort=asc`;
+}
+
 const MARKETPLACES: Record<string, Marketplace> = {
   leboncoin: {
     id: 'leboncoin',

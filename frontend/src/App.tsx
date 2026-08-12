@@ -4,7 +4,7 @@ import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, Stats, User } from './types';
 import { TYPE_META, TYPE_ORDER } from './types';
-import { getMarketplaces, marketplaceBundleUrl, setEasycashStore, type Marketplace } from './marketplace';
+import { getMarketplaces, marketplaceBundleUrl, setEasycashStore, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -384,6 +384,18 @@ export default function App() {
             <button className="ghostbtn" onClick={() => setCatalogueOpen(true)} title={t('catalogue.hint')}>
               {t('controls.catalogue')}
             </button>
+          )}
+          {marketplaces.some((m) => m.id === 'easycash') && easycashStoreLabel() && (
+            <a
+              className="ghostbtn"
+              href={easycashStoreBrowseUrl('game')}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t('controls.easycashStoreTitle', { store: easycashStoreLabel() })}
+              style={{ textDecoration: 'none' }}
+            >
+              🎮 Easy Cash {easycashStoreLabel()}
+            </a>
           )}
         </div>
       </div>
