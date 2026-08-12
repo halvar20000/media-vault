@@ -29,7 +29,7 @@
     "shelf": "Shelf",
     "gallery": "Gallery",
     "catalogue": "▤ Catalogue",
-    "easycashStoreTitle": "Browse all games in stock at the {{store}} Easy Cash store, cheapest first"
+    "easycashStoreTitle": "Browse games in stock at the {{store}} Easy Cash store, cheapest first (follows the selected platform)"
   },
   "catalogue": {
     "title": "Games catalogue",

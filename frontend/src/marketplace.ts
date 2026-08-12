@@ -43,13 +43,15 @@ export function easycashStoreLabel(): string {
   return easycashStore.replace(/^\s*\d+\s*-\s*/, '').trim();
 }
 
-// Browse everything of a media type in stock at the configured store, cheapest first.
-export function easycashStoreBrowseUrl(type: MediaType | 'all' = 'game'): string {
-  const term =
+// Browse a media type in stock at the configured store, cheapest first. When a
+// game platform is given (e.g. "Xbox 360"), narrow to that platform's games.
+export function easycashStoreBrowseUrl(type: MediaType | 'all' = 'game', platform?: string): string {
+  let term =
     type === 'movie' ? 'dvd blu-ray'
     : type === 'lp' || type === 'single' ? 'vinyle'
     : type === 'cd' ? 'cd'
     : 'jeux video';
+  if (type === 'game' && platform && platform.trim()) term = `jeux ${platform.trim()}`;
   return `${easycashUrl(term)}&sort=asc`;
 }
 

@@ -388,13 +388,14 @@ export default function App() {
           {marketplaces.some((m) => m.id === 'easycash') && easycashStoreLabel() && (
             <a
               className="ghostbtn"
-              href={easycashStoreBrowseUrl('game')}
+              href={easycashStoreBrowseUrl('game', active === 'game' && activeFormat !== 'all' ? activeFormat : undefined)}
               target="_blank"
               rel="noopener noreferrer"
               title={t('controls.easycashStoreTitle', { store: easycashStoreLabel() })}
               style={{ textDecoration: 'none' }}
             >
               🎮 Easy Cash {easycashStoreLabel()}
+              {active === 'game' && activeFormat !== 'all' ? ` · ${activeFormat}` : ''}
             </a>
           )}
         </div>

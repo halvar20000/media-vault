@@ -29,7 +29,7 @@
     "shelf": "Regal",
     "gallery": "Galerie",
     "catalogue": "▤ Katalog",
-    "easycashStoreTitle": "Alle Spiele im Easy-Cash-Laden {{store}} durchstöbern, günstigste zuerst"
+    "easycashStoreTitle": "Spiele im Easy-Cash-Laden {{store}} durchstöbern, günstigste zuerst (folgt der gewählten Plattform)"
   },
   "catalogue": {
     "title": "Spiele-Katalog",
