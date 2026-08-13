@@ -6,6 +6,7 @@ import type { Cabinet, EnrichStatus, Item, MediaType, ShopsConfig, Stats, User }
 import { TYPE_META, TYPE_ORDER } from './types';
 import { buildMarketplaces, marketplaceBundleUrl, setEasycashStore, setCraigslistSite, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
 import { SettingsModal } from './components/SettingsModal';
+import { ChangelogModal } from './components/ChangelogModal';
 import { Auth } from './components/Auth';
 import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
@@ -28,6 +29,7 @@ export default function App() {
   const [shops, setShops] = useState<ShopsConfig | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [version, setVersion] = useState('');
+  const [changelogOpen, setChangelogOpen] = useState(false);
 
   const [active, setActive] = useState<'all' | MediaType>('all');
   const [activeFormat, setActiveFormat] = useState<string>('all');
@@ -268,7 +270,11 @@ export default function App() {
         <div className="brand">
           <h1>media-vault<span className="dot">.</span></h1>
           <span className="sub">{t('brand.sub')}</span>
-          {version && <span className="ver" title={t('brand.version', { version })}>v{version}</span>}
+          {version && (
+            <button className="ver verbtn" onClick={() => setChangelogOpen(true)} title={t('changelog.title')}>
+              v{version}
+            </button>
+          )}
         </div>
         <div className="searchwrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -446,6 +452,8 @@ export default function App() {
         onSaved={applyShops}
         onKeysSaved={refreshSources}
       />
+
+      <ChangelogModal open={changelogOpen} current={version} onClose={() => setChangelogOpen(false)} />
 
       {catalogueOpen && (
         <div className="catoverlay">

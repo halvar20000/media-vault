@@ -1,5 +1,6 @@
 {
   "brand": { "sub": "Physische-Medien-Archiv", "version": "media-vault Version {{version}}" },
+  "changelog": { "title": "Was ist neu", "current": "deine Version" },
   "common": {
     "save": "Speichern", "saving": "Speichern…", "cancel": "Abbrechen", "delete": "Löschen",
     "edit": "Bearbeiten", "search": "Suchen", "searching": "Suche…", "loading": "Lädt…",

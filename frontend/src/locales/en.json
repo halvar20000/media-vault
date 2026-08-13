@@ -1,5 +1,6 @@
 {
   "brand": { "sub": "physical media archive", "version": "media-vault version {{version}}" },
+  "changelog": { "title": "What's new", "current": "you're on this" },
   "common": {
     "save": "Save", "saving": "Saving…", "cancel": "Cancel", "delete": "Delete",
     "edit": "Edit", "search": "Search", "searching": "Searching…", "loading": "Loading…",
