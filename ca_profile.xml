@@ -13,6 +13,8 @@ media-vault is a self-hosted, open-source catalog for your **physical media** �
 
 **Requires a separate PostgreSQL 16 container** — install `postgres:16-alpine` first, then point media-vault's DB variables at it.
 
+📖 Setup guide: https://github.com/halvar20000/media-vault/blob/main/docs/INSTALL.md
+
 Issues and support: https://github.com/halvar20000/media-vault/issues
   </Profile>
   <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/icon.svg</Icon>

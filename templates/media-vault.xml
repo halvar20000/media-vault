@@ -8,13 +8,13 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/halvar20000/media-vault/issues</Support>
   <Project>https://github.com/halvar20000/media-vault</Project>
-  <Overview>&#9888; SETUP FIRST: media-vault needs a separate PostgreSQL 16 database — install a "postgres:16-alpine" container first, then set this container's DB Host/Port/Name/User/Password to point at it.&#13;&#10;&#13;&#10;A self-hosted, open-source catalog for physical media (games, movies, vinyl, CDs) with automatic cover/rating/description enrichment and a signature spine-shelf view.</Overview>
+  <Overview>&#9888; SETUP FIRST: media-vault needs a separate PostgreSQL 16 database — install a "postgres:16-alpine" container first, then set this container's DB Host/Port/Name/User/Password to point at it.&#13;&#10;&#13;&#10;A self-hosted, open-source catalog for physical media (games, movies, vinyl, CDs) with automatic cover/rating/description enrichment and a signature spine-shelf view.&#13;&#10;&#13;&#10;&#128214; Full setup guide (install, get the free artwork keys, add them in the app): https://github.com/halvar20000/media-vault/blob/main/docs/INSTALL.md</Overview>
   <Description>&#9888; REQUIRES A SEPARATE POSTGRESQL 16 CONTAINER. Before installing media-vault, add a "postgres:16-alpine" container (set POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB), then fill in the DB Host/Port/Name/User/Password fields below to match it. media-vault will not start without a reachable database.&#13;&#10;&#13;&#10;media-vault catalogs your physical media collection and auto-fetches cover art, ratings and descriptions per media type (IGDB for games, TMDB for movies, Discogs for vinyl/CD).&#13;&#10;&#13;&#10;FIRST LOGIN: use the "Login email" and "Login password" you set below (defaults admin@media-vault.local / changeme). The Session Secret can be left blank — it's generated automatically.</Description>
   <Category>MediaApp:Video MediaApp:Music MediaApp:Other</Category>
   <WebUI>http://[IP]:[PORT:8080]</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/halvar20000/media-vault/main/templates/media-vault.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/halvar20000/media-vault/main/icon.png</Icon>
-  <Requires>A PostgreSQL 16 database. Install a postgres:16-alpine container first (set POSTGRES_USER/PASSWORD/DB) and link it via the DB variables below.</Requires>
+  <Requires>A PostgreSQL 16 database. Install a postgres:16-alpine container first (set POSTGRES_USER/PASSWORD/DB) and link it via the DB variables below.&#13;&#10;&#13;&#10;Step-by-step setup guide: https://github.com/halvar20000/media-vault/blob/main/docs/INSTALL.md</Requires>
 
   <Config Name="WebUI Port" Target="4000" Default="8080" Mode="tcp" Description="Port the app is reached on." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
   <Config Name="Covers Volume" Target="/app/data/covers" Default="/mnt/user/appdata/media-vault/covers" Mode="rw" Description="Where cached cover images are stored." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/media-vault/covers</Config>
