@@ -6,6 +6,21 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    # Don't rebuild the image for changes that don't affect the running app
+    # (docs, the CA template/profile, repo icons) — this stops Unraid from
+    # showing a phantom "update available". Release tags always build (their
+    # commit bumps package.json, which isn't ignored), and workflow_dispatch is
+    # always a manual override.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'templates/**'
+      - 'unraid-template/**'
+      - 'ca_profile.xml'
+      - 'icon.svg'
+      - 'icon.png'
+      - 'LICENSE'
+      - '.gitignore'
   workflow_dispatch:
 
 env:
