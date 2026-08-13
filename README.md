@@ -10,6 +10,9 @@ and unified into one browsable **spine shelf**.
 
 ![status](https://img.shields.io/badge/status-early--v1-E0A126) ![license](https://img.shields.io/badge/license-AGPL--3.0-4C9A5A)
 
+📖 **New here? Follow the [Installation & Setup Guide](docs/INSTALL.md)** — install the app +
+database, get the free artwork keys, and add them in the app, step by step.
+
 ---
 
 ## Why self-hosted
@@ -131,6 +134,7 @@ Pin a specific version by setting the container's repository to `…/media-vault
 
 ## Project docs
 
+- [`docs/INSTALL.md`](docs/INSTALL.md) — **installation & setup guide** (start here).
 - [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) — founding spec.
 - [`CHAT_SUMMARY.md`](CHAT_SUMMARY.md) — design reasoning.
 - [`media-vault-prototype.html`](media-vault-prototype.html) — original design prototype.
