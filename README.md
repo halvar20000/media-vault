@@ -135,6 +135,7 @@ Pin a specific version by setting the container's repository to `…/media-vault
 ## Project docs
 
 - [`docs/INSTALL.md`](docs/INSTALL.md) — **installation & setup guide** (start here).
+- [`CHANGELOG.md`](CHANGELOG.md) — version history (also viewable in-app via the version badge).
 - [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) — founding spec.
 - [`CHAT_SUMMARY.md`](CHAT_SUMMARY.md) — design reasoning.
 - [`media-vault-prototype.html`](media-vault-prototype.html) — original design prototype.
