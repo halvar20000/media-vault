@@ -1,5 +1,5 @@
 {
-  "brand": { "sub": "Physische-Medien-Archiv" },
+  "brand": { "sub": "Physische-Medien-Archiv", "version": "media-vault Version {{version}}" },
   "common": {
     "save": "Speichern", "saving": "Speichern…", "cancel": "Abbrechen", "delete": "Löschen",
     "edit": "Bearbeiten", "search": "Suchen", "searching": "Suche…", "loading": "Lädt…",

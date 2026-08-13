@@ -105,6 +105,23 @@ value adds its own button (e.g. `MARKETPLACE=leboncoin,medimops,kleinanzeigen`).
 `easycash` (French used-goods shop), `gamestop` (US game shop), `craigslist` (US classifieds —
 set `CRAIGSLIST_SITE` to your city, e.g. `newyork`), or `none` to hide the buttons.
 
+## Releasing (versioned images)
+
+Images are tagged by version. Pushing a `vX.Y.Z` git tag builds and publishes
+`ghcr.io/halvar20000/media-vault:X.Y.Z`, `:X.Y`, and `:latest`. The running version
+is shown in the app header and at `GET /api/health`.
+
+To cut a release:
+
+```bash
+# bump the version in backend/package.json + frontend/package.json to X.Y.Z, commit, then:
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin vX.Y.Z
+```
+
+Every push to `main` still publishes `:latest`, so Unraid's "check for updates" keeps working.
+Pin a specific version by setting the container's repository to `…/media-vault:X.Y.Z`.
+
 ## Tech stack
 
 - **Backend** — Node.js + TypeScript + Express, PostgreSQL (`pg`, plain SQL migrations).

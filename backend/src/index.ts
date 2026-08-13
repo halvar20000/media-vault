@@ -1,5 +1,6 @@
 import express from 'express';
 import { join } from 'path';
+import { readFileSync } from 'fs';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -52,8 +53,18 @@ app.use(
 // Serve cached cover images (downloaded during enrichment).
 app.use('/api/covers', express.static(COVERS_DIR, { maxAge: '7d', immutable: true }));
 
-// Health check.
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+// App version: an APP_VERSION env (baked at image build) wins, else package.json.
+const APP_VERSION = (() => {
+  if (process.env.APP_VERSION) return process.env.APP_VERSION;
+  try {
+    return JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8')).version as string;
+  } catch {
+    return 'dev';
+  }
+})();
+
+// Health check (also reports the running version).
+app.get('/api/health', (_req, res) => res.json({ ok: true, version: APP_VERSION }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/items', itemsRouter);

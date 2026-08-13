@@ -1,5 +1,5 @@
 {
-  "brand": { "sub": "physical media archive" },
+  "brand": { "sub": "physical media archive", "version": "media-vault version {{version}}" },
   "common": {
     "save": "Save", "saving": "Saving…", "cancel": "Cancel", "delete": "Delete",
     "edit": "Edit", "search": "Search", "searching": "Searching…", "loading": "Loading…",

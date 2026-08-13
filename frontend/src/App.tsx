@@ -27,6 +27,7 @@ export default function App() {
   const [marketplaces, setMarketplaces] = useState<Marketplace[]>([]);
   const [shops, setShops] = useState<ShopsConfig | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [version, setVersion] = useState('');
 
   const [active, setActive] = useState<'all' | MediaType>('all');
   const [activeFormat, setActiveFormat] = useState<string>('all');
@@ -55,6 +56,7 @@ export default function App() {
       .then(({ user }) => setUser(user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
+    api.health().then((h) => setVersion(h.version)).catch(() => {});
   }, []);
 
   const refresh = useCallback(async () => {
@@ -266,6 +268,7 @@ export default function App() {
         <div className="brand">
           <h1>media-vault<span className="dot">.</span></h1>
           <span className="sub">{t('brand.sub')}</span>
+          {version && <span className="ver" title={t('brand.version', { version })}>v{version}</span>}
         </div>
         <div className="searchwrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

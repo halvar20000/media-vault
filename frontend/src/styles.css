@@ -54,6 +54,7 @@ header {
   line-height: 1;
 }
 .brand .dot { color: var(--accent); }
+.brand .ver { font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; align-self: center; }
 .brand .sub {
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;

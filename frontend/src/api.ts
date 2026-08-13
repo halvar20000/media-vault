@@ -21,6 +21,9 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
+  // meta
+  health: () => req<{ ok: boolean; version: string }>('/health'),
+
   // auth
   authConfig: () =>
     req<{ allowRegistration: boolean; marketplaces: string[]; easycashStore: string }>('/auth/config'),
