@@ -47,5 +47,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Publish a plain single-manifest image (no attestation index), so
+          # Unraid's update check can compare digests instead of "not available".
+          provenance: false
+          sbom: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
