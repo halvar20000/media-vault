@@ -1,6 +1,6 @@
 // TMDB (movies) provider. Auth is a v4 bearer "Read Access Token".
 // Docs: https://developer.themoviedb.org/
-import { config } from '../config';
+import { getApiKeys } from '../lib/apikeys';
 import type { EnrichmentResult, SearchHit } from '../types';
 
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
@@ -18,10 +18,10 @@ async function apiSearch(title: string): Promise<TmdbMovie[]> {
   const url = new URL('https://api.themoviedb.org/3/search/movie');
   url.searchParams.set('query', title);
   url.searchParams.set('include_adult', 'false');
-  url.searchParams.set('language', config.tmdb.language);
+  url.searchParams.set('language', getApiKeys().tmdbLanguage);
   const res = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${config.tmdb.accessToken}`,
+      Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`,
       Accept: 'application/json',
     },
   });

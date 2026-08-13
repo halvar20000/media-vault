@@ -113,6 +113,13 @@ export default function App() {
     setMarketplaces(buildMarketplaces(cfg));
   }
 
+  // After saving API keys, re-read which sources are live so the Catalogue,
+  // Enrich and Value buttons appear/disappear without a reload.
+  function refreshSources() {
+    api.enrichStatus().then((s) => setSources(s.sources)).catch(() => {});
+    api.valueStatus().then((s) => setValueSources(s.sources)).catch(() => {});
+  }
+
   const refreshCabinets = useCallback(async () => {
     try { setCabinets((await api.listCabinets()).cabinets); } catch { /* ignore */ }
   }, []);
@@ -434,6 +441,7 @@ export default function App() {
         config={shops ?? { enabled: [], easycashStore: '', craigslistSite: '', custom: [] }}
         onClose={() => setSettingsOpen(false)}
         onSaved={applyShops}
+        onKeysSaved={refreshSources}
       />
 
       {catalogueOpen && (

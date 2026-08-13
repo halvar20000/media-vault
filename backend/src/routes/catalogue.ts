@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
-import { config } from '../config';
+import { sourcesEnabled } from '../lib/apikeys';
 import { igdbBrowse } from '../services/igdb';
 import { buildCandidate, bestMatch, type Candidate } from '../lib/match';
 
@@ -11,7 +11,7 @@ catalogueRouter.use(requireAuth);
 // GET /api/catalogue?platform=8&region=1&q=&sort=popular&offset=0
 // Browse a platform's game library with owned / wishlist overlay.
 catalogueRouter.get('/', async (req, res) => {
-  if (!config.igdb.enabled) return res.status(400).json({ error: 'IGDB is not configured', games: [] });
+  if (!sourcesEnabled().igdb) return res.status(400).json({ error: 'IGDB is not configured', games: [] });
 
   const platform = parseInt(String(req.query.platform ?? ''), 10);
   if (!platform) return res.status(400).json({ error: 'platform (IGDB id) required' });

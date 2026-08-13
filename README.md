@@ -88,6 +88,10 @@ cd frontend && npm install && npm run dev                                     # 
 All config is via environment variables — see [`.env.example`](.env.example) for the full
 list (database, session secret, app origin, and the three metadata-source keys).
 
+**API keys** (IGDB, TMDB, Discogs, eBay, PriceCharting) can be added in-app via the **⚙ Settings**
+panel — no env editing or restart. They're stored on your server, shown masked, and override the
+env defaults below. IGDB unlocks game covers + the catalogue, TMDB movies, Discogs music.
+
 **Shops** can be configured in-app via the **⚙ Settings** panel — toggle the built-in shops, set
 an Easy Cash store, and add your own custom shops by search-URL (use `{query}` as the placeholder,
 e.g. `https://shop.xy/search?q={query}`). Changes save to the database and apply instantly. The

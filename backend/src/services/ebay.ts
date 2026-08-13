@@ -5,7 +5,7 @@
 // completed/sold prices (eBay's sold-price API needs business approval), so treat
 // the figure as a solid ballpark rather than an exact sold value.
 // Docs: https://developer.ebay.com/api-docs/buy/browse/overview.html
-import { config } from '../config';
+import { getApiKeys } from '../lib/apikeys';
 import type { ValueResult } from '../types';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
@@ -13,7 +13,7 @@ let cachedToken: { value: string; expiresAt: number } | null = null;
 async function getToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expiresAt - 60_000) return cachedToken.value;
 
-  const basic = Buffer.from(`${config.ebay.clientId}:${config.ebay.clientSecret}`).toString('base64');
+  const basic = Buffer.from(`${getApiKeys().ebayClientId}:${getApiKeys().ebayClientSecret}`).toString('base64');
   const res = await fetch('https://api.ebay.com/identity/v1/oauth2/token', {
     method: 'POST',
     headers: {
@@ -54,7 +54,7 @@ export async function ebayValue(
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
-      'X-EBAY-C-MARKETPLACE-ID': config.ebay.marketplaceId,
+      'X-EBAY-C-MARKETPLACE-ID': getApiKeys().ebayMarketplaceId,
     },
   });
   if (!res.ok) throw new Error(`eBay search failed: ${res.status} ${await res.text()}`);

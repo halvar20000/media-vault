@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../db/pool';
 import { requireAuth } from '../middleware/auth';
 import { config } from '../config';
+import { getApiKeys, reloadApiKeys, SECRET_FIELDS, PLAIN_FIELDS } from '../lib/apikeys';
 
 export const settingsRouter = Router();
 
@@ -82,4 +83,49 @@ settingsRouter.put('/shops', requireAuth, async (req, res) => {
     [JSON.stringify(clean)]
   );
   res.json(clean);
+});
+
+// Masked view of the effective API keys: secrets are booleans (set or not),
+// plain fields (language, marketplace, currency) are returned in the clear.
+function maskedKeys() {
+  const k = getApiKeys();
+  const out: Record<string, boolean | string> = {};
+  for (const f of SECRET_FIELDS) out[f] = Boolean(k[f]);
+  for (const f of PLAIN_FIELDS) out[f] = k[f];
+  return out;
+}
+
+// GET /api/settings/keys → which keys are configured (never the secret values).
+settingsRouter.get('/keys', requireAuth, async (_req, res) => {
+  res.json(maskedKeys());
+});
+
+// PUT /api/settings/keys → set DB overrides. Only non-empty secrets are stored
+// (empty = keep existing); `clear: ["field", …]` removes an override (env falls back).
+settingsRouter.put('/keys', requireAuth, async (req, res) => {
+  const rows = await query<{ value: Record<string, string> }>(`SELECT value FROM settings WHERE key = 'apikeys'`);
+  const overrides: Record<string, string> = rows.length ? { ...rows[0].value } : {};
+  const body = req.body ?? {};
+
+  for (const f of SECRET_FIELDS) {
+    if (typeof body[f] === 'string' && body[f].trim() !== '') overrides[f] = body[f].trim();
+  }
+  for (const f of PLAIN_FIELDS) {
+    if (typeof body[f] === 'string') {
+      const v = body[f].trim();
+      if (v) overrides[f] = v;
+      else delete overrides[f];
+    }
+  }
+  if (Array.isArray(body.clear)) {
+    for (const f of body.clear) if (typeof f === 'string' && SECRET_FIELDS.includes(f as any)) delete overrides[f];
+  }
+
+  await query(
+    `INSERT INTO settings (key, value, updated_at) VALUES ('apikeys', $1, now())
+     ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = now()`,
+    [JSON.stringify(overrides)]
+  );
+  await reloadApiKeys();
+  res.json(maskedKeys());
 });

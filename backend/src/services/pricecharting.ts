@@ -1,7 +1,7 @@
 // PriceCharting (game valuation). NOTE: requires a PAID subscription token —
 // there is no free game-price API. Prices are in US cents (USD).
 // Docs: https://www.pricecharting.com/api-documentation
-import { config } from '../config';
+import { getApiKeys } from '../lib/apikeys';
 import type { ValueResult } from '../types';
 
 interface PcProduct {
@@ -28,7 +28,7 @@ export async function priceChartingValue(
   condition: string | null
 ): Promise<ValueResult | null> {
   const url = new URL('https://www.pricecharting.com/api/product');
-  url.searchParams.set('t', config.pricecharting.token);
+  url.searchParams.set('t', getApiKeys().pricechartingToken);
   url.searchParams.set('q', [title, platform].filter(Boolean).join(' '));
 
   const res = await fetch(url);

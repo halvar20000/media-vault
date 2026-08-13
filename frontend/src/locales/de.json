@@ -42,7 +42,12 @@
     "customName": "Shop-Name",
     "customAdd": "Hinzufügen",
     "customHint": "Nutze {query} als Platzhalter für den Suchbegriff, z. B. https://shop.xy/search?q={query}",
-    "customError": "Gib eine http(s)-URL ein, die {query} enthält."
+    "customError": "Gib eine http(s)-URL ein, die {query} enthält.",
+    "keysTitle": "API-Schlüssel (Artwork & Wert)",
+    "keysHint": "Alle kostenlos & optional. Ein Schlüssel schaltet die jeweilige Quelle frei — IGDB liefert Spiele-Cover und den Katalog, TMDB Filme, Discogs Musik. Schlüssel werden auf deinem Server gespeichert und hier maskiert angezeigt.",
+    "keysPlaceholder": "Schlüssel einfügen",
+    "keysOptions": "Optionen",
+    "keysSaved": "Schlüssel gespeichert"
   },
   "catalogue": {
     "title": "Spiele-Katalog",

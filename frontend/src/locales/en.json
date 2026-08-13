@@ -42,7 +42,12 @@
     "customName": "Shop name",
     "customAdd": "Add",
     "customHint": "Use {query} where the search term goes, e.g. https://shop.xy/search?q={query}",
-    "customError": "Enter an http(s) URL that contains {query}."
+    "customError": "Enter an http(s) URL that contains {query}.",
+    "keysTitle": "API keys (artwork & valuation)",
+    "keysHint": "All free & optional. Add a key to unlock that source — IGDB powers game covers and the catalogue, TMDB movies, Discogs music. Keys are stored on your server and shown masked here.",
+    "keysPlaceholder": "paste key",
+    "keysOptions": "Options",
+    "keysSaved": "Keys saved"
   },
   "catalogue": {
     "title": "Games catalogue",

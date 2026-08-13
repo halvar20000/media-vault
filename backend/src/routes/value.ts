@@ -9,7 +9,6 @@ import {
   valueSourceEnabled,
   type ValueSummary,
 } from '../services/valuation';
-import { config } from '../config';
 
 export const valueRouter = Router();
 valueRouter.use(requireAuth);
@@ -44,8 +43,8 @@ valueRouter.get('/status', (req, res) => {
   res.json({
     job: jobs.get(userId(req)) ?? null,
     sources: {
-      ebay: config.ebay.enabled,
-      pricecharting: config.pricecharting.enabled,
+      ebay: valueSourceEnabled('ebay'),
+      pricecharting: valueSourceEnabled('pricecharting'),
       discogs: valueSourceEnabled('discogs'),
     },
   });

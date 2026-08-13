@@ -1,8 +1,9 @@
 // Valuation router — condition-aware market value per item.
 //   games → PriceCharting (paid token), music → Discogs marketplace, movies → none.
 // Manual values are never overwritten by a bulk run.
-import { config, MediaType } from '../config';
+import { MediaType } from '../config';
 import { query } from '../db/pool';
+import { sourcesEnabled } from '../lib/apikeys';
 import type { Item, ValueResult } from '../types';
 import { priceChartingValue } from './pricecharting';
 import { discogsMarketValue } from './discogs';
@@ -12,15 +13,13 @@ export type ValueSource = 'pricecharting' | 'discogs' | 'ebay';
 
 export function valueSourceFor(type: MediaType): ValueSource | null {
   // Games: prefer free eBay when configured, else the paid PriceCharting.
-  if (type === 'game') return config.ebay.enabled ? 'ebay' : 'pricecharting';
+  if (type === 'game') return sourcesEnabled().ebay ? 'ebay' : 'pricecharting';
   if (type === 'lp' || type === 'single' || type === 'cd') return 'discogs';
   return null; // movies have no automatic price source
 }
 
 export function valueSourceEnabled(src: ValueSource): boolean {
-  if (src === 'ebay') return config.ebay.enabled;
-  if (src === 'pricecharting') return config.pricecharting.enabled;
-  return config.discogs.enabled;
+  return sourcesEnabled()[src];
 }
 
 export interface ValueOutcome {

@@ -109,6 +109,24 @@ export interface ShopsConfig {
   custom: CustomShop[];
 }
 
+// Masked API-keys status: secrets are booleans (configured or not), plain
+// fields (language / marketplace / currency) are the actual values.
+export interface KeysStatus {
+  igdbClientId: boolean;
+  igdbClientSecret: boolean;
+  tmdbAccessToken: boolean;
+  discogsToken: boolean;
+  discogsKey: boolean;
+  discogsSecret: boolean;
+  pricechartingToken: boolean;
+  ebayClientId: boolean;
+  ebayClientSecret: boolean;
+  tmdbLanguage: string;
+  discogsUserAgent: string;
+  ebayMarketplaceId: string;
+  valuationCurrency: string;
+}
+
 export interface TypeMeta {
   label: string;
   color: string;

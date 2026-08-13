@@ -1,4 +1,4 @@
-import type { Cabinet, EnrichStatus, Item, MediaType, SearchHit, ShopsConfig, Stats, User, ValueStatus } from './types';
+import type { Cabinet, EnrichStatus, Item, KeysStatus, MediaType, SearchHit, ShopsConfig, Stats, User, ValueStatus } from './types';
 
 // All requests share cookies for session auth.
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -80,6 +80,11 @@ export const api = {
   getShops: () => req<ShopsConfig>('/settings/shops'),
   saveShops: (cfg: ShopsConfig) =>
     req<ShopsConfig>('/settings/shops', { method: 'PUT', body: JSON.stringify(cfg) }),
+
+  // API keys (masked). saveKeys sends only changed secrets + plain fields.
+  getKeys: () => req<KeysStatus>('/settings/keys'),
+  saveKeys: (patch: Record<string, string | string[]>) =>
+    req<KeysStatus>('/settings/keys', { method: 'PUT', body: JSON.stringify(patch) }),
 
   // cabinets
   listCabinets: () => req<{ cabinets: Cabinet[] }>('/cabinets'),

@@ -8,6 +8,7 @@ import { config } from './config';
 import { pool } from './db/pool';
 import { COVERS_DIR } from './lib/covers';
 import { resolveSessionSecret } from './lib/secret';
+import { reloadApiKeys, sourcesEnabled } from './lib/apikeys';
 import { authRouter } from './routes/auth';
 import { itemsRouter } from './routes/items';
 import { enrichRouter } from './routes/enrich';
@@ -80,11 +81,12 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: 'internal server error' });
 });
 
-app.listen(config.port, () => {
+app.listen(config.port, async () => {
   console.log(`[media-vault] API listening on :${config.port}`);
+  await reloadApiKeys(); // overlay any in-app key overrides from the DB
+  const s = sourcesEnabled();
   console.log(
-    `[media-vault] sources → IGDB:${config.igdb.enabled ? 'on' : 'off'} ` +
-      `TMDB:${config.tmdb.enabled ? 'on' : 'off'} ` +
-      `Discogs:${config.discogs.enabled ? 'on' : 'off'}`
+    `[media-vault] sources → IGDB:${s.igdb ? 'on' : 'off'} ` +
+      `TMDB:${s.tmdb ? 'on' : 'off'} Discogs:${s.discogs ? 'on' : 'off'}`
   );
 });

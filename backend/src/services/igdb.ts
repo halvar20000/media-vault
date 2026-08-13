@@ -1,6 +1,6 @@
 // IGDB (games) provider. Auth is a Twitch client-credentials token.
 // Docs: https://api-docs.igdb.com/
-import { config } from '../config';
+import { getApiKeys } from '../lib/apikeys';
 import type { EnrichmentResult, SearchHit } from '../types';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
@@ -10,8 +10,8 @@ async function getToken(): Promise<string> {
     return cachedToken.value;
   }
   const url = new URL('https://id.twitch.tv/oauth2/token');
-  url.searchParams.set('client_id', config.igdb.clientId);
-  url.searchParams.set('client_secret', config.igdb.clientSecret);
+  url.searchParams.set('client_id', getApiKeys().igdbClientId);
+  url.searchParams.set('client_secret', getApiKeys().igdbClientSecret);
   url.searchParams.set('grant_type', 'client_credentials');
 
   const res = await fetch(url, { method: 'POST' });
@@ -48,7 +48,7 @@ async function apiGames(where: string): Promise<IgdbGame[]> {
   const res = await fetch('https://api.igdb.com/v4/games', {
     method: 'POST',
     headers: {
-      'Client-ID': config.igdb.clientId,
+      'Client-ID': getApiKeys().igdbClientId,
       Authorization: `Bearer ${token}`,
       'Content-Type': 'text/plain',
     },

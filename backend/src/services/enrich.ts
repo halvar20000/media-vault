@@ -1,9 +1,10 @@
 // Enrichment router — the hero feature.
 // Routes each item to the right provider by media type, using the shared
 // metadata_cache so each title is fetched from the network at most once.
-import { config, SOURCE_FOR_TYPE, MediaType } from '../config';
+import { SOURCE_FOR_TYPE, MediaType } from '../config';
 import { query } from '../db/pool';
 import { cacheKey, getCached, putCached } from '../lib/cache';
+import { sourcesEnabled } from '../lib/apikeys';
 import type { EnrichmentResult, Item, SearchHit } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
 import { tmdbEnrich, tmdbSearch } from './tmdb';
@@ -11,9 +12,7 @@ import { discogsEnrich, discogsSearch } from './discogs';
 import { cacheCover } from '../lib/covers';
 
 export function sourceEnabled(source: 'igdb' | 'tmdb' | 'discogs'): boolean {
-  if (source === 'igdb') return config.igdb.enabled;
-  if (source === 'tmdb') return config.tmdb.enabled;
-  return config.discogs.enabled;
+  return sourcesEnabled()[source];
 }
 
 // The cache key groups CDs separately from vinyl (different Discogs format filter),

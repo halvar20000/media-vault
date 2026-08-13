@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { PRESETS } from '../marketplace';
-import type { CustomShop, ShopsConfig } from '../types';
+import type { CustomShop, KeysStatus, ShopsConfig } from '../types';
 
 const LANGS = [
   { code: 'fr', label: 'Français' },
@@ -12,22 +12,46 @@ const LANGS = [
   { code: 'es', label: 'Español' },
 ];
 
+// Secret API-key fields, grouped by what they unlock. The UI only ever shows
+// whether each is configured, never the value.
+const SECRET_KEYS: { f: keyof KeysStatus; label: string; group: string }[] = [
+  { f: 'igdbClientId', label: 'IGDB Client ID', group: 'Games — IGDB (unlocks covers + catalogue)' },
+  { f: 'igdbClientSecret', label: 'IGDB Client Secret', group: 'Games — IGDB (unlocks covers + catalogue)' },
+  { f: 'tmdbAccessToken', label: 'TMDB Read Access Token (v4)', group: 'Movies — TMDB' },
+  { f: 'discogsToken', label: 'Discogs token', group: 'Music — Discogs' },
+  { f: 'discogsKey', label: 'Discogs consumer key', group: 'Music — Discogs' },
+  { f: 'discogsSecret', label: 'Discogs consumer secret', group: 'Music — Discogs' },
+  { f: 'ebayClientId', label: 'eBay Client ID (App ID)', group: 'Game valuation — eBay (free)' },
+  { f: 'ebayClientSecret', label: 'eBay Client Secret (Cert ID)', group: 'Game valuation — eBay (free)' },
+  { f: 'pricechartingToken', label: 'PriceCharting token (paid, optional)', group: 'Game valuation — eBay (free)' },
+];
+const PLAIN_KEYS: { f: keyof KeysStatus; label: string; ph: string }[] = [
+  { f: 'tmdbLanguage', label: 'TMDB language', ph: 'en-US' },
+  { f: 'ebayMarketplaceId', label: 'eBay marketplace', ph: 'EBAY_DE' },
+  { f: 'valuationCurrency', label: 'Discogs value currency', ph: 'EUR' },
+];
+
 export function SettingsModal({
   open,
   config,
   onClose,
   onSaved,
+  onKeysSaved,
 }: {
   open: boolean;
   config: ShopsConfig;
   onClose: () => void;
   onSaved: (cfg: ShopsConfig) => void;
+  onKeysSaved: () => void;
 }) {
   const { t } = useTranslation();
   const [enabled, setEnabled] = useState<string[]>([]);
   const [easycashStore, setEasycashStore] = useState('');
   const [craigslistSite, setCraigslistSite] = useState('');
   const [custom, setCustom] = useState<CustomShop[]>([]);
+  const [keys, setKeys] = useState<KeysStatus | null>(null);
+  const [secretInputs, setSecretInputs] = useState<Record<string, string>>({});
+  const [plainInputs, setPlainInputs] = useState<Record<string, string>>({});
   const [nLabel, setNLabel] = useState('');
   const [nUrl, setNUrl] = useState('');
   const [nLang, setNLang] = useState('en');
@@ -42,6 +66,16 @@ export function SettingsModal({
       setCraigslistSite(config.craigslistSite ?? '');
       setCustom(config.custom ?? []);
       setNLabel(''); setNUrl(''); setNLang('en'); setErr(null);
+      // Load masked API-keys status fresh each open.
+      api.getKeys().then((k) => {
+        setKeys(k);
+        setSecretInputs({});
+        setPlainInputs({
+          tmdbLanguage: k.tmdbLanguage || '',
+          ebayMarketplaceId: k.ebayMarketplaceId || '',
+          valuationCurrency: k.valuationCurrency || '',
+        });
+      }).catch(() => {});
     }
   }, [open, config]);
 
@@ -69,7 +103,16 @@ export function SettingsModal({
     setErr(null);
     try {
       const saved = await api.saveShops({ enabled, easycashStore: easycashStore.trim(), craigslistSite: craigslistSite.trim(), custom });
+      // Build the API-keys patch: changed secrets (non-empty) + all plain fields.
+      const patch: Record<string, string> = {};
+      for (const s of SECRET_KEYS) {
+        const v = (secretInputs[s.f] || '').trim();
+        if (v) patch[s.f] = v;
+      }
+      for (const p of PLAIN_KEYS) patch[p.f] = (plainInputs[p.f] ?? '').trim();
+      await api.saveKeys(patch);
       onSaved(saved);
+      onKeysSaved();
       onClose();
     } catch (e: any) {
       setErr(e?.message || 'Could not save');
@@ -149,6 +192,40 @@ export function SettingsModal({
             </div>
             <span className="sethint">{t('settings.customHint')}</span>
           </div>
+
+          <h4 className="seth4">{t('settings.keysTitle')}</h4>
+          <p className="sethint" style={{ marginBottom: 12 }}>{t('settings.keysHint')}</p>
+          {SECRET_KEYS.map((s, i) => (
+            <div key={s.f}>
+              {(i === 0 || SECRET_KEYS[i - 1].group !== s.group) && (
+                <div className="setkeygroup">{s.group}</div>
+              )}
+              <div className="setfield">
+                <label>
+                  {s.label}
+                  {keys && (keys[s.f] ? <span className="setok"> ✓ configured</span> : <span className="setmuted"> — not set</span>)}
+                </label>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={secretInputs[s.f] || ''}
+                  onChange={(e) => setSecretInputs((v) => ({ ...v, [s.f]: e.target.value }))}
+                  placeholder={keys && keys[s.f] ? '•••••••• (leave blank to keep)' : t('settings.keysPlaceholder')}
+                />
+              </div>
+            </div>
+          ))}
+          <div className="setkeygroup">{t('settings.keysOptions')}</div>
+          {PLAIN_KEYS.map((p) => (
+            <div key={p.f} className="setfield">
+              <label>{p.label}</label>
+              <input
+                value={plainInputs[p.f] ?? ''}
+                onChange={(e) => setPlainInputs((v) => ({ ...v, [p.f]: e.target.value }))}
+                placeholder={p.ph}
+              />
+            </div>
+          ))}
 
           {err && <p className="seterr">{err}</p>}
         </div>

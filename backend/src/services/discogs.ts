@@ -1,6 +1,7 @@
 // Discogs (vinyl LP / single / CD) provider. Auth is a personal access token.
 // Docs: https://www.discogs.com/developers
-import { config, type MediaType } from '../config';
+import { type MediaType } from '../config';
+import { getApiKeys } from '../lib/apikeys';
 import type { EnrichmentResult, SearchHit, ValueResult } from '../types';
 
 interface DiscogsSearchResult {
@@ -20,14 +21,15 @@ interface DiscogsRelease {
 
 function authHeader(): string {
   // Prefer a personal token; fall back to consumer key+secret (read-only).
-  if (config.discogs.token) return `Discogs token=${config.discogs.token}`;
-  return `Discogs key=${config.discogs.key}, secret=${config.discogs.secret}`;
+  const k = getApiKeys();
+  if (k.discogsToken) return `Discogs token=${k.discogsToken}`;
+  return `Discogs key=${k.discogsKey}, secret=${k.discogsSecret}`;
 }
 
 function headers() {
   return {
     Authorization: authHeader(),
-    'User-Agent': config.discogs.userAgent,
+    'User-Agent': getApiKeys().discogsUserAgent,
     Accept: 'application/json',
   };
 }
@@ -122,7 +124,7 @@ export async function discogsEnrich(
 
 // Market value = lowest current marketplace listing for a release (uses the token).
 export async function discogsMarketValue(releaseId: string): Promise<ValueResult | null> {
-  const curr = config.valuationCurrency;
+  const curr = getApiKeys().valuationCurrency;
   const res = await fetch(
     `https://api.discogs.com/marketplace/stats/${encodeURIComponent(releaseId)}?curr_abbr=${curr}`,
     { headers: headers() }
