@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.1.0',
+    date: '2026-08-13',
+    title: 'French & Spanish',
+    changes: [
+      'Added French and Spanish interfaces — the app now speaks English, German, French & Spanish.',
+      'Your language is auto-detected from the browser, and you can switch any time from the language menu in the header.',
+    ],
+  },
+  {
     version: '1.0.0',
     date: '2026-08-13',
     title: 'First release',

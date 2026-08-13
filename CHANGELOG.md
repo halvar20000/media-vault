@@ -6,6 +6,13 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-08-13
+
+### Added
+- **French and Spanish** interfaces — the app now speaks English, German, French
+  and Spanish. Language is auto-detected from the browser and switchable from the
+  header menu.
+
 ## [1.0.0] — 2026-08-13
 
 First release.
@@ -26,4 +33,5 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.1.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.1.0
 [1.0.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.0.0
