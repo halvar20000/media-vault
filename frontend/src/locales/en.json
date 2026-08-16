@@ -1,23 +1,72 @@
 {
-  "brand": { "sub": "physical media archive", "version": "media-vault version {{version}}" },
-  "changelog": { "title": "What's new", "current": "you're on this" },
-  "common": {
-    "save": "Save", "saving": "Saving…", "cancel": "Cancel", "delete": "Delete",
-    "edit": "Edit", "search": "Search", "searching": "Searching…", "loading": "Loading…",
-    "none": "— none —", "working": "Working…"
+  "brand": {
+    "sub": "physical media archive",
+    "version": "media-vault version {{version}}"
   },
-  "types": { "game": "Game", "movie": "Film", "lp": "Vinyl LP", "single": "Single", "cd": "CD" },
-  "types_plural": { "game": "Games", "movie": "Films", "lp": "Vinyl LPs", "single": "Singles", "cd": "CDs" },
+  "changelog": {
+    "title": "What's new",
+    "current": "you're on this"
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "searching": "Searching…",
+    "loading": "Loading…",
+    "none": "— none —",
+    "working": "Working…"
+  },
+  "types": {
+    "game": "Game",
+    "movie": "Film",
+    "lp": "Vinyl LP",
+    "single": "Single",
+    "cd": "CD"
+  },
+  "types_plural": {
+    "game": "Games",
+    "movie": "Films",
+    "lp": "Vinyl LPs",
+    "single": "Singles",
+    "cd": "CDs"
+  },
   "header": {
     "searchPlaceholder": "Search across games, films, vinyl…",
     "addItem": "+ Add item",
     "signOut": "Sign out",
     "export": "Export CSV"
   },
-  "stats": { "itemsTotal": "items total", "collectionValue": "Collection value", "wishlist": "on wishlist" },
-  "filters": { "all": "All", "allPlatforms": "All platforms", "allFormats": "All formats", "needsBarcode": "Needs barcode", "wishlist": "★ Wishlist", "bundles": "Bundles", "bundlesTitle": "Search {{marketplace}} for bundles/lots of the selected type/platform" },
-  "wishlist": { "add": "Add to wishlist", "markOwned": "I own this now", "moveTo": "Move to wishlist", "badge": "WISHLIST" },
-  "sort": { "label": "Sort", "title": "Title (A–Z)", "added": "Newest added", "rating": "Rating", "value": "Value", "year": "Year" },
+  "stats": {
+    "itemsTotal": "items total",
+    "collectionValue": "Collection value",
+    "wishlist": "on wishlist"
+  },
+  "filters": {
+    "all": "All",
+    "allPlatforms": "All platforms",
+    "allFormats": "All formats",
+    "needsBarcode": "Needs barcode",
+    "wishlist": "★ Wishlist",
+    "bundles": "Bundles",
+    "bundlesTitle": "Search {{marketplace}} for bundles/lots of the selected type/platform"
+  },
+  "wishlist": {
+    "add": "Add to wishlist",
+    "markOwned": "I own this now",
+    "moveTo": "Move to wishlist",
+    "badge": "WISHLIST"
+  },
+  "sort": {
+    "label": "Sort",
+    "title": "Title (A–Z)",
+    "added": "Newest added",
+    "rating": "Rating",
+    "value": "Value",
+    "year": "Year"
+  },
   "controls": {
     "enrich": "✦ Enrich collection",
     "enriching": "Enriching…",
@@ -60,7 +109,8 @@
     "more": "Load more",
     "close": "Close",
     "empty": "No games found — try another platform or search.",
-    "hint": "Browse a platform's library. Games you own are marked; ★ Want adds to your wishlist."
+    "hint": "Browse a platform's library. Games you own are marked; ★ Want adds to your wishlist.",
+    "ownedOnTitle": "You already own this on {{platform}}"
   },
   "shelf": {
     "hint": "↔ scroll the shelf · click a spine for details · coloured band = platform / format",

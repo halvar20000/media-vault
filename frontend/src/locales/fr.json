@@ -1,23 +1,72 @@
 {
-  "brand": { "sub": "archive de médias physiques", "version": "media-vault version {{version}}" },
-  "changelog": { "title": "Nouveautés", "current": "votre version" },
-  "common": {
-    "save": "Enregistrer", "saving": "Enregistrement…", "cancel": "Annuler", "delete": "Supprimer",
-    "edit": "Modifier", "search": "Rechercher", "searching": "Recherche…", "loading": "Chargement…",
-    "none": "— aucun —", "working": "En cours…"
+  "brand": {
+    "sub": "archive de médias physiques",
+    "version": "media-vault version {{version}}"
   },
-  "types": { "game": "Jeu", "movie": "Film", "lp": "Vinyle LP", "single": "Single", "cd": "CD" },
-  "types_plural": { "game": "Jeux", "movie": "Films", "lp": "Vinyles LP", "single": "Singles", "cd": "CD" },
+  "changelog": {
+    "title": "Nouveautés",
+    "current": "votre version"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "searching": "Recherche…",
+    "loading": "Chargement…",
+    "none": "— aucun —",
+    "working": "En cours…"
+  },
+  "types": {
+    "game": "Jeu",
+    "movie": "Film",
+    "lp": "Vinyle LP",
+    "single": "Single",
+    "cd": "CD"
+  },
+  "types_plural": {
+    "game": "Jeux",
+    "movie": "Films",
+    "lp": "Vinyles LP",
+    "single": "Singles",
+    "cd": "CD"
+  },
   "header": {
     "searchPlaceholder": "Rechercher jeux, films, vinyles…",
     "addItem": "+ Ajouter",
     "signOut": "Déconnexion",
     "export": "Exporter CSV"
   },
-  "stats": { "itemsTotal": "articles au total", "collectionValue": "Valeur de la collection", "wishlist": "en liste de souhaits" },
-  "filters": { "all": "Tous", "allPlatforms": "Toutes les plateformes", "allFormats": "Tous les formats", "needsBarcode": "Sans code-barres", "wishlist": "★ Souhaits", "bundles": "Lots", "bundlesTitle": "Rechercher des lots du type/de la plateforme sélectionné(e) sur {{marketplace}}" },
-  "wishlist": { "add": "Ajouter aux souhaits", "markOwned": "Je le possède", "moveTo": "Déplacer vers les souhaits", "badge": "SOUHAIT" },
-  "sort": { "label": "Trier", "title": "Titre (A–Z)", "added": "Plus récents", "rating": "Note", "value": "Valeur", "year": "Année" },
+  "stats": {
+    "itemsTotal": "articles au total",
+    "collectionValue": "Valeur de la collection",
+    "wishlist": "en liste de souhaits"
+  },
+  "filters": {
+    "all": "Tous",
+    "allPlatforms": "Toutes les plateformes",
+    "allFormats": "Tous les formats",
+    "needsBarcode": "Sans code-barres",
+    "wishlist": "★ Souhaits",
+    "bundles": "Lots",
+    "bundlesTitle": "Rechercher des lots du type/de la plateforme sélectionné(e) sur {{marketplace}}"
+  },
+  "wishlist": {
+    "add": "Ajouter aux souhaits",
+    "markOwned": "Je le possède",
+    "moveTo": "Déplacer vers les souhaits",
+    "badge": "SOUHAIT"
+  },
+  "sort": {
+    "label": "Trier",
+    "title": "Titre (A–Z)",
+    "added": "Plus récents",
+    "rating": "Note",
+    "value": "Valeur",
+    "year": "Année"
+  },
   "controls": {
     "enrich": "✦ Enrichir la collection",
     "enriching": "Enrichissement…",
@@ -60,7 +109,8 @@
     "more": "Charger plus",
     "close": "Fermer",
     "empty": "Aucun jeu trouvé — essayez une autre plateforme ou recherche.",
-    "hint": "Parcourez la ludothèque d'une plateforme. Les jeux possédés sont marqués ; ★ Souhait les ajoute à votre liste."
+    "hint": "Parcourez la ludothèque d'une plateforme. Les jeux possédés sont marqués ; ★ Souhait les ajoute à votre liste.",
+    "ownedOnTitle": "Vous le possédez déjà sur {{platform}}"
   },
   "shelf": {
     "hint": "↔ faites défiler l'étagère · cliquez sur une tranche pour les détails · bande colorée = plateforme / format",

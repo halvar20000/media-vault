@@ -28,23 +28,36 @@ catalogueRouter.get('/', async (req, res) => {
   );
   const ownedIgdb = new Set<string>();
   const wishIgdb = new Set<string>();
-  const ownedCand: Candidate[] = [];
-  const wishCand: Candidate[] = [];
+  const ownedCand: Candidate[] = []; // owned on THIS platform
+  const wishCand: Candidate[] = []; // wishlisted on THIS platform
+  const otherCand: Candidate[] = []; // owned on ANOTHER platform (carries its format)
   for (const r of rows) {
-    if (fmtNorm && (r.format ?? '').toLowerCase().replace(/[^a-z0-9]/g, '') !== fmtNorm) continue;
-    if (r.source === 'igdb' && r.source_id) (r.wishlist ? wishIgdb : ownedIgdb).add(r.source_id);
-    (r.wishlist ? wishCand : ownedCand).push(buildCandidate(r.title, r.wishlist));
+    const rFmt = (r.format ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const isThis = !fmtNorm || rFmt === fmtNorm;
+    if (isThis) {
+      if (r.source === 'igdb' && r.source_id) (r.wishlist ? wishIgdb : ownedIgdb).add(r.source_id);
+      (r.wishlist ? wishCand : ownedCand).push(buildCandidate(r.title, r.wishlist));
+    } else if (!r.wishlist) {
+      // Owned on a different platform — remember which one for the label.
+      otherCand.push(buildCandidate(r.title, false, r.format));
+    }
   }
 
   try {
     const hits = await igdbBrowse({ platformId: platform, q, sort, limit: 40, offset });
     const games = hits.map((h) => {
-      let status: 'owned' | 'wishlist' | 'none' = 'none';
-      if (ownedIgdb.has(h.sourceId)) status = 'owned';
-      else if (wishIgdb.has(h.sourceId)) status = 'wishlist';
-      else if (bestMatch(h.title, ownedCand)) status = 'owned';
-      else if (bestMatch(h.title, wishCand)) status = 'wishlist';
-      return { ...h, status };
+      let status: 'owned' | 'wishlist' | 'owned-other' | 'none' = 'none';
+      let ownedOn: string | null = null;
+      if (ownedIgdb.has(h.sourceId) || bestMatch(h.title, ownedCand)) status = 'owned';
+      else if (wishIgdb.has(h.sourceId) || bestMatch(h.title, wishCand)) status = 'wishlist';
+      else {
+        const m = bestMatch(h.title, otherCand);
+        if (m) {
+          status = 'owned-other';
+          ownedOn = m.match.format ?? null;
+        }
+      }
+      return { ...h, status, ownedOn };
     });
     res.json({ games, offset, hasMore: hits.length === 40 });
   } catch (err: any) {

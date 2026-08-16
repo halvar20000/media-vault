@@ -4,29 +4,49 @@ import { api } from '../api';
 import { marketplaceItemUrl, type Marketplace } from '../marketplace';
 import type { SearchHit } from '../types';
 
-type Game = SearchHit & { status: 'owned' | 'wishlist' | 'none' };
+type Game = SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null };
 
-// Curated platform list → IGDB platform id + the format string used in the collection.
+// Comprehensive platform list → IGDB platform id + the format string used in the
+// collection. Grouped by maker; IGDB ids verified against the /platforms endpoint.
 const PLATFORMS: { label: string; igdb: number; format: string }[] = [
+  // Microsoft
+  { label: 'Xbox Series X|S', igdb: 169, format: 'Xbox Series' },
+  { label: 'Xbox One', igdb: 49, format: 'Xbox One' },
+  { label: 'Xbox 360', igdb: 12, format: 'Xbox 360' },
+  { label: 'Xbox', igdb: 11, format: 'Xbox' },
+  // Sony
+  { label: 'PlayStation 5', igdb: 167, format: 'PS5' },
+  { label: 'PlayStation 4', igdb: 48, format: 'PS4' },
+  { label: 'PlayStation 3', igdb: 9, format: 'PS3' },
   { label: 'PlayStation 2', igdb: 8, format: 'PS2' },
   { label: 'PlayStation', igdb: 7, format: 'PS1' },
-  { label: 'PlayStation 3', igdb: 9, format: 'PS3' },
-  { label: 'PlayStation 4', igdb: 48, format: 'PS4' },
-  { label: 'PlayStation 5', igdb: 167, format: 'PS5' },
+  { label: 'PS Vita', igdb: 46, format: 'Vita' },
   { label: 'PSP', igdb: 38, format: 'PSP' },
-  { label: 'Xbox', igdb: 11, format: 'Xbox' },
-  { label: 'Xbox 360', igdb: 12, format: 'Xbox 360' },
-  { label: 'Xbox One', igdb: 49, format: 'Xbox One' },
-  { label: 'Wii', igdb: 5, format: 'Wii' },
+  // Nintendo
+  { label: 'Nintendo Switch 2', igdb: 508, format: 'Switch 2' },
+  { label: 'Nintendo Switch', igdb: 130, format: 'Switch' },
   { label: 'Wii U', igdb: 41, format: 'Wii U' },
-  { label: 'Switch', igdb: 130, format: 'Switch' },
+  { label: 'Wii', igdb: 5, format: 'Wii' },
   { label: 'GameCube', igdb: 21, format: 'GameCube' },
   { label: 'Nintendo 64', igdb: 4, format: 'N64' },
-  { label: 'Nintendo DS', igdb: 20, format: 'DS' },
-  { label: 'Nintendo 3DS', igdb: 37, format: '3DS' },
-  { label: 'Game Boy Advance', igdb: 24, format: 'GBA' },
   { label: 'SNES', igdb: 19, format: 'SNES' },
   { label: 'NES', igdb: 18, format: 'NES' },
+  { label: 'Nintendo 3DS', igdb: 37, format: '3DS' },
+  { label: 'Nintendo DS', igdb: 20, format: 'DS' },
+  { label: 'Game Boy Advance', igdb: 24, format: 'GBA' },
+  { label: 'Game Boy Color', igdb: 22, format: 'GBC' },
+  { label: 'Game Boy', igdb: 33, format: 'Game Boy' },
+  // Sega
+  { label: 'Dreamcast', igdb: 23, format: 'Dreamcast' },
+  { label: 'Sega Saturn', igdb: 32, format: 'Saturn' },
+  { label: 'Mega Drive / Genesis', igdb: 29, format: 'Genesis' },
+  { label: 'Master System', igdb: 64, format: 'Master System' },
+  { label: 'Game Gear', igdb: 35, format: 'Game Gear' },
+  // Other
+  { label: 'TurboGrafx-16 / PC Engine', igdb: 86, format: 'PC Engine' },
+  { label: 'Neo Geo (AES)', igdb: 80, format: 'Neo Geo' },
+  { label: 'Atari 2600', igdb: 59, format: 'Atari 2600' },
+  { label: 'Commodore 64', igdb: 15, format: 'C64' },
   { label: 'PC', igdb: 6, format: 'PC' },
 ];
 
@@ -126,7 +146,12 @@ export function Catalogue({
               {g.coverUrl && <img src={g.coverUrl} alt="" loading="lazy" />}
               {g.status === 'owned' && <span className="catbadge owned">✓ {t('catalogue.owned')}</span>}
               {g.status === 'wishlist' && <span className="catbadge wish">★</span>}
-              {g.status === 'none' && (
+              {g.status === 'owned-other' && (
+                <span className="catbadge other" title={t('catalogue.ownedOnTitle', { platform: g.ownedOn })}>
+                  ✓ {g.ownedOn}
+                </span>
+              )}
+              {(g.status === 'none' || g.status === 'owned-other') && (
                 <button className="catadd" onClick={() => addToWishlist(g)} disabled={busyId === g.sourceId}>
                   {busyId === g.sourceId ? '…' : `★ ${t('catalogue.want')}`}
                 </button>

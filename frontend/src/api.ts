@@ -119,9 +119,11 @@ export const api = {
     if (params.q) qs.set('q', params.q);
     if (params.sort) qs.set('sort', params.sort);
     if (params.offset) qs.set('offset', String(params.offset));
-    return req<{ games: (SearchHit & { status: 'owned' | 'wishlist' | 'none' })[]; hasMore: boolean; offset: number }>(
-      `/catalogue?${qs}`
-    );
+    return req<{
+      games: (SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null })[];
+      hasMore: boolean;
+      offset: number;
+    }>(`/catalogue?${qs}`);
   },
 
   // barcode (EAN/UPC) lookup — manual entry or scan feed the same call

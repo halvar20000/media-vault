@@ -6,6 +6,16 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-08-13
+
+### Added
+- **Bigger games catalogue** — now 34 consoles, including Xbox Series X|S, Switch 2,
+  PS Vita, the Sega range (Dreamcast, Saturn, Mega Drive/Genesis, Master System,
+  Game Gear), Game Boy / Game Boy Color, Neo Geo, TurboGrafx-16, Atari 2600 and more.
+- **Cross-platform ownership** in the catalogue — a game you own on another console
+  shows a "✓ <platform>" badge (e.g. browsing PS3, a title you have on Xbox 360 is
+  flagged), and you can still wishlist it for the platform you're viewing.
+
 ## [1.1.0] — 2026-08-13
 
 ### Added
@@ -33,5 +43,6 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.2.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.2.0
 [1.1.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.1.0
 [1.0.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.0.0

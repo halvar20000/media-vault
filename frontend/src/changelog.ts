@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.2.0',
+    date: '2026-08-13',
+    title: 'Bigger catalogue + cross-platform ownership',
+    changes: [
+      'The games catalogue now covers 34 consoles — added Xbox Series X|S, Switch 2, PS Vita, plus Sega (Dreamcast, Saturn, Mega Drive/Genesis, Master System, Game Gear), Game Boy / Game Boy Color, Neo Geo, TurboGrafx-16, Atari 2600, Commodore 64 and more.',
+      'Cross-platform ownership: a game you own on another console now shows a "✓ <platform>" badge in the catalogue (e.g. browsing PS3, a game you have on Xbox 360 is flagged) — and you can still wishlist it for the platform you\'re viewing.',
+    ],
+  },
+  {
     version: '1.1.0',
     date: '2026-08-13',
     title: 'French & Spanish',

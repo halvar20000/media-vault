@@ -64,10 +64,11 @@ export interface Candidate {
   norm: string;
   toks: string[];
   nums: Set<number>;
+  format?: string | null; // the platform/format this owned copy is on (catalogue cross-platform)
 }
 
-export function buildCandidate(title: string, wishlist: boolean): Candidate {
-  return { title, wishlist, norm: normalize(title), toks: tokens(title), nums: numbersOf(title) };
+export function buildCandidate(title: string, wishlist: boolean, format?: string | null): Candidate {
+  return { title, wishlist, norm: normalize(title), toks: tokens(title), nums: numbersOf(title), format };
 }
 
 // Best collection match for an input title, or null below the threshold.
