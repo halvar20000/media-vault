@@ -250,6 +250,7 @@
     "rowViewed": "Viewed",
     "rowNotes": "Notes",
     "rowSource": "Source",
-    "confirmDelete": "Delete “{{title}}”?"
+    "confirmDelete": "Delete “{{title}}”?",
+    "listenTitle": "Search {{service}} for this album"
   }
 }

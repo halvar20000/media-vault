@@ -246,6 +246,16 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
                   title={t('drawer.marketplaceTitle', { marketplace: m.label })}
                   style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>🔎 {m.label}</a>
               ))}
+              {(item.type === 'lp' || item.type === 'single' || item.type === 'cd') && (
+                <>
+                  <a className="ghostbtn listen spotify" href={`https://open.spotify.com/search/${encodeURIComponent(item.title)}`}
+                    target="_blank" rel="noopener noreferrer" title={t('drawer.listenTitle', { service: 'Spotify' })}
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>▶ Spotify</a>
+                  <a className="ghostbtn listen apple" href={`https://music.apple.com/search?term=${encodeURIComponent(item.title)}`}
+                    target="_blank" rel="noopener noreferrer" title={t('drawer.listenTitle', { service: 'Apple Music' })}
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>▶ Apple Music</a>
+                </>
+              )}
               {item.viewed_at
                 ? <button className="ghostbtn" onClick={() => quick({ viewed_at: null })} disabled={busy}>{t('drawer.unwatch')}</button>
                 : <button className="ghostbtn" onClick={() => quick({ viewed_at: new Date().toISOString() })} disabled={busy}>{t('drawer.markViewed')}</button>}

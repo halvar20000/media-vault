@@ -6,6 +6,12 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] — 2026-08-16
+
+### Added
+- **Listen on Spotify / Apple Music** — CDs, singles and vinyl get ▶ Spotify and
+  ▶ Apple Music buttons that open the album ready to play. No account or API key needed.
+
 ## [1.5.1] — 2026-08-16
 
 ### Changed
@@ -73,6 +79,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.6.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.6.0
 [1.5.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.1
 [1.5.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.0
 [1.4.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.4.0

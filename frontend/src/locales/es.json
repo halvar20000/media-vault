@@ -250,6 +250,7 @@
     "rowViewed": "Visto",
     "rowNotes": "Notas",
     "rowSource": "Fuente",
-    "confirmDelete": "¿Eliminar «{{title}}»?"
+    "confirmDelete": "¿Eliminar «{{title}}»?",
+    "listenTitle": "Buscar este álbum en {{service}}"
   }
 }

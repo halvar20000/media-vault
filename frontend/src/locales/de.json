@@ -250,6 +250,7 @@
     "rowViewed": "Gesehen",
     "rowNotes": "Notizen",
     "rowSource": "Quelle",
-    "confirmDelete": "„{{title}}“ löschen?"
+    "confirmDelete": "„{{title}}“ löschen?",
+    "listenTitle": "{{service}} nach diesem Album durchsuchen"
   }
 }

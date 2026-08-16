@@ -250,6 +250,7 @@
     "rowViewed": "Vu",
     "rowNotes": "Notes",
     "rowSource": "Source",
-    "confirmDelete": "Supprimer « {{title}} » ?"
+    "confirmDelete": "Supprimer « {{title}} » ?",
+    "listenTitle": "Rechercher cet album sur {{service}}"
   }
 }

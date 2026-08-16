@@ -10,6 +10,14 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.6.0',
+    date: '2026-08-16',
+    title: 'Listen on Spotify / Apple Music',
+    changes: [
+      'CDs, singles and vinyl now have ▶ Spotify and ▶ Apple Music buttons that open the album ready to play. No account or API key needed.',
+    ],
+  },
+  {
     version: '1.5.1',
     date: '2026-08-16',
     title: 'Steam games stand out',
