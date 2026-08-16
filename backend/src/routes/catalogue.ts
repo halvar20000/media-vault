@@ -4,7 +4,7 @@ import { requireAuth, userId } from '../middleware/auth';
 import { sourcesEnabled } from '../lib/apikeys';
 import { igdbBrowse } from '../services/igdb';
 import { buildCandidate, bestMatch, normalize, type Candidate } from '../lib/match';
-import { XBOX360_BC } from '../data/xbox360bc';
+import { XBOX360_BC } from '../lib/xbox360bc';
 
 export const catalogueRouter = Router();
 catalogueRouter.use(requireAuth);
