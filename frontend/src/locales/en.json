@@ -112,7 +112,15 @@
     "hint": "Browse a platform's library. Games you own are marked; ★ Want adds to your wishlist.",
     "ownedOnTitle": "You already own this on {{platform}}",
     "bcTag": "Xbox One/Series",
-    "bcTitle": "Backward-compatible — this Xbox 360 game plays on Xbox One and Series X|S"
+    "bcTitle": "Backward-compatible — this Xbox 360 game plays on Xbox One and Series X|S",
+    "playsOn": "{{platform}} games also play on {{plays}}",
+    "compatNotes": {
+      "earlyPs3": "early \"fat\" PS3 models with PS2 support only",
+      "earlyWii": "early Wii models with GameCube ports only",
+      "gbaSlot": "consoles with a GBA slot (DS / DS Lite)",
+      "mostTitles": "most titles",
+      "digitalOnly": "digital versions only — no UMD drive"
+    }
   },
   "shelf": {
     "hint": "↔ scroll the shelf · click a spine for details · coloured band = platform / format",

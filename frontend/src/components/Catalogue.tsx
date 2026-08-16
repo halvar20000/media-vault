@@ -50,6 +50,20 @@ const PLATFORMS: { label: string; igdb: number; format: string }[] = [
   { label: 'PC', igdb: 6, format: 'PC' },
 ];
 
+// Hardware-level forward compatibility: an older platform's games play on newer
+// hardware (all-or-nothing, unlike the Xbox 360 curated list). Shown as a banner.
+const FORWARD_COMPAT: Record<string, { plays: string; noteKey?: string }> = {
+  PS1: { plays: 'PlayStation 2 & 3' },
+  PS2: { plays: 'PlayStation 3', noteKey: 'earlyPs3' },
+  PS4: { plays: 'PlayStation 5' },
+  PSP: { plays: 'PS Vita', noteKey: 'digitalOnly' },
+  Wii: { plays: 'Wii U' },
+  GameCube: { plays: 'Wii', noteKey: 'earlyWii' },
+  Switch: { plays: 'Nintendo Switch 2', noteKey: 'mostTitles' },
+  DS: { plays: 'Nintendo 3DS' },
+  GBA: { plays: 'Nintendo DS / DS Lite', noteKey: 'gbaSlot' },
+};
+
 export function Catalogue({
   onClose,
   onChanged,
@@ -138,6 +152,15 @@ export function Catalogue({
         </select>
         <button className="ghostbtn" onClick={onClose}>✕ {t('catalogue.close')}</button>
       </div>
+
+      {FORWARD_COMPAT[platform.format] && (
+        <div className="catcompat">
+          ▹ {t('catalogue.playsOn', { platform: platform.label, plays: FORWARD_COMPAT[platform.format].plays })}
+          {FORWARD_COMPAT[platform.format].noteKey && (
+            <span className="cnote"> — {t(`catalogue.compatNotes.${FORWARD_COMPAT[platform.format].noteKey}`)}</span>
+          )}
+        </div>
+      )}
 
       <div className="grid">
         {games.map((g) => (

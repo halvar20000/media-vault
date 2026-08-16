@@ -112,7 +112,15 @@
     "hint": "Parcourez la ludothèque d'une plateforme. Les jeux possédés sont marqués ; ★ Souhait les ajoute à votre liste.",
     "ownedOnTitle": "Vous le possédez déjà sur {{platform}}",
     "bcTag": "Xbox One/Series",
-    "bcTitle": "Rétrocompatible — ce jeu Xbox 360 fonctionne sur Xbox One et Series X|S"
+    "bcTitle": "Rétrocompatible — ce jeu Xbox 360 fonctionne sur Xbox One et Series X|S",
+    "playsOn": "Les jeux {{platform}} fonctionnent aussi sur {{plays}}",
+    "compatNotes": {
+      "earlyPs3": "seulement les premiers modèles PS3 « fat » compatibles PS2",
+      "earlyWii": "seulement les premières Wii avec ports GameCube",
+      "gbaSlot": "consoles avec port GBA (DS / DS Lite)",
+      "mostTitles": "la plupart des titres",
+      "digitalOnly": "versions numériques uniquement — pas de lecteur UMD"
+    }
   },
   "shelf": {
     "hint": "↔ faites défiler l'étagère · cliquez sur une tranche pour les détails · bande colorée = plateforme / format",

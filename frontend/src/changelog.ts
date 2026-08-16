@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.4.0',
+    date: '2026-08-16',
+    title: 'More console compatibility hints',
+    changes: [
+      'The catalogue now shows a compatibility banner for hardware-level backward compatibility: Wii → Wii U, Switch → Switch 2, PS1 → PS2/PS3, PS4 → PS5, DS → 3DS, GBA → DS, with model caveats where they matter (e.g. PS2 → PS3 only on early "fat" models).',
+      'Kept honest: PS3 games are not shown as compatible with PS4/PS5 (they aren\'t), and Xbox 360 stays per-game since only some titles are supported.',
+    ],
+  },
+  {
     version: '1.3.0',
     date: '2026-08-16',
     title: 'Xbox 360 backward-compatibility tags',

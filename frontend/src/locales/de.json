@@ -112,7 +112,15 @@
     "hint": "Durchstöbere die Bibliothek einer Plattform. Spiele im Besitz sind markiert; ★ Wunsch fügt zur Wunschliste hinzu.",
     "ownedOnTitle": "Du besitzt dies bereits auf {{platform}}",
     "bcTag": "Xbox One/Series",
-    "bcTitle": "Abwärtskompatibel — dieses Xbox-360-Spiel läuft auf Xbox One und Series X|S"
+    "bcTitle": "Abwärtskompatibel — dieses Xbox-360-Spiel läuft auf Xbox One und Series X|S",
+    "playsOn": "{{platform}}-Spiele laufen auch auf {{plays}}",
+    "compatNotes": {
+      "earlyPs3": "nur frühe „Fat“-PS3-Modelle mit PS2-Unterstützung",
+      "earlyWii": "nur frühe Wii-Modelle mit GameCube-Anschlüssen",
+      "gbaSlot": "Konsolen mit GBA-Schacht (DS / DS Lite)",
+      "mostTitles": "die meisten Titel",
+      "digitalOnly": "nur digitale Versionen — kein UMD-Laufwerk"
+    }
   },
   "shelf": {
     "hint": "↔ Regal scrollen · Rücken anklicken für Details · farbiges Band = Plattform / Format",

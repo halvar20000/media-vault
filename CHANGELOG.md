@@ -6,6 +6,15 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] — 2026-08-16
+
+### Added
+- **Console compatibility banners** in the catalogue for hardware-level backward
+  compatibility: Wii → Wii U, Switch → Switch 2, PS1 → PS2/PS3, PS4 → PS5, DS → 3DS,
+  GBA → DS, with model caveats where relevant (PS2 → PS3 only on early "fat" models,
+  GameCube → Wii only on early models). PS3 → PS4/PS5 is intentionally not shown
+  (unsupported); Xbox 360 remains per-game (see 1.3.0).
+
 ## [1.3.0] — 2026-08-16
 
 ### Added
@@ -50,6 +59,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.4.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.4.0
 [1.3.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.3.0
 [1.2.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.2.0
 [1.1.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.1.0
