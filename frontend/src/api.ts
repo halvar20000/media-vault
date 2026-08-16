@@ -156,6 +156,13 @@ export const api = {
   setCoverUrl: (id: string, url: string) =>
     req<{ item: Item }>(`/items/${id}/cover`, { method: 'POST', body: JSON.stringify({ url }) }),
 
+  // Steam import — owned games from a SteamID / vanity / profile URL.
+  importSteam: (steamId: string) =>
+    req<{ imported: number; total: number; skipped: number; hint?: string }>('/import/steam', {
+      method: 'POST',
+      body: JSON.stringify({ steamId }),
+    }),
+
   // CSV import (multipart). kind: 'games' | 'movies'
   importCsv: async (kind: 'games' | 'movies', file: File) => {
     const fd = new FormData();

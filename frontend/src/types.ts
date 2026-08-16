@@ -121,6 +121,7 @@ export interface KeysStatus {
   pricechartingToken: boolean;
   ebayClientId: boolean;
   ebayClientSecret: boolean;
+  steamApiKey: boolean;
   tmdbLanguage: string;
   discogsUserAgent: string;
   ebayMarketplaceId: string;

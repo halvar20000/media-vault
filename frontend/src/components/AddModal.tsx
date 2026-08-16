@@ -5,7 +5,7 @@ import { api } from '../api';
 import { TYPE_ORDER } from '../types';
 import type { MediaType, SearchHit } from '../types';
 
-type Method = 'search' | 'import' | 'scan' | 'manual' | 'check';
+type Method = 'search' | 'import' | 'scan' | 'manual' | 'check' | 'steam';
 
 interface CheckResult {
   input: string;
@@ -41,6 +41,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [wishlist, setWishlist] = useState(false);
   const [resolved, setResolved] = useState('');
   const [manual, setManual] = useState({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
+  const [steamId, setSteamId] = useState('');
   const [checkText, setCheckText] = useState('');
   const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
   const [checkSummary, setCheckSummary] = useState<{ total: number; owned: number; wishlist: number; new: number } | null>(null);
@@ -203,6 +204,25 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     }
   }
 
+  async function runSteamImport() {
+    if (!steamId.trim()) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const r = await api.importSteam(steamId.trim());
+      setMsg(
+        r.hint
+          ? r.hint
+          : t('add.steamDone', { imported: r.imported, skipped: r.skipped })
+      );
+      if (r.imported > 0) onAdded();
+    } catch (e: any) {
+      setMsg(e.message || 'Steam import failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function addAllNewToWishlist() {
     const news = checkResults.filter((r) => r.status === 'new');
     if (!news.length) return;
@@ -278,6 +298,11 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <span className="mi">✓</span>
             <span className="mh">{t('add.check')}</span>
             <span className="md">{t('add.checkDesc')}</span>
+          </button>
+          <button className="method" aria-pressed={method === 'steam'} onClick={() => setMethod('steam')}>
+            <span className="mi">🎮</span>
+            <span className="mh">{t('add.steam')}</span>
+            <span className="md">{t('add.steamDesc')}</span>
           </button>
         </div>
 
@@ -508,6 +533,26 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                   </div>
                 </>
               )}
+            </>
+          )}
+
+          {method === 'steam' && (
+            <>
+              <div className="field">
+                <label>{t('add.steamIdLabel')}</label>
+                <input
+                  value={steamId}
+                  onChange={(e) => setSteamId(e.target.value)}
+                  placeholder="7656119…  ·  vanity name  ·  profile URL"
+                  autoFocus
+                />
+                <span className="sethint">{t('add.steamHint')}</span>
+              </div>
+              <button className="primary" onClick={runSteamImport} disabled={busy || !steamId.trim()}>
+                {busy ? '…' : t('add.steamBtn')}
+              </button>
+              {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
+              <p className="mnote" style={{ padding: '12px 0 0', border: 0 }}>{t('add.steamNote')}</p>
             </>
           )}
         </div>

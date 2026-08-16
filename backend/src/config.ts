@@ -87,6 +87,15 @@ export const config = {
       return Boolean(this.clientId && this.clientSecret);
     },
   },
+  // Steam Web API key (https://steamcommunity.com/dev/apikey) — lets you import
+  // your owned Steam games. Read-only; the profile's game details must be public.
+  steam: {
+    apiKey: env('STEAM_API_KEY'),
+    get enabled() {
+      return Boolean(this.apiKey);
+    },
+  },
+
   // Currency for Discogs marketplace prices (music valuation).
   valuationCurrency: env('VALUATION_CURRENCY', 'EUR'),
 

@@ -190,7 +190,14 @@
     "afterImport": "Nach dem Import „Sammlung anreichern“ klicken, um Cover, Bewertungen & Beschreibungen zu holen.",
     "sourcesNote": "Metadaten werden je Medientyp geholt: Spiele → IGDB · Filme → TMDB · Vinyl / Singles / CD → Discogs.",
     "scanHint": "Richte die Kamera auf einen EAN/UPC-Barcode. Bei Erkennung übernehmen wir den Code in die Suche. (Kamerazugriff braucht HTTPS oder localhost.)",
-    "scanUnavailable": "Kamera nicht verfügbar — Kameraberechtigung erteilen und HTTPS verwenden."
+    "scanUnavailable": "Kamera nicht verfügbar — Kameraberechtigung erteilen und HTTPS verwenden.",
+    "steam": "Steam",
+    "steamDesc": "Deine gekauften Steam-Spiele importieren (digital).",
+    "steamIdLabel": "Deine SteamID, dein Vanity-Name oder deine Profil-URL",
+    "steamHint": "z. B. 76561198000000000, dein individueller URL-Name oder https://steamcommunity.com/id/deinname",
+    "steamBtn": "Meine Steam-Bibliothek importieren",
+    "steamNote": "Benötigt einen Steam-Web-API-Schlüssel (in ⚙ Einstellungen) und die „Spieldetails“ deines Steam-Profils müssen auf Öffentlich stehen. Wird als Format „Steam“ importiert; jederzeit erneut ausführen, um neue Käufe zu ergänzen.",
+    "steamDone": "{{imported}} Spiele importiert ({{skipped}} bereits vorhanden)."
   },
   "drawer": {
     "markViewed": "Als gesehen markieren",

@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.5.0',
+    date: '2026-08-16',
+    title: 'Import your Steam library',
+    changes: [
+      'Add → Steam imports your owned Steam games (with cover art) as digital "Steam" items — great alongside your physical shelf.',
+      'Needs a free Steam Web API key (⚙ Settings) and a public Steam profile. Re-run any time to pull in new purchases; already-imported games are skipped.',
+    ],
+  },
+  {
     version: '1.4.0',
     date: '2026-08-16',
     title: 'More console compatibility hints',

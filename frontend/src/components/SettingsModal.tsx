@@ -24,6 +24,7 @@ const SECRET_KEYS: { f: keyof KeysStatus; label: string; group: string }[] = [
   { f: 'ebayClientId', label: 'eBay Client ID (App ID)', group: 'Game valuation — eBay (free)' },
   { f: 'ebayClientSecret', label: 'eBay Client Secret (Cert ID)', group: 'Game valuation — eBay (free)' },
   { f: 'pricechartingToken', label: 'PriceCharting token (paid, optional)', group: 'Game valuation — eBay (free)' },
+  { f: 'steamApiKey', label: 'Steam Web API key', group: 'Steam import (add your digital games)' },
 ];
 const PLAIN_KEYS: { f: keyof KeysStatus; label: string; ph: string }[] = [
   { f: 'tmdbLanguage', label: 'TMDB language', ph: 'en-US' },

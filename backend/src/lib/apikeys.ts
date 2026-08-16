@@ -17,6 +17,7 @@ export interface ApiKeys {
   ebayClientId: string;
   ebayClientSecret: string;
   ebayMarketplaceId: string;
+  steamApiKey: string;
   valuationCurrency: string;
 }
 
@@ -24,7 +25,7 @@ export interface ApiKeys {
 export const SECRET_FIELDS: (keyof ApiKeys)[] = [
   'igdbClientId', 'igdbClientSecret', 'tmdbAccessToken',
   'discogsToken', 'discogsKey', 'discogsSecret',
-  'pricechartingToken', 'ebayClientId', 'ebayClientSecret',
+  'pricechartingToken', 'ebayClientId', 'ebayClientSecret', 'steamApiKey',
 ];
 // Plain fields — safe to show and edit in the clear.
 export const PLAIN_FIELDS: (keyof ApiKeys)[] = [
@@ -45,6 +46,7 @@ function fromEnv(): ApiKeys {
     ebayClientId: config.ebay.clientId,
     ebayClientSecret: config.ebay.clientSecret,
     ebayMarketplaceId: config.ebay.marketplaceId,
+    steamApiKey: config.steam.apiKey,
     valuationCurrency: config.valuationCurrency,
   };
 }
@@ -81,5 +83,6 @@ export function sourcesEnabled() {
     discogs: Boolean(k.discogsToken || (k.discogsKey && k.discogsSecret)),
     pricecharting: Boolean(k.pricechartingToken),
     ebay: Boolean(k.ebayClientId && k.ebayClientSecret),
+    steam: Boolean(k.steamApiKey),
   };
 }

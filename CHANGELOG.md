@@ -6,6 +6,14 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] — 2026-08-16
+
+### Added
+- **Steam library import** — **Add → Steam** imports your owned Steam games (with
+  cover art) as digital "Steam" items, alongside your physical shelf. Needs a free
+  Steam Web API key (⚙ Settings) and a public Steam profile; re-run any time to add
+  new purchases (already-imported games are skipped).
+
 ## [1.4.0] — 2026-08-16
 
 ### Added
@@ -59,6 +67,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.5.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.0
 [1.4.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.4.0
 [1.3.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.3.0
 [1.2.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.2.0

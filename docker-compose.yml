@@ -59,6 +59,7 @@ services:
       EBAY_CLIENT_ID: ${EBAY_CLIENT_ID}
       EBAY_CLIENT_SECRET: ${EBAY_CLIENT_SECRET}
       EBAY_MARKETPLACE_ID: ${EBAY_MARKETPLACE_ID:-EBAY_DE}
+      STEAM_API_KEY: ${STEAM_API_KEY}
       VALUATION_CURRENCY: ${VALUATION_CURRENCY:-EUR}
     volumes:
       # Canonical seed list, mounted read-only (no duplication in the image).

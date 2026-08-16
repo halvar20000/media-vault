@@ -190,7 +190,14 @@
     "afterImport": "Tras importar, pulsa Enriquecer colección para obtener carátulas, valoraciones y descripciones.",
     "sourcesNote": "Los metadatos se obtienen por tipo: Juegos → IGDB · Películas → TMDB · Vinilos / Singles / CD → Discogs.",
     "scanHint": "Apunta la cámara a un código de barras EAN/UPC. Al detectarlo, pondremos el código en la búsqueda. (El acceso a la cámara requiere HTTPS o localhost.)",
-    "scanUnavailable": "Cámara no disponible — concede permiso de cámara y usa HTTPS."
+    "scanUnavailable": "Cámara no disponible — concede permiso de cámara y usa HTTPS.",
+    "steam": "Steam",
+    "steamDesc": "Importa tus juegos comprados en Steam (digitales).",
+    "steamIdLabel": "Tu SteamID, nombre personalizado o URL de perfil",
+    "steamHint": "p. ej. 76561198000000000, tu nombre de URL personalizado, o https://steamcommunity.com/id/tunombre",
+    "steamBtn": "Importar mi biblioteca de Steam",
+    "steamNote": "Necesita una clave de la API web de Steam (añádela en ⚙ Ajustes) y los «Detalles del juego» de tu perfil de Steam en Público. Se importa con el formato «Steam»; vuelve a ejecutarlo cuando quieras para añadir nuevas compras.",
+    "steamDone": "{{imported}} juegos importados ({{skipped}} ya estaban)."
   },
   "drawer": {
     "markViewed": "Marcar como visto",
