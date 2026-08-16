@@ -110,7 +110,9 @@
     "close": "Fermer",
     "empty": "Aucun jeu trouvé — essayez une autre plateforme ou recherche.",
     "hint": "Parcourez la ludothèque d'une plateforme. Les jeux possédés sont marqués ; ★ Souhait les ajoute à votre liste.",
-    "ownedOnTitle": "Vous le possédez déjà sur {{platform}}"
+    "ownedOnTitle": "Vous le possédez déjà sur {{platform}}",
+    "bcTag": "Xbox One/Series",
+    "bcTitle": "Rétrocompatible — ce jeu Xbox 360 fonctionne sur Xbox One et Series X|S"
   },
   "shelf": {
     "hint": "↔ faites défiler l'étagère · cliquez sur une tranche pour les détails · bande colorée = plateforme / format",

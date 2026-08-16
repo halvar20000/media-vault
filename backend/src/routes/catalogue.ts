@@ -3,7 +3,8 @@ import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
 import { sourcesEnabled } from '../lib/apikeys';
 import { igdbBrowse } from '../services/igdb';
-import { buildCandidate, bestMatch, type Candidate } from '../lib/match';
+import { buildCandidate, bestMatch, normalize, type Candidate } from '../lib/match';
+import { XBOX360_BC } from '../data/xbox360bc';
 
 export const catalogueRouter = Router();
 catalogueRouter.use(requireAuth);
@@ -43,6 +44,9 @@ catalogueRouter.get('/', async (req, res) => {
     }
   }
 
+  // Xbox 360 (IGDB id 12): flag games playable on Xbox One / Series via back-compat.
+  const isXbox360 = platform === 12;
+
   try {
     const hits = await igdbBrowse({ platformId: platform, q, sort, limit: 40, offset });
     const games = hits.map((h) => {
@@ -57,7 +61,8 @@ catalogueRouter.get('/', async (req, res) => {
           ownedOn = m.match.format ?? null;
         }
       }
-      return { ...h, status, ownedOn };
+      const bc = isXbox360 && XBOX360_BC.has(normalize(h.title));
+      return { ...h, status, ownedOn, bc };
     });
     res.json({ games, offset, hasMore: hits.length === 40 });
   } catch (err: any) {

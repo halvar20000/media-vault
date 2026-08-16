@@ -110,7 +110,9 @@
     "close": "Close",
     "empty": "No games found — try another platform or search.",
     "hint": "Browse a platform's library. Games you own are marked; ★ Want adds to your wishlist.",
-    "ownedOnTitle": "You already own this on {{platform}}"
+    "ownedOnTitle": "You already own this on {{platform}}",
+    "bcTag": "Xbox One/Series",
+    "bcTitle": "Backward-compatible — this Xbox 360 game plays on Xbox One and Series X|S"
   },
   "shelf": {
     "hint": "↔ scroll the shelf · click a spine for details · coloured band = platform / format",

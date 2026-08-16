@@ -4,7 +4,7 @@ import { api } from '../api';
 import { marketplaceItemUrl, type Marketplace } from '../marketplace';
 import type { SearchHit } from '../types';
 
-type Game = SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null };
+type Game = SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null; bc?: boolean };
 
 // Comprehensive platform list → IGDB platform id + the format string used in the
 // collection. Grouped by maker; IGDB ids verified against the /platforms endpoint.
@@ -160,6 +160,7 @@ export function Catalogue({
             <div className="meta">
               <p className="mt">{g.title}</p>
               <div className="ms"><span>{g.year || ''}</span><span>{g.rating != null ? `★ ${Math.round(g.rating)}` : ''}</span></div>
+              {g.bc && <span className="bctag" title={t('catalogue.bcTitle')}>✓ {t('catalogue.bcTag')}</span>}
               {marketplaces.length > 0 && (
                 <details className="catshops">
                   <summary>🔎 {t('catalogue.deals')}</summary>

@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.3.0',
+    date: '2026-08-16',
+    title: 'Xbox 360 backward-compatibility tags',
+    changes: [
+      'In the Xbox 360 catalogue, games that are backward-compatible on Xbox One and Series X|S now show a "✓ Xbox One/Series" tag — handy when buying 360 games to play on a newer console.',
+      'Based on Microsoft\'s official backward-compatibility list (615 titles).',
+    ],
+  },
+  {
     version: '1.2.0',
     date: '2026-08-13',
     title: 'Bigger catalogue + cross-platform ownership',

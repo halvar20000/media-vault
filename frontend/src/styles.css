@@ -423,6 +423,7 @@ header {
 .catcard .meta { padding: 9px 11px 12px; }
 .catcard .meta .mt { font-weight: 600; font-size: 12.5px; line-height: 1.2; margin: 0 0 3px; }
 .catcard .meta .ms { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; }
+.bctag { display: inline-block; margin-top: 7px; font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.02em; color: #1a7a3f; background: rgba(79, 154, 90, 0.16); border: 1px solid rgba(79, 154, 90, 0.4); border-radius: 4px; padding: 2px 7px; }
 .catshops { margin-top: 7px; }
 .catshops summary { cursor: pointer; font-size: 11px; color: #6a6152; list-style: none; user-select: none; }
 .catshops summary::-webkit-details-marker { display: none; }

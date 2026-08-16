@@ -120,7 +120,7 @@ export const api = {
     if (params.sort) qs.set('sort', params.sort);
     if (params.offset) qs.set('offset', String(params.offset));
     return req<{
-      games: (SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null })[];
+      games: (SearchHit & { status: 'owned' | 'wishlist' | 'owned-other' | 'none'; ownedOn: string | null; bc?: boolean })[];
       hasMore: boolean;
       offset: number;
     }>(`/catalogue?${qs}`);

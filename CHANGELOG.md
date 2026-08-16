@@ -6,6 +6,13 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-08-16
+
+### Added
+- **Xbox 360 backward-compatibility tags** — in the Xbox 360 catalogue, games playable
+  on Xbox One and Series X|S show a "✓ Xbox One/Series" tag, based on Microsoft's
+  official back-compat list (615 titles). Useful when buying 360 games for a newer console.
+
 ## [1.2.0] — 2026-08-13
 
 ### Added
@@ -43,6 +50,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.3.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.3.0
 [1.2.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.2.0
 [1.1.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.1.0
 [1.0.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.0.0
