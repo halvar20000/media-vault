@@ -8,6 +8,7 @@ const C = {
   nintendo: '#C4162A',
   sega: '#0098A6',
   pc: '#2A2E37',
+  steam: '#2F6690', // digital Steam — distinct from PlayStation azure
   bluray: '#0E1C6B', // deep Blu-ray navy (distinct from PlayStation blue)
   uhd: '#0C0C0C',
   dvd: '#39393B',
@@ -49,7 +50,8 @@ const RULES: [RegExp, string, string][] = [
   [/snes|superfamicom|supernintendo/, 'SNES', C.nintendo],
   [/nes|famicom/, 'NES', C.nintendo],
   [/megadrive|genesis|dreamcast|saturn|segacd|gamegear|mastersystem|sega/, 'SEGA', C.sega],
-  [/windows|steam|linux|^mac|^pc/, 'PC', C.pc],
+  [/^steam/, 'STEAM', C.steam],
+  [/windows|linux|^mac|^pc/, 'PC', C.pc],
   // movies
   [/4k|uhd|ultrahd/, '4K UHD', C.uhd],
   [/bluray3d|3dbluray/, 'BD 3D', C.bluray],

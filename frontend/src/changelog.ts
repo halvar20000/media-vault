@@ -10,6 +10,14 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.5.1',
+    date: '2026-08-16',
+    title: 'Steam games stand out',
+    changes: [
+      'Imported Steam games now show a distinct "STEAM" spine badge (instead of generic "PC"). Filter to just your Steam library via the Games → platform dropdown.',
+    ],
+  },
+  {
     version: '1.5.0',
     date: '2026-08-16',
     title: 'Import your Steam library',
