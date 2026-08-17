@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { api } from '../api';
 import { TYPE_ORDER } from '../types';
+import { CONSOLES } from '../consoles';
 import type { MediaType, SearchHit } from '../types';
 
-type Method = 'search' | 'import' | 'scan' | 'manual' | 'check' | 'steam';
+type Method = 'search' | 'import' | 'scan' | 'manual' | 'check' | 'steam' | 'console';
 
 interface CheckResult {
   input: string;
@@ -42,6 +43,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [resolved, setResolved] = useState('');
   const [manual, setManual] = useState({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
   const [steamId, setSteamId] = useState('');
+  const [ownedConsoles, setOwnedConsoles] = useState<Set<string>>(new Set());
+  const [busyConsole, setBusyConsole] = useState<string | null>(null);
   const [checkText, setCheckText] = useState('');
   const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
   const [checkSummary, setCheckSummary] = useState<{ total: number; owned: number; wishlist: number; new: number } | null>(null);
@@ -204,6 +207,27 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     }
   }
 
+  // Load which consoles are already owned when the Console picker opens.
+  useEffect(() => {
+    if (method !== 'console') return;
+    api.listItems({ type: 'console' })
+      .then(({ items }) => setOwnedConsoles(new Set(items.map((i) => i.title))))
+      .catch(() => {});
+  }, [method]);
+
+  async function addConsole(name: string, image: string) {
+    setBusyConsole(name);
+    try {
+      await api.createItem({ type: 'console', title: name, cover_url: image, cover_source_url: image }, true);
+      setOwnedConsoles((s) => new Set(s).add(name));
+      onAdded();
+    } catch {
+      /* ignore */
+    } finally {
+      setBusyConsole(null);
+    }
+  }
+
   async function runSteamImport() {
     if (!steamId.trim()) return;
     setBusy(true);
@@ -303,6 +327,11 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
             <span className="mi">🎮</span>
             <span className="mh">{t('add.steam')}</span>
             <span className="md">{t('add.steamDesc')}</span>
+          </button>
+          <button className="method" aria-pressed={method === 'console'} onClick={() => setMethod('console')}>
+            <span className="mi">🕹️</span>
+            <span className="mh">{t('add.console')}</span>
+            <span className="md">{t('add.consoleDesc')}</span>
           </button>
         </div>
 
@@ -553,6 +582,30 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
               </button>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
               <p className="mnote" style={{ padding: '12px 0 0', border: 0 }}>{t('add.steamNote')}</p>
+            </>
+          )}
+
+          {method === 'console' && (
+            <>
+              <p className="mnote" style={{ padding: '0 0 10px', border: 0 }}>{t('add.consoleHint')}</p>
+              <div className="consolegrid">
+                {CONSOLES.map((c) => {
+                  const owned = ownedConsoles.has(c.name);
+                  return (
+                    <button
+                      key={c.name}
+                      className={`concard ${owned ? 'owned' : ''}`}
+                      onClick={() => !owned && addConsole(c.name, c.image)}
+                      disabled={owned || busyConsole === c.name}
+                      title={c.name}
+                    >
+                      <span className="conimg"><img src={c.image} alt="" loading="lazy" /></span>
+                      <span className="conname">{c.name}</span>
+                      {owned ? <span className="conbadge">✓</span> : busyConsole === c.name ? <span className="conbadge">…</span> : <span className="conadd">＋</span>}
+                    </button>
+                  );
+                })}
+              </div>
             </>
           )}
         </div>

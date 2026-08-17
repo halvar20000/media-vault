@@ -118,14 +118,16 @@ export const config = {
   craigslistSite: env('CRAIGSLIST_SITE', '').trim().toLowerCase(),
 };
 
-export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd';
-export const MEDIA_TYPES: MediaType[] = ['game', 'movie', 'lp', 'single', 'cd'];
+export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd' | 'console';
+export const MEDIA_TYPES: MediaType[] = ['game', 'movie', 'lp', 'single', 'cd', 'console'];
 
-// Which metadata source powers each media type.
-export const SOURCE_FOR_TYPE: Record<MediaType, 'igdb' | 'tmdb' | 'discogs'> = {
+// Which metadata source powers each media type (null = no auto-enrichment, e.g.
+// consoles, which are added from a curated list with their own images).
+export const SOURCE_FOR_TYPE: Record<MediaType, 'igdb' | 'tmdb' | 'discogs' | null> = {
   game: 'igdb',
   movie: 'tmdb',
   lp: 'discogs',
   single: 'discogs',
   cd: 'discogs',
+  console: null,
 };

@@ -24,14 +24,16 @@
     "movie": "Película",
     "lp": "Vinilo LP",
     "single": "Single",
-    "cd": "CD"
+    "cd": "CD",
+    "console": "Consola"
   },
   "types_plural": {
     "game": "Juegos",
     "movie": "Películas",
     "lp": "Vinilos LP",
     "single": "Singles",
-    "cd": "CD"
+    "cd": "CD",
+    "console": "Consolas"
   },
   "header": {
     "searchPlaceholder": "Buscar juegos, películas, vinilos…",
@@ -197,7 +199,10 @@
     "steamHint": "p. ej. 76561198000000000, tu nombre de URL personalizado, o https://steamcommunity.com/id/tunombre",
     "steamBtn": "Importar mi biblioteca de Steam",
     "steamNote": "Necesita una clave de la API web de Steam (añádela en ⚙ Ajustes) y los «Detalles del juego» de tu perfil de Steam en Público. Se importa con el formato «Steam»; vuelve a ejecutarlo cuando quieras para añadir nuevas compras.",
-    "steamDone": "{{imported}} juegos importados ({{skipped}} ya estaban)."
+    "steamDone": "{{imported}} juegos importados ({{skipped}} ya estaban).",
+    "console": "Consola",
+    "consoleDesc": "Añade tus consolas de videojuegos, con fotos.",
+    "consoleHint": "Haz clic en las consolas que tienes — añadidas con foto. Las que ya tienes están marcadas con ✓."
   },
   "drawer": {
     "markViewed": "Marcar como visto",

@@ -34,6 +34,8 @@ async function fetchFromProvider(
       return tmdbEnrich(item.title, { year: item.year });
     case 'discogs':
       return discogsEnrich(item.title, item.type);
+    default:
+      return null; // no auto-enrichment (e.g. consoles)
   }
 }
 
@@ -45,7 +47,7 @@ export interface EnrichOutcome {
 // Enrich a single item: cache-first, then provider, then persist onto the item.
 export async function enrichItem(item: Item): Promise<EnrichOutcome> {
   const source = SOURCE_FOR_TYPE[item.type];
-  if (!sourceEnabled(source)) return { status: 'source-disabled' };
+  if (!source || !sourceEnabled(source)) return { status: 'source-disabled' };
 
   const key = keyForItem(item);
   try {
@@ -163,7 +165,7 @@ export async function enrichUserItems(
 // External title search for the add-flow autofill.
 export async function searchExternal(type: MediaType, q: string): Promise<SearchHit[]> {
   const source = SOURCE_FOR_TYPE[type];
-  if (!sourceEnabled(source)) return [];
+  if (!source || !sourceEnabled(source)) return [];
   switch (source) {
     case 'igdb':
       return igdbSearch(q);
@@ -171,6 +173,8 @@ export async function searchExternal(type: MediaType, q: string): Promise<Search
       return tmdbSearch(q);
     case 'discogs':
       return discogsSearch(q, type);
+    default:
+      return [];
   }
 }
 

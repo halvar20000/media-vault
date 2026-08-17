@@ -1,0 +1,38 @@
+// Curated gaming consoles for the Consoles category, each with a photo
+// (Wikipedia/Wikimedia lead images). The name is stored as the item title.
+export interface ConsoleDef { name: string; image: string; }
+
+export const CONSOLES: ConsoleDef[] = [
+  { name: "Nintendo Entertainment System", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/NES-Console-Set.png/330px-NES-Console-Set.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Super Nintendo (SNES)", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/SNES-Mod1-Console-Set.png/330px-SNES-Mod1-Console-Set.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo 64", image: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Nintendo_64_%28logo%29.svg/330px-Nintendo_64_%28logo%29.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo GameCube", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/GameCube-Console-Set.png/330px-GameCube-Console-Set.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo Wii", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Wii-Console.png/330px-Wii-Console.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo Wii U", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Wii_U_Console_and_Gamepad.png/330px-Wii_U_Console_and_Gamepad.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo Switch", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Nintendo_Switch_logo.svg/330px-Nintendo_Switch_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo Switch 2", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Nintendo_Switch_2_logo.svg/330px-Nintendo_Switch_2_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Game Boy", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Game-Boy-FL.png/330px-Game-Boy-FL.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Game Boy Color", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Nintendo-Game-Boy-Color-FL.png/330px-Nintendo-Game-Boy-Color-FL.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Game Boy Advance", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Nintendo-Game-Boy-Advance-Purple-FL.png/330px-Nintendo-Game-Boy-Advance-Purple-FL.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo DS", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Nintendo-DS-Fat-Blue.png/330px-Nintendo-DS-Fat-Blue.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Nintendo 3DS", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Nintendo-3DS-AquaOpen.png/330px-Nintendo-3DS-AquaOpen.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Sony PlayStation", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Playstation_logo_colour.svg/330px-Playstation_logo_colour.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation 2", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PS2-Versions.png/330px-PS2-Versions.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation 3", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/PS3_consoles_montage_HQ.png/330px-PS3_consoles_montage_HQ.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation 4", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/PS4_consoles_montage.jpg/330px-PS4_consoles_montage.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation 5", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Black_and_white_Playstation_5_base_edition_with_controller.png/330px-Black_and_white_Playstation_5_base_edition_with_controller.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation Portable (PSP)", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/PSP-1000.png/330px-PSP-1000.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "PlayStation Vita", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/PlayStation-Vita-1101-FL.png/330px-PlayStation-Vita-1101-FL.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Xbox", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Xbox-Console-wDuke-L.png/330px-Xbox-Console-wDuke-L.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Xbox 360", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Xbox-360S-Console-Set.png" },
+  { name: "Xbox One", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Xbox_One_consoles_montage.png/330px-Xbox_One_consoles_montage.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Xbox Series X|S", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Xbox_Series_X_S_color.svg/330px-Xbox_Series_X_S_color.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Sega Master System", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Sega-Master-System-Set.png" },
+  { name: "Sega Genesis / Mega Drive", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Sega-Mega-Drive-JP-Mk1-Console-Set.jpg/330px-Sega-Mega-Drive-JP-Mk1-Console-Set.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Sega Saturn", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Sega-Saturn-Console-Set-Mk2.png/330px-Sega-Saturn-Console-Set-Mk2.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Sega Dreamcast", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Dreamcast_logo_Japan.svg/330px-Dreamcast_logo_Japan.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Sega Game Gear", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Sega-Game-Gear-WB.png/330px-Sega-Game-Gear-WB.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Atari 2600", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Atari-2600-Wood-4Sw-Set.png/330px-Atari-2600-Wood-4Sw-Set.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Neo Geo", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Neo-Geo-AES-Console-Set.png/330px-Neo-Geo-AES-Console-Set.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+  { name: "Steam Deck", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Steam_Deck_%28front%29.png/330px-Steam_Deck_%28front%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail" },
+];

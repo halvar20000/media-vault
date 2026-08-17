@@ -6,6 +6,13 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.7.0] — 2026-08-16
+
+### Added
+- **Gaming consoles category** — a new "Consoles" media type. **Add → Console** shows
+  a picker of 33 consoles (Nintendo, PlayStation, Xbox, Sega, Game Boy, Steam Deck…),
+  each with a real photo; click the ones you own to add them. Consoles get their own filter.
+
 ## [1.6.0] — 2026-08-16
 
 ### Added
@@ -79,6 +86,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.7.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.0
 [1.6.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.6.0
 [1.5.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.1
 [1.5.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.0

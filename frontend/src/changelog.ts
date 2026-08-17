@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.7.0',
+    date: '2026-08-16',
+    title: 'Gaming consoles category',
+    changes: [
+      'New "Consoles" category — Add → Console shows a picker of 33 consoles (Nintendo, PlayStation, Xbox, Sega, Game Boy, Steam Deck and more), each with a real photo; click the ones you own to add them.',
+      'Consoles appear as their own filter alongside Games, Films and music.',
+    ],
+  },
+  {
     version: '1.6.0',
     date: '2026-08-16',
     title: 'Listen on Spotify / Apple Music',

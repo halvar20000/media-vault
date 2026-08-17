@@ -24,14 +24,16 @@
     "movie": "Film",
     "lp": "Vinyl LP",
     "single": "Single",
-    "cd": "CD"
+    "cd": "CD",
+    "console": "Console"
   },
   "types_plural": {
     "game": "Games",
     "movie": "Films",
     "lp": "Vinyl LPs",
     "single": "Singles",
-    "cd": "CDs"
+    "cd": "CDs",
+    "console": "Consoles"
   },
   "header": {
     "searchPlaceholder": "Search across games, films, vinyl…",
@@ -197,7 +199,10 @@
     "steamHint": "e.g. 76561198000000000, your custom URL name, or https://steamcommunity.com/id/yourname",
     "steamBtn": "Import my Steam library",
     "steamNote": "Needs a Steam Web API key (add it in ⚙ Settings) and your Steam profile’s “Game details” set to Public. Imported as format “Steam”; re-run any time to add new purchases.",
-    "steamDone": "Imported {{imported}} games ({{skipped}} already there)."
+    "steamDone": "Imported {{imported}} games ({{skipped}} already there).",
+    "console": "Console",
+    "consoleDesc": "Add gaming consoles you own, with photos.",
+    "consoleHint": "Click the consoles you own — added with a photo. Owned ones are marked ✓."
   },
   "drawer": {
     "markViewed": "Mark viewed",

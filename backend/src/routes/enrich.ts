@@ -81,7 +81,7 @@ enrichRouter.post('/item/:id', async (req, res) => {
   if (!rows.length) return res.status(404).json({ error: 'not found' });
 
   const source = SOURCE_FOR_TYPE[rows[0].type];
-  if (!sourceEnabled(source)) {
+  if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured` });
   }
   const outcome = await enrichItem(rows[0]);

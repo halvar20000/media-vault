@@ -19,7 +19,7 @@ barcodeRouter.get('/:type/:code', async (req, res) => {
   if (!code) return res.status(400).json({ error: 'invalid barcode' });
 
   const source = SOURCE_FOR_TYPE[type];
-  if (!sourceEnabled(source)) {
+  if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured`, hits: [] });
   }
 

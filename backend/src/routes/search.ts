@@ -16,7 +16,7 @@ searchRouter.get('/:type', async (req, res) => {
   if (!q) return res.json({ hits: [] });
 
   const source = SOURCE_FOR_TYPE[type];
-  if (!sourceEnabled(source)) {
+  if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured`, hits: [] });
   }
 
