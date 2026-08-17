@@ -202,7 +202,8 @@
     "steamDone": "{{imported}} jeux importés ({{skipped}} déjà présents).",
     "console": "Console",
     "consoleDesc": "Ajoutez vos consoles de jeu, avec photos.",
-    "consoleHint": "Cliquez sur les consoles que vous possédez — ajoutées avec une photo. Celles possédées sont marquées ✓."
+    "consoleHint": "Cliquez sur une console pour l'ajouter — cliquez à nouveau pour en ajouter une autre (par ex. deux PS3). Un badge ×N indique combien vous en possédez. Pour une édition limitée, ajoutez la console de base puis renommez-la et définissez votre propre photo dans ses détails.",
+    "consoleAddAnother": "Vous en possédez {{count}} — cliquez pour en ajouter une autre"
   },
   "drawer": {
     "markViewed": "Marquer comme vu",

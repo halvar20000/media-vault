@@ -202,7 +202,8 @@
     "steamDone": "Imported {{imported}} games ({{skipped}} already there).",
     "console": "Console",
     "consoleDesc": "Add gaming consoles you own, with photos.",
-    "consoleHint": "Click the consoles you own — added with a photo. Owned ones are marked ✓."
+    "consoleHint": "Click a console to add it — click again to add another (e.g. two PS3s). A ×N badge shows how many you own. For a limited edition, add the base console then rename it and set your own photo in its details.",
+    "consoleAddAnother": "You own {{count}} — click to add another"
   },
   "drawer": {
     "markViewed": "Mark viewed",

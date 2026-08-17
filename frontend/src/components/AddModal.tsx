@@ -43,7 +43,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [resolved, setResolved] = useState('');
   const [manual, setManual] = useState({ title: '', format: '', year: '', barcode: '', condition: '', notes: '' });
   const [steamId, setSteamId] = useState('');
-  const [ownedConsoles, setOwnedConsoles] = useState<Set<string>>(new Set());
+  const [consoleCounts, setConsoleCounts] = useState<Record<string, number>>({});
   const [busyConsole, setBusyConsole] = useState<string | null>(null);
   const [checkText, setCheckText] = useState('');
   const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
@@ -207,19 +207,25 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     }
   }
 
-  // Load which consoles are already owned when the Console picker opens.
+  // Load how many of each console are already owned when the picker opens,
+  // so we can show a ×N count and still allow adding more (duplicates, editions).
   useEffect(() => {
     if (method !== 'console') return;
     api.listItems({ type: 'console' })
-      .then(({ items }) => setOwnedConsoles(new Set(items.map((i) => i.title))))
+      .then(({ items }) => {
+        const counts: Record<string, number> = {};
+        for (const i of items) counts[i.title] = (counts[i.title] || 0) + 1;
+        setConsoleCounts(counts);
+      })
       .catch(() => {});
   }, [method]);
 
   async function addConsole(name: string, image: string) {
     setBusyConsole(name);
     try {
+      // force=true skips the duplicate check: a collector can own several of the same console.
       await api.createItem({ type: 'console', title: name, cover_url: image, cover_source_url: image }, true);
-      setOwnedConsoles((s) => new Set(s).add(name));
+      setConsoleCounts((c) => ({ ...c, [name]: (c[name] || 0) + 1 }));
       onAdded();
     } catch {
       /* ignore */
@@ -590,18 +596,19 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
               <p className="mnote" style={{ padding: '0 0 10px', border: 0 }}>{t('add.consoleHint')}</p>
               <div className="consolegrid">
                 {CONSOLES.map((c) => {
-                  const owned = ownedConsoles.has(c.name);
+                  const count = consoleCounts[c.name] || 0;
                   return (
                     <button
                       key={c.name}
-                      className={`concard ${owned ? 'owned' : ''}`}
-                      onClick={() => !owned && addConsole(c.name, c.image)}
-                      disabled={owned || busyConsole === c.name}
-                      title={c.name}
+                      className={`concard ${count ? 'owned' : ''}`}
+                      onClick={() => addConsole(c.name, c.image)}
+                      disabled={busyConsole === c.name}
+                      title={count ? t('add.consoleAddAnother', { count }) : c.name}
                     >
                       <span className="conimg"><img src={c.image} alt="" loading="lazy" /></span>
                       <span className="conname">{c.name}</span>
-                      {owned ? <span className="conbadge">✓</span> : busyConsole === c.name ? <span className="conbadge">…</span> : <span className="conadd">＋</span>}
+                      {count > 0 && <span className="concount">×{count}</span>}
+                      {busyConsole === c.name ? <span className="conbadge">…</span> : <span className="conadd">＋</span>}
                     </button>
                   );
                 })}

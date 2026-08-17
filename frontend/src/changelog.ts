@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.7.1',
+    date: '2026-08-17',
+    title: 'Add several of the same console',
+    changes: [
+      'The console picker now lets you add duplicates — click a console again to add another (e.g. two PS3s, several Xbox 360s). A ×N badge shows how many you own.',
+      'For a limited/special edition: add the base console, then open it and rename it and set your own photo in its details.',
+    ],
+  },
+  {
     version: '1.7.0',
     date: '2026-08-16',
     title: 'Gaming consoles category',

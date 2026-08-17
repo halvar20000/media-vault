@@ -6,6 +6,14 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.7.1] — 2026-08-17
+
+### Changed
+- The console picker now lets you **add duplicates** — click a console again to add
+  another (e.g. two PS3s, several Xbox 360s). A ×N badge shows how many you own. For a
+  limited/special edition, add the base console then rename it and set your own photo
+  in its details.
+
 ## [1.7.0] — 2026-08-16
 
 ### Added
@@ -86,6 +94,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.7.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.1
 [1.7.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.0
 [1.6.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.6.0
 [1.5.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.5.1

@@ -1,6 +1,6 @@
 {
   "name": "media-vault-backend",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "private": true,
   "description": "media-vault API — unified physical-media catalog with automatic artwork enrichment",
   "license": "AGPL-3.0-or-later",
