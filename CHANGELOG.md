@@ -6,6 +6,16 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] — 2026-08-17
+
+### Added
+- **Universal CSV import** — a single documented, AI-fillable format for every media
+  type: a header row with columns `type,title,year,format,tmdb_id,notes` (one row per
+  item). Available under **Add → Import → Universal CSV**, with a downloadable template.
+  Add a `tmdb_id` (or `igdb_id` / `discogs_id`) to a row and enrichment fetches that
+  **exact** record — ideal for having an AI identify discs from photos and fill the CSV.
+  Rows without an id still match by title. Handles comma or semicolon (Excel) delimiters.
+
 ## [1.7.1] — 2026-08-17
 
 ### Changed
@@ -94,6 +104,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.8.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.8.0
 [1.7.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.1
 [1.7.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.0
 [1.6.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.6.0

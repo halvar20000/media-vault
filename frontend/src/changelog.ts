@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.8.0',
+    date: '2026-08-17',
+    title: 'Universal CSV import (AI-friendly)',
+    changes: [
+      'New Add → Import → "Universal CSV" — one documented format for every media type: a header row with columns type, title, year, format, tmdb_id, notes. Download a starter template right from the dialog.',
+      'Add a tmdb_id (or igdb_id / discogs_id) to any row and enrichment fetches that exact record — perfect for letting an AI identify your discs from photos and fill in the CSV. Rows without an ID still match by title as before.',
+    ],
+  },
+  {
     version: '1.7.1',
     date: '2026-08-17',
     title: 'Add several of the same console',

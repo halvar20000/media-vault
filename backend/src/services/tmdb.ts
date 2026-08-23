@@ -51,6 +51,31 @@ export async function tmdbSearch(title: string, limit = 8): Promise<SearchHit[]>
   return results.slice(0, limit).map(toHit);
 }
 
+// Fetch a movie by its exact TMDB id — used when an import row carries a
+// tmdb_id (e.g. an AI matched the disc), so we skip title-guessing entirely.
+export async function tmdbGetById(id: string): Promise<EnrichmentResult | null> {
+  const url = new URL(`https://api.themoviedb.org/3/movie/${encodeURIComponent(id)}`);
+  url.searchParams.set('language', getApiKeys().tmdbLanguage);
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`,
+      Accept: 'application/json',
+    },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`TMDB get ${id} failed: ${res.status} ${await res.text()}`);
+  const m = (await res.json()) as TmdbMovie;
+  const hit = toHit(m);
+  return {
+    source: 'tmdb',
+    sourceId: hit.sourceId,
+    coverUrl: hit.coverUrl,
+    rating: hit.rating,
+    description: hit.description,
+    payload: hit,
+  };
+}
+
 export interface TmdbHint {
   year?: number | null;
 }

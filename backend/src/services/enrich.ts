@@ -7,7 +7,7 @@ import { cacheKey, getCached, putCached } from '../lib/cache';
 import { sourcesEnabled } from '../lib/apikeys';
 import type { EnrichmentResult, Item, SearchHit } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
-import { tmdbEnrich, tmdbSearch } from './tmdb';
+import { tmdbEnrich, tmdbSearch, tmdbGetById } from './tmdb';
 import { discogsEnrich, discogsSearch } from './discogs';
 import { cacheCover } from '../lib/covers';
 
@@ -39,6 +39,44 @@ async function fetchFromProvider(
   }
 }
 
+// Exact fetch by a provider id already stored on the item (e.g. a tmdb_id
+// supplied in an import). Only TMDB is wired for now; other sources return
+// null so the caller falls back to the title-based path.
+async function fetchByIdFromProvider(
+  item: Pick<Item, 'type' | 'source' | 'source_id'>
+): Promise<EnrichmentResult | null> {
+  if (!item.source_id) return null;
+  if (item.source === 'tmdb' && SOURCE_FOR_TYPE[item.type] === 'tmdb') {
+    return tmdbGetById(item.source_id);
+  }
+  return null;
+}
+
+// Cache the cover locally, then write the enrichment result onto the item.
+async function persistResult(
+  item: Pick<Item, 'id'>,
+  result: EnrichmentResult,
+  source: 'igdb' | 'tmdb' | 'discogs'
+): Promise<void> {
+  const remoteCover = result.coverUrl;
+  let localCover: string | null = null;
+  if (remoteCover) localCover = await cacheCover(remoteCover);
+  const coverToStore = localCover ?? remoteCover;
+
+  await query(
+    `UPDATE items SET
+       cover_url = COALESCE($2, cover_url),
+       cover_source_url = COALESCE($3, cover_source_url),
+       rating = $4,
+       description = COALESCE($5, description),
+       source = $6,
+       source_id = $7,
+       enriched_at = now()
+     WHERE id = $1`,
+    [item.id, coverToStore, remoteCover, result.rating, result.description, source, result.sourceId]
+  );
+}
+
 export interface EnrichOutcome {
   status: 'enriched' | 'cached' | 'no-match' | 'source-disabled' | 'error';
   message?: string;
@@ -49,8 +87,16 @@ export async function enrichItem(item: Item): Promise<EnrichOutcome> {
   const source = SOURCE_FOR_TYPE[item.type];
   if (!source || !sourceEnabled(source)) return { status: 'source-disabled' };
 
-  const key = keyForItem(item);
   try {
+    // Exact match first: if the item already carries a provider id (e.g. a
+    // tmdb_id from an import), fetch that record directly — no title-guessing.
+    const byId = await fetchByIdFromProvider(item);
+    if (byId) {
+      await persistResult(item, byId, source);
+      return { status: 'enriched' };
+    }
+
+    const key = keyForItem(item);
     let result: EnrichmentResult | null = null;
     let fromCache = false;
 
@@ -81,25 +127,7 @@ export async function enrichItem(item: Item): Promise<EnrichOutcome> {
 
     if (!result) return { status: 'no-match' };
 
-    // Cache the cover locally; fall back to the remote URL if the download fails.
-    const remoteCover = result.coverUrl;
-    let localCover: string | null = null;
-    if (remoteCover) localCover = await cacheCover(remoteCover);
-    const coverToStore = localCover ?? remoteCover;
-
-    await query(
-      `UPDATE items SET
-         cover_url = COALESCE($2, cover_url),
-         cover_source_url = COALESCE($3, cover_source_url),
-         rating = $4,
-         description = COALESCE($5, description),
-         source = $6,
-         source_id = $7,
-         enriched_at = now()
-       WHERE id = $1`,
-      [item.id, coverToStore, remoteCover, result.rating, result.description, source, result.sourceId]
-    );
-
+    await persistResult(item, result, source);
     return { status: fromCache ? 'cached' : 'enriched' };
   } catch (err: any) {
     console.error(`[enrich] item ${item.id} (${item.title}) failed:`, err?.message ?? err);

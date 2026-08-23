@@ -432,6 +432,7 @@ header {
 .concard.owned { border-color: #2f7d4f; }
 .concard:disabled { cursor: default; }
 .concard .concount { position: absolute; top: 6px; left: 6px; min-width: 22px; height: 22px; padding: 0 6px; display: grid; place-items: center; border-radius: 999px; background: #2f7d4f; color: #fff; font-size: 12px; font-weight: 700; }
+.linklike { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
 .concard .conimg { aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 5px; background: #fff; }
 .concard .conimg img { width: 100%; height: 100%; object-fit: contain; }
 .concard .conname { font-size: 11.5px; line-height: 1.2; color: var(--surface); }

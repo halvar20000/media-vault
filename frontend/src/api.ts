@@ -163,8 +163,8 @@ export const api = {
       body: JSON.stringify({ steamId }),
     }),
 
-  // CSV import (multipart). kind: 'games' | 'movies'
-  importCsv: async (kind: 'games' | 'movies', file: File) => {
+  // CSV import (multipart). kind: 'games' | 'movies' | 'csv' (universal format)
+  importCsv: async (kind: 'games' | 'movies' | 'csv', file: File) => {
     const fd = new FormData();
     fd.append('file', file);
     const res = await fetch(`/api/import/${kind}`, {
@@ -173,6 +173,6 @@ export const api = {
       body: fd,
     });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `${res.status}`);
-    return (await res.json()) as { imported: number; total: number };
+    return (await res.json()) as { imported: number; total: number; withId?: number };
   },
 };

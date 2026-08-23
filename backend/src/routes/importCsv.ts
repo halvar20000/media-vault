@@ -4,6 +4,7 @@ import { query } from '../db/pool';
 import { requireAuth, userId } from '../middleware/auth';
 import { parseGamesCsv } from '../lib/games-csv';
 import { parseFlickrackCsv } from '../lib/movies-csv';
+import { parseUniversalCsv } from '../lib/universal-csv';
 import { getApiKeys } from '../lib/apikeys';
 import { resolveSteamId, getOwnedGames, steamCoverUrl } from '../services/steam';
 
@@ -39,6 +40,39 @@ importRouter.post('/games', upload.single('file'), async (req, res) => {
     imported++;
   }
   res.status(201).json({ imported, total: rows.length });
+});
+
+// POST /api/import/csv  (multipart form field: "file")
+// The documented, AI-fillable universal format: a header row with named columns
+// (type,title,year,format,tmdb_id,notes,…) covering every media type. When a row
+// carries a provider id (tmdb_id/igdb_id/discogs_id) it is stored so a later
+// enrich pass fetches that exact record; rows without an id enrich by title.
+importRouter.post('/csv', upload.single('file'), async (req, res) => {
+  const uid = userId(req);
+  if (!req.file) return res.status(400).json({ error: 'no file uploaded (field "file")' });
+
+  let rows;
+  try {
+    rows = parseUniversalCsv(req.file.buffer.toString('utf8'));
+  } catch (err: any) {
+    return res.status(400).json({ error: `could not parse CSV: ${err?.message ?? err}` });
+  }
+  if (!rows.length) {
+    return res.status(400).json({ error: 'no valid rows found (need a header row with at least a "title" column)' });
+  }
+
+  let imported = 0;
+  let withId = 0;
+  for (const r of rows) {
+    await query(
+      `INSERT INTO items (user_id, type, title, format, year, catalog_no, notes, source, source_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [uid, r.type, r.title, r.format, r.year, r.catalog_no, r.notes, r.source, r.source_id]
+    );
+    imported++;
+    if (r.source_id) withId++;
+  }
+  res.status(201).json({ imported, total: rows.length, withId });
 });
 
 // POST /api/import/steam  { steamId: "<SteamID64 | vanity | profile URL>" }

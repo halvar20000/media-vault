@@ -35,7 +35,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [importKind, setImportKind] = useState<'games' | 'movies'>('games');
+  const [importKind, setImportKind] = useState<'games' | 'movies' | 'csv'>('csv');
   const [barcode, setBarcode] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [autoAdd, setAutoAdd] = useState(false);
@@ -282,13 +282,34 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
     setMsg(null);
     try {
       const r = await api.importCsv(importKind, file);
-      setMsg(t('add.imported', { count: r.imported, kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) }));
+      if (importKind === 'csv') {
+        setMsg(t('add.importedCsv', { count: r.imported, withId: r.withId ?? 0 }));
+      } else {
+        setMsg(t('add.imported', { count: r.imported, kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) }));
+      }
       onAdded();
     } catch (e: any) {
       setMsg(e.message || 'Import failed');
     } finally {
       setBusy(false);
     }
+  }
+
+  // Offer the documented universal-CSV format as a downloadable starter file,
+  // so it (and its header row) can be handed straight to an AI to fill in.
+  function downloadCsvTemplate() {
+    const csv = [
+      'type,title,year,format,tmdb_id,notes',
+      'Blu-ray,The Matrix,1999,Blu-ray,603,',
+      'DVD,Amélie,2001,DVD,194,',
+      '4K,Dune,2021,4K UHD,438631,',
+    ].join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'media-vault-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   if (!open) return null;
@@ -398,7 +419,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
               <div className="rowfields">
                 <div className="field">
                   <label>{t('add.importType')}</label>
-                  <select value={importKind} onChange={(e) => setImportKind(e.target.value as 'games' | 'movies')}>
+                  <select value={importKind} onChange={(e) => setImportKind(e.target.value as 'games' | 'movies' | 'csv')}>
+                    <option value="csv">{t('add.universalCsv')}</option>
                     <option value="games">{t('add.gamesList')}</option>
                     <option value="movies">{t('add.moviesList')}</option>
                   </select>
@@ -409,13 +431,25 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
                 </div>
               </div>
               <button className="primary" onClick={doImport} disabled={busy}>
-                {busy ? t('add.importing') : t('add.import', { kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) })}
+                {busy
+                  ? t('add.importing')
+                  : importKind === 'csv'
+                    ? t('add.importCsvBtn')
+                    : t('add.import', { kind: t(`types_plural.${importKind === 'movies' ? 'movie' : 'game'}`) })}
               </button>
               {msg && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{msg}</p>}
-              <p className="mnote">
-                {importKind === 'games' ? t('add.gamesNote') : t('add.moviesNote')}{' '}
-                {t('add.afterImport')}
-              </p>
+              {importKind === 'csv' ? (
+                <p className="mnote">
+                  {t('add.csvNote')}{' '}
+                  <button type="button" className="linklike" onClick={downloadCsvTemplate}>{t('add.downloadTemplate')}</button>
+                  {' '}{t('add.afterImport')}
+                </p>
+              ) : (
+                <p className="mnote">
+                  {importKind === 'games' ? t('add.gamesNote') : t('add.moviesNote')}{' '}
+                  {t('add.afterImport')}
+                </p>
+              )}
             </>
           )}
 
