@@ -118,14 +118,17 @@ export const config = {
   craigslistSite: env('CRAIGSLIST_SITE', '').trim().toLowerCase(),
 };
 
-export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd' | 'console';
-export const MEDIA_TYPES: MediaType[] = ['game', 'movie', 'lp', 'single', 'cd', 'console'];
+export type MediaType = 'game' | 'movie' | 'series' | 'lp' | 'single' | 'cd' | 'console';
+export const MEDIA_TYPES: MediaType[] = ['game', 'movie', 'series', 'lp', 'single', 'cd', 'console'];
 
 // Which metadata source powers each media type (null = no auto-enrichment, e.g.
 // consoles, which are added from a curated list with their own images).
+// Both movies and series use TMDB, but via different endpoints (/movie vs /tv);
+// enrich.ts branches on the media type to pick the right one.
 export const SOURCE_FOR_TYPE: Record<MediaType, 'igdb' | 'tmdb' | 'discogs' | null> = {
   game: 'igdb',
   movie: 'tmdb',
+  series: 'tmdb',
   lp: 'discogs',
   single: 'discogs',
   cd: 'discogs',

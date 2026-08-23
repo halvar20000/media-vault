@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.9.0',
+    date: '2026-08-17',
+    title: 'TV series as their own category',
+    changes: [
+      'New "Series" media type — TV series and box sets get their own filter alongside Films, with correct TMDB enrichment via the /tv endpoints (title search and exact tmdb_id lookup).',
+      'In the universal CSV, set type = series and put the show\'s TMDB TV id in tmdb_id. TMDB keeps movies and series in separate id spaces, so a series id is now resolved against /tv — no more accidental wrong-film matches.',
+    ],
+  },
+  {
     version: '1.8.0',
     date: '2026-08-17',
     title: 'Universal CSV import (AI-friendly)',

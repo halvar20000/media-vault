@@ -52,6 +52,7 @@ export function easycashStoreLabel(): string {
 // Browse a media type in stock at the configured store, cheapest first. When a
 // game platform is given (e.g. "Xbox 360"), narrow to that platform's games.
 export function easycashStoreBrowseUrl(type: MediaType | 'all' = 'game', platform?: string): string {
+  if (type === 'series') type = 'movie'; // series discs live with movies at the shop
   let term =
     type === 'movie' ? 'dvd blu-ray'
     : type === 'lp' || type === 'single' ? 'vinyle'
@@ -242,7 +243,7 @@ export function marketplaceItemUrl(
   // Drop the "(360)" style disambiguator from the display title.
   const cleanTitle = item.title.replace(/\s*\([a-z0-9][a-z0-9 \-]{0,6}\)\s*$/i, '').trim();
   const parts = [cleanTitle];
-  if ((item.type === 'game' || item.type === 'movie') && item.format) parts.push(item.format);
+  if ((item.type === 'game' || item.type === 'movie' || item.type === 'series') && item.format) parts.push(item.format);
   return mkt.build(parts.join(' ').trim());
 }
 
@@ -252,6 +253,8 @@ export function marketplaceBundleUrl(
   type: MediaType | 'all',
   format?: string
 ): string {
-  if (mkt.bundle) return mkt.bundle(type, format);
-  return mkt.build(bundleQuery(mkt.lang, type, format));
+  // Series discs search like movies ("dvd blu-ray") across every shop.
+  const t = type === 'series' ? 'movie' : type;
+  if (mkt.bundle) return mkt.bundle(t, format);
+  return mkt.build(bundleQuery(mkt.lang, t, format));
 }

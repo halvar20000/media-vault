@@ -23,7 +23,7 @@ interface Props {
 
 function sourceForType(t: MediaType): 'igdb' | 'tmdb' | 'discogs' {
   if (t === 'game') return 'igdb';
-  if (t === 'movie') return 'tmdb';
+  if (t === 'movie' || t === 'series') return 'tmdb';
   return 'discogs';
 }
 

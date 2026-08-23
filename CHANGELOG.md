@@ -6,6 +6,18 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.9.0] — 2026-08-17
+
+### Added
+- **TV series as a first-class category** — a new `series` media type with its own
+  filter chip alongside Films. Series enrich from TMDB via the **`/tv`** endpoints
+  (both title search and exact-id lookup), so box sets get the right artwork, rating
+  and description.
+- In the **universal CSV**, set `type` to `series` and put the show's **TMDB TV id**
+  in `tmdb_id`. Movies and series live in separate id spaces on TMDB, so a series id
+  is resolved against `/tv/{id}` — no more silently matching an unrelated film that
+  happens to share the number.
+
 ## [1.8.0] — 2026-08-17
 
 ### Added
@@ -104,6 +116,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.9.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.9.0
 [1.8.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.8.0
 [1.7.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.1
 [1.7.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.0

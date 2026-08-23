@@ -7,7 +7,7 @@ import { cacheKey, getCached, putCached } from '../lib/cache';
 import { sourcesEnabled } from '../lib/apikeys';
 import type { EnrichmentResult, Item, SearchHit } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
-import { tmdbEnrich, tmdbSearch, tmdbGetById } from './tmdb';
+import { tmdbEnrich, tmdbSearch, tmdbGetById, tmdbTvEnrich, tmdbTvSearch, tmdbTvGetById } from './tmdb';
 import { discogsEnrich, discogsSearch } from './discogs';
 import { cacheCover } from '../lib/covers';
 
@@ -21,6 +21,9 @@ function keyForItem(item: Pick<Item, 'type' | 'title' | 'format'>): string {
   if (item.type === 'game') return cacheKey(item.title, item.format);
   if (item.type === 'cd') return cacheKey(item.title, 'cd');
   if (item.type === 'lp' || item.type === 'single') return cacheKey(item.title, 'vinyl');
+  // Series share the TMDB source with movies but a different namespace — key them
+  // apart so a film and a same-named series don't collide in the cache.
+  if (item.type === 'series') return cacheKey(item.title, 'tv');
   return cacheKey(item.title);
 }
 
@@ -31,7 +34,9 @@ async function fetchFromProvider(
     case 'igdb':
       return igdbEnrich(item.title, { platform: item.format });
     case 'tmdb':
-      return tmdbEnrich(item.title, { year: item.year });
+      return item.type === 'series'
+        ? tmdbTvEnrich(item.title, { year: item.year })
+        : tmdbEnrich(item.title, { year: item.year });
     case 'discogs':
       return discogsEnrich(item.title, item.type);
     default:
@@ -47,7 +52,8 @@ async function fetchByIdFromProvider(
 ): Promise<EnrichmentResult | null> {
   if (!item.source_id) return null;
   if (item.source === 'tmdb' && SOURCE_FOR_TYPE[item.type] === 'tmdb') {
-    return tmdbGetById(item.source_id);
+    // A series id is a TMDB *TV* id — resolve it via /tv, never /movie.
+    return item.type === 'series' ? tmdbTvGetById(item.source_id) : tmdbGetById(item.source_id);
   }
   return null;
 }
@@ -198,7 +204,7 @@ export async function searchExternal(type: MediaType, q: string): Promise<Search
     case 'igdb':
       return igdbSearch(q);
     case 'tmdb':
-      return tmdbSearch(q);
+      return type === 'series' ? tmdbTvSearch(q) : tmdbSearch(q);
     case 'discogs':
       return discogsSearch(q, type);
     default:

@@ -22,6 +22,7 @@
   "types": {
     "game": "Game",
     "movie": "Film",
+    "series": "Series",
     "lp": "Vinyl LP",
     "single": "Single",
     "cd": "CD",
@@ -30,6 +31,7 @@
   "types_plural": {
     "game": "Games",
     "movie": "Films",
+    "series": "Series",
     "lp": "Vinyl LPs",
     "single": "Singles",
     "cd": "CDs",

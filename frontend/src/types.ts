@@ -1,4 +1,4 @@
-export type MediaType = 'game' | 'movie' | 'lp' | 'single' | 'cd' | 'console';
+export type MediaType = 'game' | 'movie' | 'series' | 'lp' | 'single' | 'cd' | 'console';
 
 export interface Item {
   id: string;
@@ -136,10 +136,11 @@ export interface TypeMeta {
 export const TYPE_META: Record<MediaType, TypeMeta> = {
   game: { label: 'Game', color: '#4C9A5A' },
   movie: { label: 'Film', color: '#3E7CB1' },
+  series: { label: 'Series', color: '#4E5D94' },
   lp: { label: 'Vinyl LP', color: '#C8681E' },
   single: { label: 'Single', color: '#A24E8F' },
   cd: { label: 'CD', color: '#3FA9A0' },
   console: { label: 'Console', color: '#7C5CBF' },
 };
 
-export const TYPE_ORDER: MediaType[] = ['game', 'movie', 'lp', 'single', 'cd', 'console'];
+export const TYPE_ORDER: MediaType[] = ['game', 'movie', 'series', 'lp', 'single', 'cd', 'console'];

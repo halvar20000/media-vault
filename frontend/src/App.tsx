@@ -248,13 +248,14 @@ export default function App() {
   }
   if (!user) return <Auth onAuthed={setUser} />;
 
+  const isVideoDisc = selected?.type === 'movie' || selected?.type === 'series';
   const sourceForActiveDrawer = selected
-    ? sources[selected.type === 'game' ? 'igdb' : selected.type === 'movie' ? 'tmdb' : 'discogs']
+    ? sources[selected.type === 'game' ? 'igdb' : isVideoDisc ? 'tmdb' : 'discogs']
     : false;
   const valueSourceForActiveDrawer = selected
     ? selected.type === 'game'
       ? valueSources.ebay || valueSources.pricecharting
-      : selected.type === 'movie'
+      : isVideoDisc
         ? false
         : valueSources.discogs
     : false;

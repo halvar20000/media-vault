@@ -14,10 +14,10 @@ German locale uses `;` — that's auto-detected).
 | Column       | Required | Notes |
 |--------------|:--------:|-------|
 | `title`      | ✅ | The title. The only truly required field. |
-| `type`       | recommended | `movie`, `game`, `lp`, `single`, `cd`, `console`. A disc format works too: `Blu-ray`, `DVD`, `4K` → treated as a movie and used as the format. Empty defaults to `movie`. |
+| `type`       | recommended | `movie`, `series`, `game`, `lp`, `single`, `cd`, `console`. A disc format works too: `Blu-ray`, `DVD`, `4K` → treated as a movie and used as the format (write `series` if it's a TV box set). Empty defaults to `movie`. |
 | `year`       | – | Release year (any 4-digit year in the cell is picked up). |
 | `format`     | – | e.g. `Blu-ray`, `4K UHD`, `DVD`; for games the platform (`PS3`, `Xbox 360`…). |
-| `tmdb_id`    | – | **Movies:** the TMDB id → exact artwork, rating & description, no guessing. |
+| `tmdb_id`    | – | **Movies:** the TMDB **movie** id. **Series:** the TMDB **TV** id — TMDB keeps movies and series in separate id spaces, so the row's `type` decides which endpoint is used (`/movie/{id}` vs `/tv/{id}`). Either way → exact artwork, rating & description, no guessing. |
 | `igdb_id`    | – | **Games:** the IGDB id (same idea). |
 | `discogs_id` | – | **Vinyl / CD / single:** the Discogs release id. |
 | `notes`      | – | Anything (age rating, edition, condition…). |
@@ -35,28 +35,40 @@ type,title,year,format,tmdb_id,notes
 Blu-ray,The Matrix,1999,Blu-ray,603,
 DVD,Amélie,2001,DVD,194,
 4K,Dune,2021,4K UHD,438631,
+series,Arrow,2012,Blu-ray,1412,tmdb_id here is a TV id
+series,Breaking Bad,2008,Blu-ray,1396,
 game,Halo 3,2007,Xbox 360,,igdb_id also works here
 ```
+
+> **TV series vs. movies.** A series like *Arrow* has a TMDB id, but it's a **TV**
+> id (1412), unrelated to any movie id. Put it in `tmdb_id` **and** set `type` to
+> `series` — media-vault then looks it up via `/tv`, so you get the series, not a
+> random film that happens to share the number. Never label a series row as a movie
+> format (`Blu-ray`) with a TV id; the `type` must say `series`.
 
 ## Letting an AI fill it from photos
 
 The whole point: photograph your discs, hand the pictures to your AI of choice with
 the prompt below, get a CSV back, import it.
 
-> You are helping me catalog my physical movie collection. I'll send photos of
-> Blu-ray / DVD / 4K covers. For each disc you can identify, output a single CSV
-> (comma-separated) with exactly this header:
+> You are helping me catalog my physical movie and TV-series collection. I'll send
+> photos of Blu-ray / DVD / 4K covers. For each disc you can identify, output a
+> single CSV (comma-separated) with exactly this header:
 >
 > `type,title,year,format,tmdb_id,notes`
 >
 > Rules:
-> - `type` = the disc format you see: `Blu-ray`, `DVD`, or `4K`.
-> - `title` = the movie's title (no "[Blu-ray]" suffixes).
-> - `year` = the film's release year if you're confident, else leave blank.
-> - `format` = same as type is fine.
-> - `tmdb_id` = the film's numeric ID on themoviedb.org **only if you are certain**
->   it's the correct film (right title AND year). If unsure, leave it blank — a wrong
->   id is worse than none.
+> - `type` = `movie` for a film, or `series` for a TV series / box set. (You may
+>   instead write the disc format `Blu-ray` / `DVD` / `4K` for a film — but a series
+>   MUST be `series`.)
+> - `title` = the title (no "[Blu-ray]" suffixes).
+> - `year` = release year (first air year for a series) if you're confident, else blank.
+> - `format` = the disc format: `Blu-ray`, `DVD`, or `4K UHD`.
+> - `tmdb_id` = the numeric themoviedb.org id, **only if you are certain** it's the
+>   right title (matching title AND year). For a `movie` use the film's **movie** id;
+>   for a `series` use the show's **TV** id (these are different id spaces on TMDB —
+>   don't put a TV id on a movie row or vice-versa). If unsure, leave it blank — a
+>   wrong id is worse than none.
 > - `notes` = leave blank unless there's an edition worth noting.
 > - One row per disc. Output only the CSV, nothing else. Don't invent titles you
 >   can't read.

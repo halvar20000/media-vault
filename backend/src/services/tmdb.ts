@@ -76,6 +76,89 @@ export async function tmdbGetById(id: string): Promise<EnrichmentResult | null> 
   };
 }
 
+// ---- TV series ---------------------------------------------------------------
+// TMDB keeps series in a separate namespace (/tv, /search/tv) with their own id
+// space and differently-named fields (name / first_air_date instead of
+// title / release_date). A movie id and a TV id are unrelated numbers, so a TV
+// id must never be looked up via /movie — hence these dedicated functions.
+
+interface TmdbTv {
+  id: number;
+  name: string;
+  overview?: string;
+  first_air_date?: string; // YYYY-MM-DD
+  vote_average?: number;
+  poster_path?: string | null;
+}
+
+function tvToHit(s: TmdbTv): SearchHit {
+  const year = s.first_air_date ? parseInt(s.first_air_date.slice(0, 4), 10) || null : null;
+  const rating = typeof s.vote_average === 'number' ? Math.round(s.vote_average * 100) / 10 : null;
+  return {
+    source: 'tmdb',
+    sourceId: String(s.id),
+    title: s.name,
+    year,
+    format: null,
+    coverUrl: s.poster_path ? `${IMG_BASE}${s.poster_path}` : null,
+    rating,
+    description: s.overview ?? null,
+  };
+}
+
+async function apiSearchTv(title: string): Promise<TmdbTv[]> {
+  const url = new URL('https://api.themoviedb.org/3/search/tv');
+  url.searchParams.set('query', title);
+  url.searchParams.set('include_adult', 'false');
+  url.searchParams.set('language', getApiKeys().tmdbLanguage);
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`, Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`TMDB tv search failed: ${res.status} ${await res.text()}`);
+  const json = (await res.json()) as { results?: TmdbTv[] };
+  return json.results ?? [];
+}
+
+export async function tmdbTvSearch(title: string, limit = 8): Promise<SearchHit[]> {
+  const results = await apiSearchTv(title);
+  return results.slice(0, limit).map(tvToHit);
+}
+
+export async function tmdbTvEnrich(title: string, hint?: TmdbHint): Promise<EnrichmentResult | null> {
+  const q = title.replace(/\s*\((?:[a-z0-9][a-z0-9 \-]{0,6})\)\s*$/i, '').trim() || title;
+  const results = await apiSearchTv(q);
+  if (!results.length) return null;
+
+  const nt = q.toLowerCase().trim();
+  let best = results[0];
+  let bestScore = -Infinity;
+  results.slice(0, 10).forEach((s, i) => {
+    let score = (10 - i) * 0.5;
+    if (s.name?.toLowerCase().trim() === nt) score += 40;
+    const y = s.first_air_date ? parseInt(s.first_air_date.slice(0, 4), 10) : null;
+    if (hint?.year && y && Math.abs(y - hint.year) <= 1) score += 30;
+    if (s.poster_path) score += 5;
+    if (score > bestScore) { bestScore = score; best = s; }
+  });
+
+  const hit = tvToHit(best);
+  return { source: 'tmdb', sourceId: hit.sourceId, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
+}
+
+// Fetch a series by its exact TMDB TV id — the /tv counterpart of tmdbGetById.
+export async function tmdbTvGetById(id: string): Promise<EnrichmentResult | null> {
+  const url = new URL(`https://api.themoviedb.org/3/tv/${encodeURIComponent(id)}`);
+  url.searchParams.set('language', getApiKeys().tmdbLanguage);
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`, Accept: 'application/json' },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`TMDB tv get ${id} failed: ${res.status} ${await res.text()}`);
+  const s = (await res.json()) as TmdbTv;
+  const hit = tvToHit(s);
+  return { source: 'tmdb', sourceId: hit.sourceId, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
+}
+
 export interface TmdbHint {
   year?: number | null;
 }

@@ -24,10 +24,16 @@ function normalizeType(raw: string): { type: MediaType; formatHint: string | nul
   const v = raw.toLowerCase().trim();
   if (!v) return { type: 'movie', formatHint: null };
 
-  // Movie disc formats — set type=movie and remember the printable format.
-  if (/\b4k\b|uhd/.test(v)) return { type: 'movie', formatHint: '4K UHD' };
-  if (/blu\s*-?\s*ray|bluray|\bbd\b/.test(v)) return { type: 'movie', formatHint: 'Blu-ray' };
-  if (/\bdvd\b/.test(v)) return { type: 'movie', formatHint: 'DVD' };
+  // A disc format may accompany any video type (movie or series box set).
+  let formatHint: string | null = null;
+  if (/\b4k\b|uhd/.test(v)) formatHint = '4K UHD';
+  else if (/blu\s*-?\s*ray|bluray|\bbd\b/.test(v)) formatHint = 'Blu-ray';
+  else if (/\bdvd\b/.test(v)) formatHint = 'DVD';
+
+  // Series/TV takes precedence over the generic movie disc mapping, so
+  // "Serie Blu-ray" is a series (format Blu-ray), not a movie.
+  if (/series|serie|\btv\b|show|staffel/.test(v)) return { type: 'series', formatHint };
+  if (formatHint) return { type: 'movie', formatHint };
   if (/movie|film/.test(v)) return { type: 'movie', formatHint: null };
 
   if (/console|konsole/.test(v)) return { type: 'console', formatHint: null };
@@ -85,7 +91,8 @@ export function parseUniversalCsv(text: string): UniversalRow[] {
     const tmdb = firstDigits(r['tmdb_id'] ?? r['tmdbid'] ?? r['tmdb']);
     const igdb = firstDigits(r['igdb_id'] ?? r['igdbid'] ?? r['igdb']);
     const discogs = firstDigits(r['discogs_id'] ?? r['discogsid'] ?? r['discogs']);
-    if (type === 'movie' && tmdb) { source = 'tmdb'; source_id = tmdb; }
+    // For a series, tmdb_id is a TMDB *TV* id (resolved via /tv on enrich).
+    if ((type === 'movie' || type === 'series') && tmdb) { source = 'tmdb'; source_id = tmdb; }
     else if (type === 'game' && igdb) { source = 'igdb'; source_id = igdb; }
     else if ((type === 'lp' || type === 'single' || type === 'cd') && discogs) { source = 'discogs'; source_id = discogs; }
 
