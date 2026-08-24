@@ -69,6 +69,7 @@ export async function tmdbGetById(id: string): Promise<EnrichmentResult | null> 
   return {
     source: 'tmdb',
     sourceId: hit.sourceId,
+    title: hit.title,
     coverUrl: hit.coverUrl,
     rating: hit.rating,
     description: hit.description,
@@ -142,7 +143,7 @@ export async function tmdbTvEnrich(title: string, hint?: TmdbHint): Promise<Enri
   });
 
   const hit = tvToHit(best);
-  return { source: 'tmdb', sourceId: hit.sourceId, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
+  return { source: 'tmdb', sourceId: hit.sourceId, title: hit.title, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
 }
 
 // Fetch a series by its exact TMDB TV id — the /tv counterpart of tmdbGetById.
@@ -156,7 +157,7 @@ export async function tmdbTvGetById(id: string): Promise<EnrichmentResult | null
   if (!res.ok) throw new Error(`TMDB tv get ${id} failed: ${res.status} ${await res.text()}`);
   const s = (await res.json()) as TmdbTv;
   const hit = tvToHit(s);
-  return { source: 'tmdb', sourceId: hit.sourceId, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
+  return { source: 'tmdb', sourceId: hit.sourceId, title: hit.title, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
 }
 
 export interface TmdbHint {
@@ -188,6 +189,7 @@ export async function tmdbEnrich(title: string, hint?: TmdbHint): Promise<Enrich
   return {
     source: 'tmdb',
     sourceId: hit.sourceId,
+    title: hit.title,
     coverUrl: hit.coverUrl,
     rating: hit.rating,
     description: hit.description,

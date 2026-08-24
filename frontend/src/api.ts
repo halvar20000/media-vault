@@ -96,8 +96,18 @@ export const api = {
   deleteCabinet: (id: string) => req<{ ok: true }>(`/cabinets/${id}`, { method: 'DELETE' }),
 
   // enrichment
-  startEnrich: (force = false) =>
-    req<{ status: string }>(`/enrich${force ? '?force=true' : ''}`, { method: 'POST' }),
+  startEnrich: (force = false, fields?: { title: boolean; cover: boolean; text: boolean }) => {
+    const params = new URLSearchParams();
+    if (force) params.set('force', 'true');
+    if (fields) {
+      const sel = [fields.title && 'title', fields.cover && 'cover', fields.text && 'text']
+        .filter(Boolean)
+        .join(',');
+      if (sel) params.set('fields', sel);
+    }
+    const qs = params.toString();
+    return req<{ status: string }>(`/enrich${qs ? `?${qs}` : ''}`, { method: 'POST' });
+  },
   enrichStatus: () => req<EnrichStatus>('/enrich/status'),
   enrichItem: (id: string) =>
     req<{ item: Item }>(`/enrich/item/${id}`, { method: 'POST' }),

@@ -58,29 +58,55 @@ async function fetchByIdFromProvider(
   return null;
 }
 
-// Cache the cover locally, then write the enrichment result onto the item.
+// Which fields a persist may overwrite. "Enrich collection" uses the default
+// (cover + text, never the title); "Re-fetch all" lets the user pick — including
+// the title, so a language switch can also pull the localized title.
+export interface EnrichFields {
+  title: boolean;
+  cover: boolean;
+  text: boolean; // rating + description
+}
+export const DEFAULT_FIELDS: EnrichFields = { title: false, cover: true, text: true };
+
+// Cache the cover locally, then write the selected fields of the enrichment
+// result onto the item. Unselected fields keep their existing values; source,
+// source_id and enriched_at are always recorded so the link/timestamp is fresh.
 async function persistResult(
   item: Pick<Item, 'id'>,
   result: EnrichmentResult,
-  source: 'igdb' | 'tmdb' | 'discogs'
+  source: 'igdb' | 'tmdb' | 'discogs',
+  fields: EnrichFields = DEFAULT_FIELDS
 ): Promise<void> {
-  const remoteCover = result.coverUrl;
-  let localCover: string | null = null;
-  if (remoteCover) localCover = await cacheCover(remoteCover);
-  const coverToStore = localCover ?? remoteCover;
+  const sets: string[] = [];
+  const vals: unknown[] = [item.id];
+  const add = (frag: string, val: unknown) => {
+    vals.push(val);
+    sets.push(frag.replace('?', `$${vals.length}`));
+  };
 
-  await query(
-    `UPDATE items SET
-       cover_url = COALESCE($2, cover_url),
-       cover_source_url = COALESCE($3, cover_source_url),
-       rating = $4,
-       description = COALESCE($5, description),
-       source = $6,
-       source_id = $7,
-       enriched_at = now()
-     WHERE id = $1`,
-    [item.id, coverToStore, remoteCover, result.rating, result.description, source, result.sourceId]
-  );
+  if (fields.cover) {
+    const remoteCover = result.coverUrl;
+    let localCover: string | null = null;
+    if (remoteCover) localCover = await cacheCover(remoteCover);
+    const coverToStore = localCover ?? remoteCover;
+    add('cover_url = COALESCE(?, cover_url)', coverToStore);
+    add('cover_source_url = COALESCE(?, cover_source_url)', remoteCover);
+  }
+  if (fields.text) {
+    add('rating = ?', result.rating);
+    add('description = COALESCE(?, description)', result.description);
+  }
+  // Only overwrite the title when asked AND the provider actually returned one,
+  // so an empty result never wipes a user's title.
+  if (fields.title && result.title) {
+    add('title = ?', result.title);
+  }
+
+  add('source = ?', source);
+  add('source_id = ?', result.sourceId);
+  sets.push('enriched_at = now()');
+
+  await query(`UPDATE items SET ${sets.join(', ')} WHERE id = $1`, vals);
 }
 
 export interface EnrichOutcome {
@@ -92,9 +118,13 @@ export interface EnrichOutcome {
 // With { force: true } the shared cache is bypassed (fetched fresh and the cache
 // overwritten) — used by "Re-fetch all" so switching the TMDB language actually
 // re-pulls metadata in the new language instead of re-serving the cached copy.
-export async function enrichItem(item: Item, opts: { force?: boolean } = {}): Promise<EnrichOutcome> {
+export async function enrichItem(
+  item: Item,
+  opts: { force?: boolean; fields?: EnrichFields } = {}
+): Promise<EnrichOutcome> {
   const source = SOURCE_FOR_TYPE[item.type];
   if (!source || !sourceEnabled(source)) return { status: 'source-disabled' };
+  const fields = opts.fields ?? DEFAULT_FIELDS;
 
   try {
     // Exact match first: if the item already carries a provider id (e.g. a
@@ -102,7 +132,7 @@ export async function enrichItem(item: Item, opts: { force?: boolean } = {}): Pr
     // This path is always live, so it already honours the current language.
     const byId = await fetchByIdFromProvider(item);
     if (byId) {
-      await persistResult(item, byId, source);
+      await persistResult(item, byId, source, fields);
       return { status: 'enriched' };
     }
 
@@ -116,6 +146,8 @@ export async function enrichItem(item: Item, opts: { force?: boolean } = {}): Pr
       result = {
         source: source,
         sourceId: cached.source_id,
+        title: null, // the cache doesn't store titles; force mode (which bypasses
+                     // the cache) is what the "Title" re-fetch relies on
         coverUrl: cached.cover_url,
         rating: cached.rating,
         description: cached.description,
@@ -137,7 +169,7 @@ export async function enrichItem(item: Item, opts: { force?: boolean } = {}): Pr
 
     if (!result) return { status: 'no-match' };
 
-    await persistResult(item, result, source);
+    await persistResult(item, result, source, fields);
     return { status: fromCache ? 'cached' : 'enriched' };
   } catch (err: any) {
     console.error(`[enrich] item ${item.id} (${item.title}) failed:`, err?.message ?? err);
@@ -157,7 +189,7 @@ export interface EnrichSummary {
 // Enrich every not-yet-enriched item for a user (or all, if force).
 export async function enrichUserItems(
   userId: string,
-  opts: { force?: boolean } = {}
+  opts: { force?: boolean; fields?: EnrichFields } = {}
 ): Promise<EnrichSummary> {
   const items = await query<Item>(
     `SELECT * FROM items
@@ -176,7 +208,7 @@ export async function enrichUserItems(
   };
 
   for (const item of items) {
-    const outcome = await enrichItem(item, { force: opts.force });
+    const outcome = await enrichItem(item, { force: opts.force, fields: opts.fields });
     switch (outcome.status) {
       case 'enriched':
         summary.enriched++;

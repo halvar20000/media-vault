@@ -88,6 +88,19 @@
     "catalogue": "▤ Catalogue",
     "easycashStoreTitle": "Parcourir les jeux en stock au magasin Easy Cash {{store}}, les moins chers d'abord (suit la plateforme sélectionnée)"
   },
+  "refetch": {
+    "title": "Recharger les métadonnées",
+    "intro": "Recharger les métadonnées de tous les éléments et choisir ce qui est écrasé. Récupéré à neuf (cache ignoré), pour qu'un changement de langue prenne effet.",
+    "fieldTitle": "Titre",
+    "fieldTitleHint": "Remplacer chaque titre par celui de la source (par ex. le titre français). Uniquement là où un ID/correspondance correct existe.",
+    "fieldCover": "Jaquette",
+    "fieldCoverHint": "Retélécharger les jaquettes.",
+    "fieldText": "Texte",
+    "fieldTextHint": "Note et description.",
+    "note": "Les titres et textes suivent votre langue TMDB (Réglages → TMDB language, par ex. fr-FR). Films & séries sont traduits ; jeux et musique non. Cela peut prendre un moment.",
+    "confirm": "Recharger",
+    "cancel": "Annuler"
+  },
   "settings": {
     "title": "Boutiques & places de marché",
     "intro": "Choisissez les boutiques recherchées par les boutons « trouver une offre ». Les changements s'appliquent immédiatement — aucun redémarrage.",

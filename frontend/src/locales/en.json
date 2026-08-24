@@ -88,6 +88,19 @@
     "catalogue": "▤ Catalogue",
     "easycashStoreTitle": "Browse games in stock at the {{store}} Easy Cash store, cheapest first (follows the selected platform)"
   },
+  "refetch": {
+    "title": "Re-fetch metadata",
+    "intro": "Re-pull metadata for every item and choose what to overwrite. Fetched fresh (cache bypassed), so a language change takes effect.",
+    "fieldTitle": "Title",
+    "fieldTitleHint": "Replace each title with the one from the source (e.g. the German title). Only where a correct ID/match exists.",
+    "fieldCover": "Cover",
+    "fieldCoverHint": "Re-download cover artwork.",
+    "fieldText": "Text",
+    "fieldTextHint": "Rating and description.",
+    "note": "Titles and text follow your TMDB language (Settings → TMDB language, e.g. de-DE). Movies & series are localized; games and music are not. This can take a while.",
+    "confirm": "Re-fetch now",
+    "cancel": "Cancel"
+  },
   "settings": {
     "title": "Shops & marketplaces",
     "intro": "Pick which shops the \"find deal\" buttons search. Changes apply instantly — no restart.",

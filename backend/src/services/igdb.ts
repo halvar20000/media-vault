@@ -205,6 +205,7 @@ export async function igdbEnrich(title: string, hint?: IgdbHint): Promise<Enrich
   return {
     source: 'igdb',
     sourceId: hit.sourceId,
+    title: hit.title,
     coverUrl: hit.coverUrl,
     rating: hit.rating,
     description: hit.description,

@@ -28,6 +28,14 @@ enrichRouter.post('/', async (req, res) => {
   const uid = userId(req);
   const force = String(req.query.force ?? '') === 'true';
 
+  // Optional field selection for a re-fetch, e.g. ?fields=title,cover,text.
+  // Absent → the default (cover + text, never the title).
+  const fieldsParam = String(req.query.fields ?? '').trim();
+  const sel = new Set(fieldsParam.split(',').map((s) => s.trim()).filter(Boolean));
+  const fields = fieldsParam
+    ? { title: sel.has('title'), cover: sel.has('cover'), text: sel.has('text') }
+    : undefined;
+
   const current = jobs.get(uid);
   if (current?.running) {
     return res.status(202).json({ status: 'already-running', job: current });
@@ -43,7 +51,7 @@ enrichRouter.post('/', async (req, res) => {
   jobs.set(uid, job);
 
   // Fire and forget; progress is observable via GET /status and /api/items/stats.
-  enrichUserItems(uid, { force })
+  enrichUserItems(uid, { force, fields })
     .then((summary) => {
       job.summary = summary;
     })

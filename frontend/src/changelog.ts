@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.11.0',
+    date: '2026-08-17',
+    title: 'Re-fetch: choose what to update',
+    changes: [
+      '"↻ Re-fetch all" now opens a dialog where you tick what to overwrite: Title, Cover, and/or Text (rating + description) — so you can, for example, pull just the localized title after switching the TMDB language.',
+      'Enrichment can now update the title from the source (previously it never touched titles). Only applied when you tick "Title", and only where a correct ID/match exists, so it won\'t clobber a title it can\'t confirm.',
+    ],
+  },
+  {
     version: '1.10.0',
     date: '2026-08-17',
     title: 'Re-fetch all metadata',

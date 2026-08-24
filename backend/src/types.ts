@@ -58,6 +58,7 @@ export interface Cabinet {
 export interface EnrichmentResult {
   source: 'igdb' | 'tmdb' | 'discogs';
   sourceId: string | null;
+  title: string | null; // provider's (localized) title — used by "Re-fetch: Title"
   coverUrl: string | null;
   rating: number | null; // normalized 0..100
   description: string | null;

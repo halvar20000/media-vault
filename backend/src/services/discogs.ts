@@ -115,6 +115,7 @@ export async function discogsEnrich(
   return {
     source: 'discogs',
     sourceId: hit.sourceId,
+    title: hit.title,
     coverUrl: hit.coverUrl,
     rating,
     description,

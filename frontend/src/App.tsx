@@ -12,6 +12,7 @@ import { Shelf } from './components/Shelf';
 import { Gallery } from './components/Gallery';
 import { DetailDrawer } from './components/DetailDrawer';
 import { AddModal } from './components/AddModal';
+import { RefetchModal } from './components/RefetchModal';
 import { Catalogue } from './components/Catalogue';
 
 const NO_SOURCES: EnrichStatus['sources'] = { igdb: false, tmdb: false, discogs: false };
@@ -42,6 +43,7 @@ export default function App() {
 
   const [selected, setSelected] = useState<Item | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [refetchOpen, setRefetchOpen] = useState(false);
   const [catalogueOpen, setCatalogueOpen] = useState(false);
   const [enriching, setEnriching] = useState(false);
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
@@ -152,12 +154,11 @@ export default function App() {
   }
 
   // ---- collection enrichment (background job + polling) ----
-  async function startEnrich(force = false) {
-    if (force && !window.confirm(t('controls.refetchConfirm'))) return;
+  async function startEnrich(force = false, fields?: { title: boolean; cover: boolean; text: boolean }) {
     setEnriching(true);
     setEnrichLine('Starting…');
     try {
-      await api.startEnrich(force);
+      await api.startEnrich(force, fields);
       poll();
     } catch (e: any) {
       setEnriching(false);
@@ -390,7 +391,7 @@ export default function App() {
             </button>
             <button
               className="enrichbtn"
-              onClick={() => startEnrich(true)}
+              onClick={() => setRefetchOpen(true)}
               disabled={enriching || !anySource}
               title={anySource ? t('controls.refetchTitle') : t('controls.enrichNoSource')}
             >
@@ -454,6 +455,15 @@ export default function App() {
       />
 
       <AddModal open={addOpen} onClose={() => setAddOpen(false)} onAdded={refresh} sources={sources} />
+
+      <RefetchModal
+        open={refetchOpen}
+        onClose={() => setRefetchOpen(false)}
+        onConfirm={(fields) => {
+          setRefetchOpen(false);
+          startEnrich(true, fields);
+        }}
+      />
 
       <SettingsModal
         open={settingsOpen}

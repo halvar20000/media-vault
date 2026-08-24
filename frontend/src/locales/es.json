@@ -88,6 +88,19 @@
     "catalogue": "▤ Catálogo",
     "easycashStoreTitle": "Explorar juegos en stock en la tienda Easy Cash {{store}}, los más baratos primero (sigue la plataforma seleccionada)"
   },
+  "refetch": {
+    "title": "Recargar metadatos",
+    "intro": "Vuelve a obtener los metadatos de todos los elementos y elige qué sobrescribir. Se descarga de nuevo (omitiendo la caché), para que un cambio de idioma surta efecto.",
+    "fieldTitle": "Título",
+    "fieldTitleHint": "Reemplazar cada título por el de la fuente (p. ej. el título en español). Solo donde exista un ID/coincidencia correcta.",
+    "fieldCover": "Carátula",
+    "fieldCoverHint": "Volver a descargar las carátulas.",
+    "fieldText": "Texto",
+    "fieldTextHint": "Valoración y descripción.",
+    "note": "Los títulos y textos siguen tu idioma de TMDB (Ajustes → TMDB language, p. ej. es-ES). Películas y series se traducen; juegos y música no. Puede tardar un rato.",
+    "confirm": "Recargar ahora",
+    "cancel": "Cancelar"
+  },
   "settings": {
     "title": "Tiendas y mercados",
     "intro": "Elige qué tiendas buscan los botones «buscar oferta». Los cambios se aplican al instante — sin reiniciar.",

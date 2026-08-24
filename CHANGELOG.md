@@ -6,6 +6,16 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.11.0] — 2026-08-17
+
+### Added
+- **Re-fetch field picker** — "↻ Re-fetch all" now opens a dialog to choose what to
+  overwrite: **Title**, **Cover**, and/or **Text** (rating + description). Handy to
+  pull just the localized title after a language switch, without disturbing covers.
+- Enrichment can now **update the title** from the source (it never touched titles
+  before). Applied only when **Title** is ticked, and only where a correct ID/match
+  exists — so it won't overwrite a title it can't confirm.
+
 ## [1.10.0] — 2026-08-17
 
 ### Added
@@ -127,6 +137,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.11.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.11.0
 [1.10.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.10.0
 [1.9.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.9.0
 [1.8.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.8.0

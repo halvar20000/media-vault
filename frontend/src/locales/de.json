@@ -88,6 +88,19 @@
     "catalogue": "▤ Katalog",
     "easycashStoreTitle": "Spiele im Easy-Cash-Laden {{store}} durchstöbern, günstigste zuerst (folgt der gewählten Plattform)"
   },
+  "refetch": {
+    "title": "Metadaten neu holen",
+    "intro": "Metadaten für alle Einträge neu laden und auswählen, was überschrieben wird. Wird frisch geholt (Cache umgangen), damit eine Sprachänderung wirkt.",
+    "fieldTitle": "Titel",
+    "fieldTitleHint": "Jeden Titel durch den der Quelle ersetzen (z. B. den deutschen Titel). Nur wo eine korrekte ID/Zuordnung besteht.",
+    "fieldCover": "Cover",
+    "fieldCoverHint": "Cover-Bilder neu herunterladen.",
+    "fieldText": "Text",
+    "fieldTextHint": "Bewertung und Beschreibung.",
+    "note": "Titel und Text folgen deiner TMDB-Sprache (Einstellungen → TMDB language, z. B. de-DE). Filme & Serien werden übersetzt, Spiele und Musik nicht. Kann etwas dauern.",
+    "confirm": "Jetzt neu holen",
+    "cancel": "Abbrechen"
+  },
   "settings": {
     "title": "Shops & Marktplätze",
     "intro": "Wähle, welche Shops die \"Angebot finden\"-Buttons durchsuchen. Änderungen gelten sofort — kein Neustart.",
