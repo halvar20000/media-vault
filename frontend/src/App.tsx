@@ -152,11 +152,12 @@ export default function App() {
   }
 
   // ---- collection enrichment (background job + polling) ----
-  async function startEnrich() {
+  async function startEnrich(force = false) {
+    if (force && !window.confirm(t('controls.refetchConfirm'))) return;
     setEnriching(true);
     setEnrichLine('Starting…');
     try {
-      await api.startEnrich(false);
+      await api.startEnrich(force);
       poll();
     } catch (e: any) {
       setEnriching(false);
@@ -381,11 +382,19 @@ export default function App() {
             {enrichLine && <span className="enrichprog">{enrichLine}</span>}
             <button
               className="enrichbtn"
-              onClick={startEnrich}
+              onClick={() => startEnrich(false)}
               disabled={enriching || !anySource}
               title={anySource ? t('controls.enrichTitle') : t('controls.enrichNoSource')}
             >
               {enriching ? t('controls.enriching') : t('controls.enrich')}
+            </button>
+            <button
+              className="enrichbtn"
+              onClick={() => startEnrich(true)}
+              disabled={enriching || !anySource}
+              title={anySource ? t('controls.refetchTitle') : t('controls.enrichNoSource')}
+            >
+              {t('controls.refetch')}
             </button>
             <button
               className="enrichbtn"

@@ -6,6 +6,17 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.10.0] — 2026-08-17
+
+### Added
+- **"↻ Re-fetch all" button** — re-pulls covers, ratings and descriptions for every
+  item from scratch. Useful after switching the **TMDB language** (e.g. English →
+  German) or to refresh stale metadata. Unlike the normal *Enrich* (new items only,
+  cache-first), Re-fetch **bypasses the shared cache** and fetches fresh, so a
+  language change actually takes effect. Set the language under **Settings → TMDB
+  language** (e.g. `de-DE`) first. Movies & series are localized by TMDB; games
+  (IGDB) and music (Discogs) are not language-specific.
+
 ## [1.9.0] — 2026-08-17
 
 ### Added
@@ -116,6 +127,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.10.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.10.0
 [1.9.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.9.0
 [1.8.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.8.0
 [1.7.1]: https://github.com/halvar20000/media-vault/releases/tag/v1.7.1

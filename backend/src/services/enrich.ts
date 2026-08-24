@@ -89,13 +89,17 @@ export interface EnrichOutcome {
 }
 
 // Enrich a single item: cache-first, then provider, then persist onto the item.
-export async function enrichItem(item: Item): Promise<EnrichOutcome> {
+// With { force: true } the shared cache is bypassed (fetched fresh and the cache
+// overwritten) — used by "Re-fetch all" so switching the TMDB language actually
+// re-pulls metadata in the new language instead of re-serving the cached copy.
+export async function enrichItem(item: Item, opts: { force?: boolean } = {}): Promise<EnrichOutcome> {
   const source = SOURCE_FOR_TYPE[item.type];
   if (!source || !sourceEnabled(source)) return { status: 'source-disabled' };
 
   try {
     // Exact match first: if the item already carries a provider id (e.g. a
     // tmdb_id from an import), fetch that record directly — no title-guessing.
+    // This path is always live, so it already honours the current language.
     const byId = await fetchByIdFromProvider(item);
     if (byId) {
       await persistResult(item, byId, source);
@@ -106,7 +110,7 @@ export async function enrichItem(item: Item): Promise<EnrichOutcome> {
     let result: EnrichmentResult | null = null;
     let fromCache = false;
 
-    const cached = await getCached(source, key);
+    const cached = opts.force ? null : await getCached(source, key);
     if (cached) {
       fromCache = true;
       result = {
@@ -172,7 +176,7 @@ export async function enrichUserItems(
   };
 
   for (const item of items) {
-    const outcome = await enrichItem(item);
+    const outcome = await enrichItem(item, { force: opts.force });
     switch (outcome.status) {
       case 'enriched':
         summary.enriched++;

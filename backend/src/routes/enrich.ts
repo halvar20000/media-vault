@@ -84,7 +84,8 @@ enrichRouter.post('/item/:id', async (req, res) => {
   if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured` });
   }
-  const outcome = await enrichItem(rows[0]);
+  const force = String(req.query.force ?? '') === 'true';
+  const outcome = await enrichItem(rows[0], { force });
   const updated = await query<Item>('SELECT * FROM items WHERE id = $1', [req.params.id]);
   res.json({ outcome, item: updated[0] });
 });

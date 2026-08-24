@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.10.0',
+    date: '2026-08-17',
+    title: 'Re-fetch all metadata',
+    changes: [
+      'New "↻ Re-fetch all" button re-pulls covers, ratings and descriptions for every item from scratch — handy after changing the TMDB language (e.g. English → German) or to refresh stale data.',
+      'Unlike the normal Enrich (which fills in only new items and reuses cached data), Re-fetch bypasses the shared cache and fetches fresh, so a language switch actually takes effect. Set your language under Settings → TMDB language (e.g. de-DE) first.',
+    ],
+  },
+  {
     version: '1.9.0',
     date: '2026-08-17',
     title: 'TV series as their own category',
