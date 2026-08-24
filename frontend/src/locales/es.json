@@ -37,6 +37,10 @@
     "cd": "CD",
     "console": "Consolas"
   },
+  "item": {
+    "season": "Temporada {{n}}",
+    "seasonShort": "T{{n}}"
+  },
   "header": {
     "searchPlaceholder": "Buscar juegos, películas, vinilos…",
     "addItem": "+ Añadir",
@@ -263,6 +267,8 @@
     "isSeries": "Es una serie / caja recopilatoria",
     "seasons": "Temporadas",
     "episodes": "Episodios",
+    "seasonNo": "Temporada (esta caja)",
+    "seasonNoPh": "p. ej. 3 — obtiene la carátula de esa temporada",
     "lentTo": "Prestado a",
     "lentSince": "Prestado desde",
     "notes": "Notas",

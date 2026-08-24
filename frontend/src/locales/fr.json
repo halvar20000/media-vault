@@ -37,6 +37,10 @@
     "cd": "CD",
     "console": "Consoles"
   },
+  "item": {
+    "season": "Saison {{n}}",
+    "seasonShort": "S{{n}}"
+  },
   "header": {
     "searchPlaceholder": "Rechercher jeux, films, vinyles…",
     "addItem": "+ Ajouter",
@@ -263,6 +267,8 @@
     "isSeries": "Série / coffret",
     "seasons": "Saisons",
     "episodes": "Épisodes",
+    "seasonNo": "Saison (ce coffret)",
+    "seasonNoPh": "par ex. 3 — récupère la jaquette de cette saison",
     "lentTo": "Prêté à",
     "lentSince": "Prêté depuis",
     "notes": "Notes",

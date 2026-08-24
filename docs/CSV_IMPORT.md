@@ -18,6 +18,7 @@ German locale uses `;` — that's auto-detected).
 | `year`       | – | Release year (any 4-digit year in the cell is picked up). |
 | `format`     | – | e.g. `Blu-ray`, `4K UHD`, `DVD`; for games the platform (`PS3`, `Xbox 360`…). |
 | `tmdb_id`    | – | **Movies:** the TMDB **movie** id. **Series:** the TMDB **TV** id — TMDB keeps movies and series in separate id spaces, so the row's `type` decides which endpoint is used (`/movie/{id}` vs `/tv/{id}`). Either way → exact artwork, rating & description, no guessing. |
+| `season`     | – | **Series only:** which season this physical box is (a number, or `Staffel 3`). Each season box then shows **that season's own poster** instead of the shared series poster. One row per season box you own. |
 | `igdb_id`    | – | **Games:** the IGDB id (same idea). |
 | `discogs_id` | – | **Vinyl / CD / single:** the Discogs release id. |
 | `notes`      | – | Anything (age rating, edition, condition…). |
@@ -40,6 +41,16 @@ series,Breaking Bad,2008,Blu-ray,1396,
 game,Halo 3,2007,Xbox 360,,igdb_id also works here
 ```
 
+For season box sets, add a `season` column and one row per box — each gets its own
+season poster:
+
+```csv
+type,title,year,format,tmdb_id,season,notes
+series,How I Met Your Mother,2005,DVD,1100,1,
+series,How I Met Your Mother,2005,DVD,1100,2,
+series,How I Met Your Mother,2005,DVD,1100,3,
+```
+
 > **TV series vs. movies.** A series like *Arrow* has a TMDB id, but it's a **TV**
 > id (1412), unrelated to any movie id. Put it in `tmdb_id` **and** set `type` to
 > `series` — media-vault then looks it up via `/tv`, so you get the series, not a
@@ -55,13 +66,14 @@ the prompt below, get a CSV back, import it.
 > photos of Blu-ray / DVD / 4K covers. For each disc you can identify, output a
 > single CSV (comma-separated) with exactly this header:
 >
-> `type,title,year,format,tmdb_id,notes`
+> `type,title,year,format,tmdb_id,season,notes`
 >
 > Rules:
 > - `type` = `movie` for a film, or `series` for a TV series / box set. (You may
 >   instead write the disc format `Blu-ray` / `DVD` / `4K` for a film — but a series
 >   MUST be `series`.)
-> - `title` = the title (no "[Blu-ray]" suffixes).
+> - `title` = the title (no "[Blu-ray]" suffixes). For a series box, the SERIES name
+>   only — don't add "Season 3" to the title; use the `season` column for that.
 > - `year` = release year (first air year for a series) if you're confident, else blank.
 > - `format` = the disc format: `Blu-ray`, `DVD`, or `4K UHD`.
 > - `tmdb_id` = the numeric themoviedb.org id, **only if you are certain** it's the
@@ -69,8 +81,10 @@ the prompt below, get a CSV back, import it.
 >   for a `series` use the show's **TV** id (these are different id spaces on TMDB —
 >   don't put a TV id on a movie row or vice-versa). If unsure, leave it blank — a
 >   wrong id is worse than none.
+> - `season` = for a series box set, the season number shown on the cover (e.g. `3`).
+>   Blank for movies. One row per season box.
 > - `notes` = leave blank unless there's an edition worth noting.
-> - One row per disc. Output only the CSV, nothing else. Don't invent titles you
+> - One row per disc/box. Output only the CSV, nothing else. Don't invent titles you
 >   can't read.
 
 The `tmdb_id` is optional but worth it: with it, media-vault pulls the exact poster

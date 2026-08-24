@@ -64,6 +64,9 @@ ALTER TABLE items ADD COLUMN IF NOT EXISTS disc_count       INT;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS is_series        BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS season_count     INT;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS episode_count    INT;
+-- Which single season this physical box represents (for series box sets); drives
+-- the season-specific TMDB poster so each season box gets its own cover.
+ALTER TABLE items ADD COLUMN IF NOT EXISTS season_no        INT;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS lent_to          TEXT;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS lent_since       DATE;
 ALTER TABLE items ADD COLUMN IF NOT EXISTS viewed_at        TIMESTAMPTZ;

@@ -65,9 +65,9 @@ importRouter.post('/csv', upload.single('file'), async (req, res) => {
   let withId = 0;
   for (const r of rows) {
     await query(
-      `INSERT INTO items (user_id, type, title, format, year, catalog_no, notes, source, source_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [uid, r.type, r.title, r.format, r.year, r.catalog_no, r.notes, r.source, r.source_id]
+      `INSERT INTO items (user_id, type, title, format, year, catalog_no, notes, season_no, source, source_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [uid, r.type, r.title, r.format, r.year, r.catalog_no, r.notes, r.season, r.source, r.source_id]
     );
     imported++;
     if (r.source_id) withId++;

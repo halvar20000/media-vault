@@ -37,6 +37,10 @@
     "cd": "CDs",
     "console": "Konsolen"
   },
+  "item": {
+    "season": "Staffel {{n}}",
+    "seasonShort": "S{{n}}"
+  },
   "header": {
     "searchPlaceholder": "Spiele, Filme, Vinyl durchsuchen…",
     "addItem": "+ Eintrag hinzufügen",
@@ -263,6 +267,8 @@
     "isSeries": "Ist eine Serie / Box",
     "seasons": "Staffeln",
     "episodes": "Episoden",
+    "seasonNo": "Staffel (diese Box)",
+    "seasonNoPh": "z. B. 3 — holt das Cover dieser Staffel",
     "lentTo": "Verliehen an",
     "lentSince": "Verliehen seit",
     "notes": "Notizen",

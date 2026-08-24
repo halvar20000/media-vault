@@ -6,6 +6,16 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.12.0] — 2026-08-17
+
+### Added
+- **Per-season covers for series box sets** — a series item can now carry a **season
+  number**, and each season box gets its **own** cover: media-vault fetches that
+  season's poster from TMDB (`/tv/{id}/season/{n}`) instead of the shared series
+  poster. Set it via the new **`season`** column in the universal CSV (one row per
+  season box), or per item in its details. The season shows as a cover badge and a
+  "Season N" label; the title stays the plain series name.
+
 ## [1.11.0] — 2026-08-17
 
 ### Added
@@ -137,6 +147,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.12.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.12.0
 [1.11.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.11.0
 [1.10.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.10.0
 [1.9.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.9.0

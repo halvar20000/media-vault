@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.12.0',
+    date: '2026-08-17',
+    title: 'Series seasons — a cover per box',
+    changes: [
+      'Series box sets can now carry a season number, and each season gets its OWN cover — media-vault fetches that season\'s poster from TMDB (/tv/{id}/season/{n}) instead of the shared series poster.',
+      'Set it in the universal CSV with a new "season" column (one row per season box), or per item in its details. Season shows as a badge on the cover and a "Season N" label; the title stays the plain series name.',
+    ],
+  },
+  {
     version: '1.11.0',
     date: '2026-08-17',
     title: 'Re-fetch: choose what to update',

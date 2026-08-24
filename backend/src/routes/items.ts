@@ -132,7 +132,7 @@ const EDITABLE = [
   'type', 'title', 'format', 'year', 'catalog_no', 'barcode', 'location', 'condition', 'notes',
   'cover_url', 'rating', 'description', 'source', 'source_id',
   // physical-collector fields
-  'disc_count', 'is_series', 'season_count', 'episode_count',
+  'disc_count', 'is_series', 'season_count', 'episode_count', 'season_no',
   'lent_to', 'lent_since', 'viewed_at', 'cabinet_id',
   // valuation (manual entry)
   'value', 'value_currency',
@@ -199,6 +199,7 @@ itemsRouter.get('/export', async (req, res) => {
     is_series: i.is_series,
     season_count: i.season_count,
     episode_count: i.episode_count,
+    season_no: i.season_no,
     lent_to: i.lent_to,
     lent_since: i.lent_since,
     viewed_at: i.viewed_at,

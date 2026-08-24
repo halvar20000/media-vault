@@ -29,6 +29,7 @@ type Draft = {
   is_series: boolean;
   season_count: string;
   episode_count: string;
+  season_no: string;
   lent_to: string;
   lent_since: string;
   cabinet_id: string;
@@ -50,6 +51,7 @@ function toDraft(i: Item): Draft {
     is_series: i.is_series,
     season_count: i.season_count != null ? String(i.season_count) : '',
     episode_count: i.episode_count != null ? String(i.episode_count) : '',
+    season_no: i.season_no != null ? String(i.season_no) : '',
     lent_to: i.lent_to ?? '',
     lent_since: i.lent_since ? i.lent_since.slice(0, 10) : '',
     cabinet_id: i.cabinet_id ?? '',
@@ -182,6 +184,7 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
         is_series: d.is_series,
         season_count: d.is_series && d.season_count ? parseInt(d.season_count, 10) : null,
         episode_count: d.is_series && d.episode_count ? parseInt(d.episode_count, 10) : null,
+        season_no: item?.type === 'series' && d.season_no ? parseInt(d.season_no, 10) : null,
         lent_to: d.lent_to || null,
         lent_since: d.lent_to ? d.lent_since || null : null,
         cabinet_id: cabinetId,
@@ -230,7 +233,9 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
           </div>
         </div>
         <h2>{item.title}</h2>
-        <p className="dtype">{t(`types.${item.type}`)}{item.wishlist && <span> · ★ {t('wishlist.badge')}</span>}</p>
+        <p className="dtype">{t(`types.${item.type}`)}
+          {item.type === 'series' && item.season_no != null && <span> · {t('item.season', { n: item.season_no })}</span>}
+          {item.wishlist && <span> · ★ {t('wishlist.badge')}</span>}</p>
         {item.description && !editing && <p className="ddesc">{item.description}</p>}
 
         {!editing ? (
@@ -365,6 +370,14 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
                   <input type="number" min="0" value={d.season_count} onChange={(e) => set({ season_count: e.target.value })} /></div>
                 <div className="field"><label>{t('drawer.episodes')}</label>
                   <input type="number" min="0" value={d.episode_count} onChange={(e) => set({ episode_count: e.target.value })} /></div>
+              </div>
+            )}
+            {item.type === 'series' && (
+              <div className="rowfields">
+                <div className="field"><label>{t('drawer.seasonNo')}</label>
+                  <input type="number" min="1" value={d.season_no} onChange={(e) => set({ season_no: e.target.value })}
+                    placeholder={t('drawer.seasonNoPh')} /></div>
+                <div className="field" />
               </div>
             )}
             <div className="rowfields">

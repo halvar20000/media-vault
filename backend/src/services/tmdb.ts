@@ -160,6 +160,20 @@ export async function tmdbTvGetById(id: string): Promise<EnrichmentResult | null
   return { source: 'tmdb', sourceId: hit.sourceId, title: hit.title, coverUrl: hit.coverUrl, rating: hit.rating, description: hit.description, payload: hit };
 }
 
+// The poster for a single season of a series, via /tv/{id}/season/{n}. Lets each
+// physical season box show its own cover instead of the shared series poster.
+// Returns null (not an error) when the season or its poster doesn't exist.
+export async function tmdbTvSeasonPoster(tvId: string, season: number): Promise<string | null> {
+  const url = new URL(`https://api.themoviedb.org/3/tv/${encodeURIComponent(tvId)}/season/${season}`);
+  url.searchParams.set('language', getApiKeys().tmdbLanguage);
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`, Accept: 'application/json' },
+  });
+  if (!res.ok) return null;
+  const s = (await res.json()) as { poster_path?: string | null };
+  return s.poster_path ? `${IMG_BASE}${s.poster_path}` : null;
+}
+
 export interface TmdbHint {
   year?: number | null;
 }

@@ -37,6 +37,10 @@
     "cd": "CDs",
     "console": "Consoles"
   },
+  "item": {
+    "season": "Season {{n}}",
+    "seasonShort": "S{{n}}"
+  },
   "header": {
     "searchPlaceholder": "Search across games, films, vinyl…",
     "addItem": "+ Add item",
@@ -263,6 +267,8 @@
     "isSeries": "Is a series / box set",
     "seasons": "Seasons",
     "episodes": "Episodes",
+    "seasonNo": "Season (this box)",
+    "seasonNoPh": "e.g. 3 — pulls that season's cover",
     "lentTo": "Lent to",
     "lentSince": "Lent since",
     "notes": "Notes",

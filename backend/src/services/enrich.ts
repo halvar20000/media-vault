@@ -7,7 +7,7 @@ import { cacheKey, getCached, putCached } from '../lib/cache';
 import { sourcesEnabled } from '../lib/apikeys';
 import type { EnrichmentResult, Item, SearchHit } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
-import { tmdbEnrich, tmdbSearch, tmdbGetById, tmdbTvEnrich, tmdbTvSearch, tmdbTvGetById } from './tmdb';
+import { tmdbEnrich, tmdbSearch, tmdbGetById, tmdbTvEnrich, tmdbTvSearch, tmdbTvGetById, tmdbTvSeasonPoster } from './tmdb';
 import { discogsEnrich, discogsSearch } from './discogs';
 import { cacheCover } from '../lib/covers';
 
@@ -68,6 +68,34 @@ export interface EnrichFields {
 }
 export const DEFAULT_FIELDS: EnrichFields = { title: false, cover: true, text: true };
 
+// A series box tagged with a specific season: fetch the series' metadata (title,
+// rating, description) but swap the cover for that season's own poster, so each
+// season box set shows a distinct cover. Resolves the TMDB TV id from a stored
+// tmdb_id, or by a title search when none is set. Returns null to fall back to
+// the normal path.
+async function fetchSeriesSeason(
+  item: Pick<Item, 'type' | 'title' | 'year' | 'source' | 'source_id' | 'season_no'>
+): Promise<EnrichmentResult | null> {
+  if (item.type !== 'series' || !item.season_no) return null;
+
+  let seriesRes: EnrichmentResult | null;
+  let tvId: string | null;
+  if (item.source === 'tmdb' && item.source_id) {
+    tvId = item.source_id;
+    seriesRes = await tmdbTvGetById(tvId);
+  } else {
+    seriesRes = await tmdbTvEnrich(item.title, { year: item.year });
+    tvId = seriesRes?.sourceId ?? null;
+  }
+  if (!seriesRes) return null;
+
+  if (tvId) {
+    const poster = await tmdbTvSeasonPoster(tvId, item.season_no);
+    if (poster) seriesRes = { ...seriesRes, coverUrl: poster };
+  }
+  return seriesRes;
+}
+
 // Cache the cover locally, then write the selected fields of the enrichment
 // result onto the item. Unselected fields keep their existing values; source,
 // source_id and enriched_at are always recorded so the link/timestamp is fresh.
@@ -127,6 +155,13 @@ export async function enrichItem(
   const fields = opts.fields ?? DEFAULT_FIELDS;
 
   try {
+    // Series box with a specific season: series metadata + that season's poster.
+    const seasonRes = await fetchSeriesSeason(item);
+    if (seasonRes) {
+      await persistResult(item, seasonRes, source, fields);
+      return { status: 'enriched' };
+    }
+
     // Exact match first: if the item already carries a provider id (e.g. a
     // tmdb_id from an import), fetch that record directly — no title-guessing.
     // This path is always live, so it already honours the current language.

@@ -297,6 +297,7 @@ header {
 .cover .ct { font-family: "Archivo", sans-serif; font-weight: 900; font-size: 15px; line-height: 1.1; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); z-index: 1; }
 .cover .badge { position: absolute; top: 8px; left: 8px; font-family: "IBM Plex Mono", monospace; font-size: 9px; background: rgba(0, 0, 0, 0.45); padding: 2px 6px; border-radius: 3px; letter-spacing: 0.04em; z-index: 2; }
 .cover .rate { position: absolute; top: 8px; right: 8px; font-family: "IBM Plex Mono", monospace; font-size: 9px; background: rgba(0, 0, 0, 0.55); padding: 2px 6px; border-radius: 3px; z-index: 2; }
+.cover .seasonchip { position: absolute; bottom: 8px; left: 8px; font-family: "IBM Plex Mono", monospace; font-size: 9px; font-weight: 700; background: var(--accent); color: var(--ink); padding: 2px 6px; border-radius: 3px; letter-spacing: 0.04em; z-index: 2; }
 .card .meta { padding: 9px 11px 12px; }
 .card .meta .mt { font-weight: 600; font-size: 12.5px; line-height: 1.2; margin: 0 0 3px; }
 .card .meta .ms { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between; }

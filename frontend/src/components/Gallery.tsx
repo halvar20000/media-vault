@@ -30,12 +30,15 @@ export function Gallery({ items, onOpen }: { items: Item[]; onOpen: (i: Item) =>
               {d.cover_url && <img src={d.cover_url} alt="" loading="lazy" />}
               <span className="badge" style={{ background: badge.color }}>{badge.code || t(`types.${d.type}`)}</span>
               {rating && <span className="rate">★ {rating}</span>}
+              {d.type === 'series' && d.season_no != null && (
+                <span className="seasonchip">{t('item.seasonShort', { n: d.season_no })}</span>
+              )}
               {!d.cover_url && <span className="ct">{d.title}</span>}
             </div>
             <div className="meta">
               <p className="mt">{d.title}</p>
               <div className="ms">
-                <span>{d.format || ''}</span>
+                <span>{d.type === 'series' && d.season_no != null ? t('item.season', { n: d.season_no }) : d.format || ''}</span>
                 <span>{d.year || ''}</span>
               </div>
             </div>

@@ -25,6 +25,7 @@ export interface Item {
   is_series: boolean;
   season_count: number | null;
   episode_count: number | null;
+  season_no: number | null;
   lent_to: string | null;
   lent_since: string | null;
   viewed_at: string | null;

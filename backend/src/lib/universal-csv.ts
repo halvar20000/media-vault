@@ -13,6 +13,7 @@ export interface UniversalRow {
   year: number | null;
   catalog_no: string | null;
   notes: string | null;
+  season: number | null; // for series box sets — which season this row is
   source: 'igdb' | 'tmdb' | 'discogs' | null;
   source_id: string | null;
 }
@@ -96,6 +97,7 @@ export function parseUniversalCsv(text: string): UniversalRow[] {
     else if (type === 'game' && igdb) { source = 'igdb'; source_id = igdb; }
     else if ((type === 'lp' || type === 'single' || type === 'cd') && discogs) { source = 'discogs'; source_id = discogs; }
 
+    const seasonRaw = firstDigits(r['season'] ?? r['staffel'] ?? r['season_no']);
     rows.push({
       type,
       title,
@@ -103,6 +105,7 @@ export function parseUniversalCsv(text: string): UniversalRow[] {
       year: toYear(r['year'] ?? r['jahr'] ?? r['release']),
       catalog_no: clean(r['barcode']) ?? clean(r['ean']) ?? clean(r['catalog_no']) ?? clean(r['asin']),
       notes: clean(r['notes']) ?? clean(r['note']) ?? clean(r['notizen']),
+      season: seasonRaw ? parseInt(seasonRaw, 10) : null,
       source,
       source_id,
     });
