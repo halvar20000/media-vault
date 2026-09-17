@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from './api';
 import { LANGUAGES } from './i18n';
 import type { Cabinet, EnrichStatus, Item, MediaType, ShopsConfig, Stats, User } from './types';
-import { TYPE_META, TYPE_ORDER } from './types';
+import { TYPE_META, TYPE_ORDER, sourceForType } from './types';
 import { buildMarketplaces, marketplaceBundleUrl, setEasycashStore, setCraigslistSite, easycashStoreLabel, easycashStoreBrowseUrl, type Marketplace } from './marketplace';
 import { SettingsModal } from './components/SettingsModal';
 import { ChangelogModal } from './components/ChangelogModal';
@@ -13,9 +13,10 @@ import { Gallery } from './components/Gallery';
 import { DetailDrawer } from './components/DetailDrawer';
 import { AddModal } from './components/AddModal';
 import { RefetchModal } from './components/RefetchModal';
+import { ArtworkPicker } from './components/ArtworkPicker';
 import { Catalogue } from './components/Catalogue';
 
-const NO_SOURCES: EnrichStatus['sources'] = { igdb: false, tmdb: false, discogs: false };
+const NO_SOURCES: EnrichStatus['sources'] = { igdb: false, tmdb: false, discogs: false, musicbrainz: false };
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -44,6 +45,9 @@ export default function App() {
   const [selected, setSelected] = useState<Item | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [refetchOpen, setRefetchOpen] = useState(false);
+  // Item whose alternate covers are being browsed (mounted here, not inside the
+  // drawer: the drawer is transformed, which would trap a fixed-position modal).
+  const [artworkFor, setArtworkFor] = useState<Item | null>(null);
   const [catalogueOpen, setCatalogueOpen] = useState(false);
   const [enriching, setEnriching] = useState(false);
   const [enrichLine, setEnrichLine] = useState<string | null>(null);
@@ -251,9 +255,8 @@ export default function App() {
   if (!user) return <Auth onAuthed={setUser} />;
 
   const isVideoDisc = selected?.type === 'movie' || selected?.type === 'series';
-  const sourceForActiveDrawer = selected
-    ? sources[selected.type === 'game' ? 'igdb' : isVideoDisc ? 'tmdb' : 'discogs']
-    : false;
+  const activeSource = selected ? sourceForType(selected.type, sources) : null;
+  const sourceForActiveDrawer = activeSource ? sources[activeSource] : false;
   const valueSourceForActiveDrawer = selected
     ? selected.type === 'game'
       ? valueSources.ebay || valueSources.pricecharting
@@ -263,7 +266,7 @@ export default function App() {
     : false;
 
   const counts = stats?.byType ?? {};
-  const anySource = sources.igdb || sources.tmdb || sources.discogs;
+  const anySource = sources.igdb || sources.tmdb || sources.discogs || sources.musicbrainz;
   const anyValueSource = valueSources.ebay || valueSources.pricecharting || valueSources.discogs;
   const hasValue = (stats?.totalValue?.length ?? 0) > 0;
 
@@ -452,7 +455,10 @@ export default function App() {
         onUpdated={applyUpdated}
         onDelete={deleteItem}
         onCreateCabinet={createCabinet}
+        onChooseCover={() => setArtworkFor(selected)}
       />
+
+      <ArtworkPicker item={artworkFor} onClose={() => setArtworkFor(null)} onUpdated={applyUpdated} />
 
       <AddModal open={addOpen} onClose={() => setAddOpen(false)} onAdded={refresh} sources={sources} />
 

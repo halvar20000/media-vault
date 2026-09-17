@@ -217,7 +217,7 @@
     "gamesNote": "Jeux : colonnes Title, Platform, EmulationStatus.",
     "moviesNote": "Films : un export FlickRack (séparé par points-virgules ; Titel, Format, Release, ASIN…). Les titres sont nettoyés automatiquement.",
     "afterImport": "Après l'import, cliquez sur Enrichir la collection pour récupérer jaquettes, notes et descriptions.",
-    "sourcesNote": "Les métadonnées sont récupérées par type : Jeux → IGDB · Films → TMDB · Vinyles / Singles / CD → Discogs.",
+    "sourcesNote": "Les métadonnées sont récupérées par type : Jeux → IGDB · Films / Séries → TMDB · Vinyles / Singles / CD → Discogs, ou MusicBrainz (sans clé) si Discogs n’est pas configuré.",
     "scanHint": "Pointez la caméra vers un code-barres EAN/UPC. À la détection, le code est placé dans la recherche.",
     "scanUnavailable": "Caméra indisponible — autorisez la caméra et utilisez HTTPS.",
     "scanNeedsHttps": "Le scan en direct nécessite HTTPS (ou localhost). Utilisez « Prendre une photo » : cela ouvre l’appareil photo du téléphone et lit le code-barres sur l’image.",
@@ -239,6 +239,17 @@
     "consoleHint": "Cliquez sur une console pour l'ajouter — cliquez à nouveau pour en ajouter une autre (par ex. deux PS3). Un badge ×N indique combien vous en possédez. Pour une édition limitée, ajoutez la console de base puis renommez-la et définissez votre propre photo dans ses détails.",
     "consoleAddAnother": "Vous en possédez {{count}} — cliquez pour en ajouter une autre"
   },
+  "artwork": {
+    "title": "Choisir une jaquette",
+    "loading": "Recherche de jaquettes alternatives…",
+    "current": "Jaquette actuelle",
+    "use": "Utiliser cette jaquette",
+    "none": "La source n’a pas d’images alternatives pour cet article. Vous pouvez toujours en téléverser une ou coller une URL dans Modifier.",
+    "noMatch": "Cet article n’est pas encore lié à une source de métadonnées : utilisez d’abord « Corriger la correspondance », puis les jaquettes alternatives seront disponibles.",
+    "sourceOff": "La source de métadonnées liée à cet article n’est pas configurée (voir ⚙ Réglages).",
+    "failed": "Impossible de charger les jaquettes alternatives.",
+    "saveFailed": "Impossible d’enregistrer cette jaquette."
+  },
   "drawer": {
     "markViewed": "Marquer comme vu",
     "unwatch": "Non vu",
@@ -252,6 +263,8 @@
     "value": "Valeur",
     "currency": "Devise",
     "fixMatch": "Corriger la correspondance…",
+    "chooseCover": "Choisir la jaquette…",
+    "chooseCoverTitle": "Parcourir les jaquettes alternatives de la source de métadonnées (autres langues, pressages, régions)",
     "rematchFrom": "Re-correspondre depuis {{source}}",
     "correctedTitle": "titre corrigé…",
     "noMatchTry": "Aucune correspondance — essayez un titre plus simple.",

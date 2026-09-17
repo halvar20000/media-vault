@@ -1,7 +1,7 @@
 // TMDB (movies) provider. Auth is a v4 bearer "Read Access Token".
 // Docs: https://developer.themoviedb.org/
 import { getApiKeys } from '../lib/apikeys';
-import type { EnrichmentResult, SearchHit } from '../types';
+import type { ArtworkOption, EnrichmentResult, SearchHit } from '../types';
 
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
 
@@ -209,4 +209,58 @@ export async function tmdbEnrich(title: string, hint?: TmdbHint): Promise<Enrich
     description: hit.description,
     payload: hit,
   };
+}
+
+// ---- artwork picker -----------------------------------------------------------
+// Every poster TMDB has for a movie / series, in the configured language first,
+// then English, then language-less (textless) art. For a series box tagged with a
+// season, that season's own posters come first — that's usually the one wanted.
+interface TmdbImage {
+  file_path: string;
+  iso_639_1?: string | null;
+  width?: number;
+  height?: number;
+  vote_average?: number;
+}
+
+async function apiImages(path: string): Promise<TmdbImage[]> {
+  const lang = getApiKeys().tmdbLanguage.split('-')[0].toLowerCase();
+  const url = new URL(`https://api.themoviedb.org/3/${path}/images`);
+  // Without this filter TMDB returns only the configured language's posters.
+  url.searchParams.set('include_image_language', [lang, 'en', 'null'].filter((v, i, a) => a.indexOf(v) === i).join(','));
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${getApiKeys().tmdbAccessToken}`, Accept: 'application/json' },
+  });
+  if (!res.ok) return [];
+  const json = (await res.json()) as { posters?: TmdbImage[] };
+  // TMDB orders by votes, which puts English first for everyone; the collector
+  // most likely wants the poster matching their configured language on top.
+  const rank = (img: TmdbImage) => (img.iso_639_1 === lang ? 0 : img.iso_639_1 === 'en' ? 1 : 2);
+  return (json.posters ?? []).slice().sort((a, b) => rank(a) - rank(b));
+}
+
+function imageOption(img: TmdbImage, prefix: string): ArtworkOption {
+  const lang = img.iso_639_1 ? img.iso_639_1.toUpperCase() : '—';
+  const size = img.width && img.height ? `${img.width}×${img.height}` : null;
+  return {
+    url: `${IMG_BASE}${img.file_path}`,
+    thumb: `https://image.tmdb.org/t/p/w185${img.file_path}`,
+    label: [prefix, lang, size].filter(Boolean).join(' · '),
+    source: 'tmdb',
+  };
+}
+
+export async function tmdbArtwork(
+  kind: 'movie' | 'tv',
+  id: string,
+  seasonNo?: number | null
+): Promise<ArtworkOption[]> {
+  const out: ArtworkOption[] = [];
+  if (kind === 'tv' && seasonNo) {
+    const season = await apiImages(`tv/${encodeURIComponent(id)}/season/${seasonNo}`);
+    out.push(...season.map((img) => imageOption(img, `TMDB S${seasonNo}`)));
+  }
+  const main = await apiImages(`${kind}/${encodeURIComponent(id)}`);
+  out.push(...main.map((img) => imageOption(img, 'TMDB')));
+  return out.slice(0, 60);
 }

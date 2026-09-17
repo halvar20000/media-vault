@@ -2,7 +2,7 @@
 // Docs: https://www.discogs.com/developers
 import { type MediaType } from '../config';
 import { getApiKeys } from '../lib/apikeys';
-import type { EnrichmentResult, SearchHit, ValueResult } from '../types';
+import type { ArtworkOption, EnrichmentResult, SearchHit, ValueResult } from '../types';
 
 interface DiscogsSearchResult {
   id: number;
@@ -13,9 +13,19 @@ interface DiscogsSearchResult {
   format?: string[];
 }
 
+interface DiscogsImage {
+  type?: 'primary' | 'secondary';
+  uri?: string;
+  uri150?: string;
+  width?: number;
+  height?: number;
+}
+
 interface DiscogsRelease {
   id: number;
   notes?: string;
+  master_id?: number | null;
+  images?: DiscogsImage[];
   community?: { rating?: { average?: number; count?: number } };
 }
 
@@ -138,4 +148,33 @@ export async function discogsMarketValue(releaseId: string): Promise<ValueResult
   const lp = stats.lowest_price;
   if (!lp || typeof lp.value !== 'number' || lp.value <= 0) return null;
   return { source: 'discogs', value: lp.value, currency: lp.currency || curr, note: 'lowest listing' };
+}
+
+// ---- artwork picker -----------------------------------------------------------
+// This release's scans (front, back, labels…) plus the master's images — i.e.
+// the sleeves of other pressings of the same album.
+function imageOptions(images: DiscogsImage[] | undefined, prefix: string): ArtworkOption[] {
+  return (images ?? [])
+    .filter((im) => im.uri)
+    .map((im) => ({
+      url: im.uri!,
+      thumb: im.uri150 || im.uri!,
+      label: [prefix, im.type, im.width && im.height ? `${im.width}×${im.height}` : null].filter(Boolean).join(' · '),
+      source: 'discogs' as const,
+    }));
+}
+
+export async function discogsArtwork(releaseId: string): Promise<ArtworkOption[]> {
+  const release = await apiRelease(parseInt(releaseId, 10));
+  if (!release) return [];
+  const out = imageOptions(release.images, 'Discogs · release');
+  if (release.master_id) {
+    const res = await fetch(`https://api.discogs.com/masters/${release.master_id}`, { headers: headers() });
+    if (res.ok) {
+      const master = (await res.json()) as { images?: DiscogsImage[] };
+      const have = new Set(out.map((o) => o.url));
+      out.push(...imageOptions(master.images, 'Discogs · master').filter((o) => !have.has(o.url)));
+    }
+  }
+  return out.slice(0, 40);
 }

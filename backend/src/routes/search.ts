@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth';
 import { MEDIA_TYPES, MediaType } from '../config';
-import { searchExternal, sourceEnabled } from '../services/enrich';
-import { SOURCE_FOR_TYPE } from '../config';
+import { searchExternal, sourceEnabled, sourceForType } from '../services/enrich';
 
 export const searchRouter = Router();
 searchRouter.use(requireAuth);
@@ -15,7 +14,7 @@ searchRouter.get('/:type', async (req, res) => {
   if (!MEDIA_TYPES.includes(type)) return res.status(400).json({ error: 'invalid type' });
   if (!q) return res.json({ hits: [] });
 
-  const source = SOURCE_FOR_TYPE[type];
+  const source = sourceForType(type);
   if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured`, hits: [] });
   }

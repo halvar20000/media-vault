@@ -1,5 +1,9 @@
 import type { MediaType } from './config';
 
+// Every metadata provider. MusicBrainz is the keyless fallback for music when
+// Discogs isn't configured (see services/enrich.ts → sourceForType).
+export type Source = 'igdb' | 'tmdb' | 'discogs' | 'musicbrainz';
+
 export interface Item {
   id: string;
   user_id: string;
@@ -57,7 +61,7 @@ export interface Cabinet {
 
 // What an enrichment provider returns for one item.
 export interface EnrichmentResult {
-  source: 'igdb' | 'tmdb' | 'discogs';
+  source: Source;
   sourceId: string | null;
   title: string | null; // provider's (localized) title — used by "Re-fetch: Title"
   coverUrl: string | null;
@@ -68,7 +72,7 @@ export interface EnrichmentResult {
 
 // A hit from an external title search (add-flow autofill).
 export interface SearchHit {
-  source: 'igdb' | 'tmdb' | 'discogs';
+  source: Source;
   sourceId: string;
   title: string;
   year: number | null;
@@ -76,4 +80,12 @@ export interface SearchHit {
   coverUrl: string | null;
   rating: number | null;
   description: string | null;
+}
+
+// One alternate cover offered by the artwork picker.
+export interface ArtworkOption {
+  url: string; // full-size image to store (cached locally on select)
+  thumb: string; // smaller preview for the grid
+  label: string; // e.g. "TMDB · DE · 1000×1500"
+  source: Source | 'current';
 }

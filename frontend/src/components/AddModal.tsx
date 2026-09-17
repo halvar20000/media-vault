@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { api } from '../api';
-import { TYPE_ORDER } from '../types';
+import { TYPE_ORDER, sourceForType } from '../types';
 import { CONSOLES } from '../consoles';
-import type { MediaType, SearchHit } from '../types';
+import type { MediaType, SearchHit, Sources } from '../types';
 
 type Method = 'search' | 'import' | 'scan' | 'manual' | 'check' | 'steam' | 'console';
 
@@ -18,13 +18,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onAdded: () => void;
-  sources: { igdb: boolean; tmdb: boolean; discogs: boolean };
-}
-
-function sourceForType(t: MediaType): 'igdb' | 'tmdb' | 'discogs' {
-  if (t === 'game') return 'igdb';
-  if (t === 'movie' || t === 'series') return 'tmdb';
-  return 'discogs';
+  sources: Sources;
 }
 
 export function AddModal({ open, onClose, onAdded, sources }: Props) {
@@ -51,7 +45,8 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
-  const sourceOn = sources[sourceForType(type)];
+  const source = sourceForType(type, sources);
+  const sourceOn = source ? sources[source] : false;
 
   useEffect(() => {
     if (!open) {
@@ -389,7 +384,7 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
               </div>
               {!sourceOn && (
                 <p className="mnote" style={{ padding: 0, border: 0 }}>
-                  <b>{sourceForType(type).toUpperCase()}</b> {t('add.sourceMissing', { type: t(`types.${type}`) })}
+                  <b>{(source ?? '').toUpperCase()}</b> {t('add.sourceMissing', { type: t(`types.${type}`) })}
                 </p>
               )}
               <button className="primary" onClick={runSearch} disabled={busy || !sourceOn}>

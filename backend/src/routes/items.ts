@@ -6,6 +6,7 @@ import { requireAuth, userId } from '../middleware/auth';
 import { MEDIA_TYPES, MediaType } from '../config';
 import type { Item } from '../types';
 import { cacheCover, saveUploadedCover } from '../lib/covers';
+import { artworkOptions } from '../services/artwork';
 import { buildCandidate, bestMatch } from '../lib/match';
 
 export const itemsRouter = Router();
@@ -332,6 +333,15 @@ itemsRouter.post('/:id/apply-match', async (req, res) => {
      b.source ?? null, b.sourceId ?? null, uid]
   );
   res.json({ item: rows[0] });
+});
+
+// GET /api/items/:id/artwork — alternate covers the item's provider offers
+// (other languages / pressings / regions). Pick one via POST /:id/cover { url }.
+itemsRouter.get('/:id/artwork', async (req, res) => {
+  const uid = userId(req);
+  const item = await ownedItem(req.params.id, uid);
+  if (!item) return res.status(404).json({ error: 'not found' });
+  res.json(await artworkOptions(item));
 });
 
 // POST /api/items/:id/cover  — manual cover: multipart "file", or JSON/form { url }

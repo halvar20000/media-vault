@@ -69,7 +69,8 @@ You can add them now or any time later. Each row says what it unlocks:
 |--------|---------|-----------------|
 | **IGDB** (via Twitch) | Game covers, ratings, **the games catalogue** | dev.twitch.tv |
 | **TMDB** | Movie posters, ratings, descriptions | themoviedb.org |
-| **Discogs** | Vinyl / CD art, ratings, **and valuation** | discogs.com |
+| **Discogs** (optional) | Vinyl / CD art, ratings, liner notes, **and valuation** | discogs.com |
+| **MusicBrainz** | Vinyl / CD art + ratings when Discogs isn't set up — **no key needed** | — |
 | **eBay** (optional) | Free game **price estimates** | developer.ebay.com |
 
 ### IGDB (games) — via a Twitch application
@@ -98,7 +99,11 @@ IGDB is owned by Twitch, so you authenticate with a Twitch app.
 
 → You now have the **TMDB Access Token**.
 
-### Discogs (vinyl / CD)
+### Discogs (vinyl / CD) — optional
+
+Without a Discogs key, music is matched via **MusicBrainz / Cover Art Archive**
+automatically (no sign-up). Add Discogs if you want its liner notes and the
+marketplace-based **€ Value** for records.
 
 1. Sign in at **https://www.discogs.com/**.
 2. Go to **Settings → Developers**

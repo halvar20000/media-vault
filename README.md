@@ -5,8 +5,8 @@
 > on *your* server. Think "Jellyfin for physical-media collectors."
 
 Each item automatically gets a **cover image, a rating, and a description**, fetched from
-the right database per media type (IGDB for games, TMDB for films, Discogs for vinyl/CD)
-and unified into one browsable **spine shelf**.
+the right database per media type (IGDB for games, TMDB for films & series, Discogs or
+MusicBrainz for vinyl/CD) and unified into one browsable **spine shelf**.
 
 ![status](https://img.shields.io/badge/status-early--v1-E0A126) ![license](https://img.shields.io/badge/license-AGPL--3.0-4C9A5A)
 
@@ -41,8 +41,16 @@ cloud-locked ownership. So this app is one you run on your **own** server, with 
 | Games | [IGDB](https://api-docs.igdb.com/) (via Twitch app) | https://dev.twitch.tv/console/apps |
 | Movies | [TMDB](https://developer.themoviedb.org/) | https://www.themoviedb.org/settings/api |
 | Vinyl / Singles / CD | [Discogs](https://www.discogs.com/developers) | https://www.discogs.com/settings/developers |
+| Vinyl / Singles / CD (fallback) | [MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_API) + [Cover Art Archive](https://coverartarchive.org/) | *no key needed* |
 
-Enrichment stays idle for any source whose keys are blank — the app still runs.
+Enrichment stays idle for any source whose keys are blank — the app still runs. Music is
+the exception: without Discogs credentials it falls back to **MusicBrainz**, which needs no
+key (Discogs still adds liner notes and marketplace valuation when configured).
+
+Every matched item also has a **Choose cover…** picker: browse every alternate the source
+knows — TMDB posters per language (and per season for series boxes), IGDB regional box art,
+Discogs scans of the release and its other pressings, Cover Art Archive fronts — and pick
+the one that matches the disc on your shelf.
 
 ---
 

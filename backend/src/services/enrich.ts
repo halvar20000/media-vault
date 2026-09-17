@@ -5,14 +5,26 @@ import { SOURCE_FOR_TYPE, MediaType } from '../config';
 import { query } from '../db/pool';
 import { cacheKey, getCached, putCached } from '../lib/cache';
 import { sourcesEnabled } from '../lib/apikeys';
-import type { EnrichmentResult, Item, SearchHit } from '../types';
+import type { EnrichmentResult, Item, SearchHit, Source } from '../types';
 import { igdbEnrich, igdbSearch } from './igdb';
 import { tmdbEnrich, tmdbSearch, tmdbGetById, tmdbTvEnrich, tmdbTvSearch, tmdbTvGetById, tmdbTvSeasonPoster } from './tmdb';
 import { discogsEnrich, discogsSearch } from './discogs';
+import { mbEnrich, mbGetById, mbSearch } from './musicbrainz';
 import { cacheCover } from '../lib/covers';
 
-export function sourceEnabled(source: 'igdb' | 'tmdb' | 'discogs'): boolean {
+// MusicBrainz needs no credentials, so it is always "on".
+export function sourceEnabled(source: Source): boolean {
+  if (source === 'musicbrainz') return true;
   return sourcesEnabled()[source];
+}
+
+// The source that will actually serve a media type right now. Music prefers
+// Discogs (richer: notes, marketplace values) and falls back to MusicBrainz when
+// no Discogs credentials are configured. null = no auto-enrichment (consoles).
+export function sourceForType(type: MediaType): Source | null {
+  const preferred = SOURCE_FOR_TYPE[type];
+  if (preferred === 'discogs' && !sourceEnabled('discogs')) return 'musicbrainz';
+  return preferred;
 }
 
 // The cache key groups CDs separately from vinyl (different Discogs format filter),
@@ -30,7 +42,7 @@ function keyForItem(item: Pick<Item, 'type' | 'title' | 'format'>): string {
 async function fetchFromProvider(
   item: Pick<Item, 'type' | 'title' | 'format' | 'year'>
 ): Promise<EnrichmentResult | null> {
-  switch (SOURCE_FOR_TYPE[item.type]) {
+  switch (sourceForType(item.type)) {
     case 'igdb':
       return igdbEnrich(item.title, { platform: item.format });
     case 'tmdb':
@@ -39,21 +51,28 @@ async function fetchFromProvider(
         : tmdbEnrich(item.title, { year: item.year });
     case 'discogs':
       return discogsEnrich(item.title, item.type);
+    case 'musicbrainz':
+      return mbEnrich(item.title, item.type);
     default:
       return null; // no auto-enrichment (e.g. consoles)
   }
 }
 
 // Exact fetch by a provider id already stored on the item (e.g. a tmdb_id
-// supplied in an import). Only TMDB is wired for now; other sources return
-// null so the caller falls back to the title-based path.
+// supplied in an import, or a MusicBrainz group id from an earlier match). Only
+// TMDB and MusicBrainz are wired; other sources return null so the caller falls
+// back to the title-based path.
 async function fetchByIdFromProvider(
   item: Pick<Item, 'type' | 'source' | 'source_id'>
 ): Promise<EnrichmentResult | null> {
   if (!item.source_id) return null;
-  if (item.source === 'tmdb' && SOURCE_FOR_TYPE[item.type] === 'tmdb') {
+  const active = sourceForType(item.type);
+  if (item.source === 'tmdb' && active === 'tmdb') {
     // A series id is a TMDB *TV* id — resolve it via /tv, never /movie.
     return item.type === 'series' ? tmdbTvGetById(item.source_id) : tmdbGetById(item.source_id);
+  }
+  if (item.source === 'musicbrainz' && active === 'musicbrainz') {
+    return mbGetById(item.source_id);
   }
   return null;
 }
@@ -102,7 +121,7 @@ async function fetchSeriesSeason(
 async function persistResult(
   item: Pick<Item, 'id'>,
   result: EnrichmentResult,
-  source: 'igdb' | 'tmdb' | 'discogs',
+  source: Source,
   fields: EnrichFields = DEFAULT_FIELDS
 ): Promise<void> {
   const sets: string[] = [];
@@ -150,7 +169,7 @@ export async function enrichItem(
   item: Item,
   opts: { force?: boolean; fields?: EnrichFields } = {}
 ): Promise<EnrichOutcome> {
-  const source = SOURCE_FOR_TYPE[item.type];
+  const source = sourceForType(item.type);
   if (!source || !sourceEnabled(source)) return { status: 'source-disabled' };
   const fields = opts.fields ?? DEFAULT_FIELDS;
 
@@ -247,7 +266,8 @@ export async function enrichUserItems(
     switch (outcome.status) {
       case 'enriched':
         summary.enriched++;
-        // Gentle pacing on live network fetches to respect provider rate limits.
+        // Gentle pacing on live network fetches to respect provider rate limits
+        // (MusicBrainz additionally serializes its own calls at 1 req/s).
         await sleep(SOURCE_FOR_TYPE[item.type] === 'discogs' ? 1100 : 300);
         break;
       case 'cached':
@@ -269,7 +289,7 @@ export async function enrichUserItems(
 
 // External title search for the add-flow autofill.
 export async function searchExternal(type: MediaType, q: string): Promise<SearchHit[]> {
-  const source = SOURCE_FOR_TYPE[type];
+  const source = sourceForType(type);
   if (!source || !sourceEnabled(source)) return [];
   switch (source) {
     case 'igdb':
@@ -278,6 +298,8 @@ export async function searchExternal(type: MediaType, q: string): Promise<Search
       return type === 'series' ? tmdbTvSearch(q) : tmdbSearch(q);
     case 'discogs':
       return discogsSearch(q, type);
+    case 'musicbrainz':
+      return mbSearch(q, type);
     default:
       return [];
   }

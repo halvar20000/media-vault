@@ -1,4 +1,4 @@
-import type { Cabinet, EnrichStatus, Item, KeysStatus, MediaType, SearchHit, ShopsConfig, Stats, User, ValueStatus } from './types';
+import type { ArtworkOption, Cabinet, EnrichStatus, Item, KeysStatus, MediaType, SearchHit, ShopsConfig, Stats, User, ValueStatus } from './types';
 
 // All requests share cookies for session auth.
 async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -154,6 +154,10 @@ export const api = {
         description: hit.description,
       }),
     }),
+
+  // artwork picker: alternate covers the item's provider offers
+  artworkOptions: (id: string) =>
+    req<{ options: ArtworkOption[]; warnings: string[] }>(`/items/${id}/artwork`),
 
   // manual cover: upload a file, or set from a URL
   uploadCover: async (id: string, file: File) => {

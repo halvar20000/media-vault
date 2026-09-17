@@ -217,7 +217,7 @@
     "gamesNote": "Spiele: Spalten Title, Platform, EmulationStatus.",
     "moviesNote": "Filme: ein FlickRack-Export (semikolon-getrennt; Titel, Format, Release, ASIN…). Titel werden automatisch bereinigt.",
     "afterImport": "Nach dem Import „Sammlung anreichern“ klicken, um Cover, Bewertungen & Beschreibungen zu holen.",
-    "sourcesNote": "Metadaten werden je Medientyp geholt: Spiele → IGDB · Filme → TMDB · Vinyl / Singles / CD → Discogs.",
+    "sourcesNote": "Metadaten werden je Medientyp geholt: Spiele → IGDB · Filme / Serien → TMDB · Vinyl / Singles / CD → Discogs, oder MusicBrainz (ohne Schlüssel), wenn Discogs nicht eingerichtet ist.",
     "scanHint": "Richte die Kamera auf einen EAN/UPC-Barcode. Bei Erkennung übernehmen wir den Code in die Suche.",
     "scanUnavailable": "Kamera nicht verfügbar — Kameraberechtigung erteilen und HTTPS verwenden.",
     "scanNeedsHttps": "Live-Scannen braucht HTTPS (oder localhost). Nutze stattdessen „Foto aufnehmen“ — das öffnet die Kamera-App deines Handys und liest den Barcode aus dem Bild.",
@@ -239,6 +239,17 @@
     "consoleHint": "Klicke eine Konsole an, um sie hinzuzufügen — klicke erneut für eine weitere (z. B. zwei PS3). Ein ×N-Abzeichen zeigt, wie viele du besitzt. Für eine limitierte Edition füge die Basiskonsole hinzu, benenne sie dann um und setze in den Details dein eigenes Foto.",
     "consoleAddAnother": "Du besitzt {{count}} — klicken, um eine weitere hinzuzufügen"
   },
+  "artwork": {
+    "title": "Cover auswählen",
+    "loading": "Suche alternative Cover…",
+    "current": "Aktuelles Cover",
+    "use": "Dieses Cover verwenden",
+    "none": "Die Quelle hat keine alternativen Bilder für diesen Eintrag. Unter „Bearbeiten“ kannst du weiterhin eines hochladen oder eine URL einfügen.",
+    "noMatch": "Dieser Eintrag ist noch nicht mit einer Metadatenquelle verknüpft — nutze zuerst „Zuordnung korrigieren“, danach stehen alternative Cover bereit.",
+    "sourceOff": "Die Metadatenquelle, mit der dieser Eintrag verknüpft wurde, ist nicht eingerichtet (siehe ⚙ Einstellungen).",
+    "failed": "Alternative Cover konnten nicht geladen werden.",
+    "saveFailed": "Dieses Cover konnte nicht gespeichert werden."
+  },
   "drawer": {
     "markViewed": "Als gesehen markieren",
     "unwatch": "Ungesehen",
@@ -252,6 +263,8 @@
     "value": "Wert",
     "currency": "Währung",
     "fixMatch": "Treffer korrigieren…",
+    "chooseCover": "Cover wählen…",
+    "chooseCoverTitle": "Alternative Cover der Metadatenquelle durchsuchen (andere Sprachen, Pressungen, Regionen)",
     "rematchFrom": "Neu abgleichen über {{source}}",
     "correctedTitle": "korrigierter Titel…",
     "noMatchTry": "Keine Treffer — versuche einen einfacheren Titel.",

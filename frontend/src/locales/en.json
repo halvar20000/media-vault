@@ -217,7 +217,7 @@
     "gamesNote": "Games: columns Title, Platform, EmulationStatus.",
     "moviesNote": "Movies: a FlickRack export (semicolon-separated; Titel, Format, Release, ASIN…). Titles are cleaned automatically.",
     "afterImport": "After importing, hit Enrich collection to fetch covers, ratings & descriptions.",
-    "sourcesNote": "Metadata is fetched per media type: Games → IGDB · Films → TMDB · Vinyl / Singles / CD → Discogs.",
+    "sourcesNote": "Metadata is fetched per media type: Games → IGDB · Films / Series → TMDB · Vinyl / Singles / CD → Discogs, or MusicBrainz (no key needed) when Discogs isn’t configured.",
     "scanHint": "Point the camera at an EAN/UPC barcode. On detection we’ll drop the code into search.",
     "scanUnavailable": "Camera unavailable — grant camera permission and use HTTPS.",
     "scanNeedsHttps": "Live camera scanning needs HTTPS (or localhost). Use “Take a photo” instead — it opens your phone’s camera app and reads the barcode from the picture.",
@@ -239,6 +239,17 @@
     "consoleHint": "Click a console to add it — click again to add another (e.g. two PS3s). A ×N badge shows how many you own. For a limited edition, add the base console then rename it and set your own photo in its details.",
     "consoleAddAnother": "You own {{count}} — click to add another"
   },
+  "artwork": {
+    "title": "Choose a cover",
+    "loading": "Looking up alternate covers…",
+    "current": "Current cover",
+    "use": "Use this cover",
+    "none": "The source has no alternate images for this item. You can still upload one or paste a URL under Edit.",
+    "noMatch": "This item isn’t linked to a metadata source yet — use Fix match first, then alternate covers become available.",
+    "sourceOff": "The metadata source this item was matched with isn’t configured (check ⚙ Settings).",
+    "failed": "Could not load alternate covers.",
+    "saveFailed": "Could not save that cover."
+  },
   "drawer": {
     "markViewed": "Mark viewed",
     "unwatch": "Unwatch",
@@ -252,6 +263,8 @@
     "value": "Value",
     "currency": "Currency",
     "fixMatch": "Fix match…",
+    "chooseCover": "Choose cover…",
+    "chooseCoverTitle": "Browse alternate covers from the metadata source (other languages, pressings, regions)",
     "rematchFrom": "Re-match from {{source}}",
     "correctedTitle": "corrected title…",
     "noMatchTry": "No matches found — try a simpler title.",

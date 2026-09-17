@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.14.0',
+    date: '2026-09-17',
+    title: 'Pick your cover · music without keys',
+    changes: [
+      'New "Choose cover…" picker in the item drawer: browse every alternate image the metadata source knows — TMDB posters per language (and per season for series boxes), IGDB regional box art and artworks, Discogs scans of this release and its other pressings, Cover Art Archive fronts — and pick the one that matches your disc.',
+      'Vinyl / singles / CDs no longer need a Discogs key: without one, media-vault matches music via MusicBrainz (with ratings) and fetches covers from the Cover Art Archive — barcode scanning included. Discogs is still preferred when configured (liner notes, valuation).',
+    ],
+  },
+  {
     version: '1.13.0',
     date: '2026-09-17',
     title: 'Barcode scanning without HTTPS',

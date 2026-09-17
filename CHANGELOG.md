@@ -6,6 +6,24 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.14.0] — 2026-09-17
+
+### Added
+- **Choose cover… (artwork picker)** — every matched item now has a picker that lists
+  the alternate images its metadata source knows, so you can pick the one that matches
+  the disc on your shelf: **TMDB** posters in your configured language first, then
+  English and textless (plus that season's posters for a series box with a season
+  number); **IGDB** cover, **regional box art** (e.g. the Japanese sleeve) and promo
+  artworks; **Discogs** scans of the release *and* of the master's other pressings;
+  **Cover Art Archive** fronts of every MusicBrainz release in the group. The pick is
+  cached locally like any other cover. Find it next to "Fix match…" in the item drawer.
+- **MusicBrainz as a keyless music source** — vinyl / singles / CDs no longer require
+  Discogs credentials. When none are configured, media-vault searches **MusicBrainz**
+  (release groups, with community ratings) and pulls covers from the **Cover Art
+  Archive**, including **barcode lookup** for the scanner. Discogs is still preferred
+  when its key is present (liner notes, marketplace valuation). Polite by design:
+  requests are serialized at 1/s with a proper User-Agent and back off on 503.
+
 ## [1.13.0] — 2026-09-17
 
 ### Added
@@ -158,6 +176,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.14.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.14.0
 [1.13.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.13.0
 [1.12.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.12.0
 [1.11.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.11.0

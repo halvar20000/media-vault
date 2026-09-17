@@ -1,16 +1,17 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth';
-import { MEDIA_TYPES, MediaType, SOURCE_FOR_TYPE } from '../config';
-import { searchExternal, sourceEnabled } from '../services/enrich';
+import { MEDIA_TYPES, MediaType } from '../config';
+import { searchExternal, sourceEnabled, sourceForType } from '../services/enrich';
 import { discogsBarcodeSearch } from '../services/discogs';
+import { mbBarcodeSearch } from '../services/musicbrainz';
 import { upcLookup } from '../services/upc';
 
 export const barcodeRouter = Router();
 barcodeRouter.use(requireAuth);
 
 // GET /api/barcode/:type/:code
-// Music → Discogs barcode search. Games/Movies → resolve the barcode to a
-// product title (UPCitemdb) then match against IGDB/TMDB.
+// Music → Discogs (or MusicBrainz) barcode search. Games/Movies → resolve the
+// barcode to a product title (UPCitemdb) then match against IGDB/TMDB.
 barcodeRouter.get('/:type/:code', async (req, res) => {
   const type = String(req.params.type) as MediaType;
   const code = String(req.params.code).replace(/\D/g, ''); // digits only
@@ -18,7 +19,7 @@ barcodeRouter.get('/:type/:code', async (req, res) => {
   if (!MEDIA_TYPES.includes(type)) return res.status(400).json({ error: 'invalid type' });
   if (!code) return res.status(400).json({ error: 'invalid barcode' });
 
-  const source = SOURCE_FOR_TYPE[type];
+  const source = sourceForType(type);
   if (!source || !sourceEnabled(source)) {
     return res.status(400).json({ error: `source "${source}" is not configured`, hits: [] });
   }
@@ -26,6 +27,10 @@ barcodeRouter.get('/:type/:code', async (req, res) => {
   try {
     if (source === 'discogs') {
       const hits = await discogsBarcodeSearch(code);
+      return res.json({ resolvedTitle: null, hits });
+    }
+    if (source === 'musicbrainz') {
+      const hits = await mbBarcodeSearch(code);
       return res.json({ resolvedTitle: null, hits });
     }
     // games / movies: barcode → title → metadata source

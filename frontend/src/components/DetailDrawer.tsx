@@ -15,6 +15,7 @@ interface Props {
   onUpdated: (item: Item) => void | Promise<void>;
   onDelete: (item: Item) => void;
   onCreateCabinet: (name: string) => Promise<Cabinet | null>;
+  onChooseCover: () => void; // opens the artwork picker (alternate covers)
 }
 
 type Draft = {
@@ -63,7 +64,7 @@ function toDraft(i: Item): Draft {
 
 const fmtDate = (s: string | null) => (s ? s.slice(0, 10) : null);
 
-export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketplaces, onClose, onUpdated, onDelete, onCreateCabinet }: Props) {
+export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketplaces, onClose, onUpdated, onDelete, onCreateCabinet, onChooseCover }: Props) {
   const { t } = useTranslation();
   const open = Boolean(item);
   const meta = item ? TYPE_META[item.type] : null;
@@ -280,6 +281,9 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
                 <button className="ghostbtn" onClick={fetchValue} disabled={busy}>{t('drawer.fetchValue')}</button>
               )}
               <button className="ghostbtn" onClick={() => setEditing(true)} disabled={busy}>{t('drawer.fixMatch')}</button>
+              {item.source_id && (
+                <button className="ghostbtn" onClick={onChooseCover} disabled={busy} title={t('drawer.chooseCoverTitle')}>🖼 {t('drawer.chooseCover')}</button>
+              )}
               <button className="ghostbtn dangerbtn" onClick={() => onDelete(item)}>{t('common.delete')}</button>
             </div>
           </>
@@ -313,6 +317,9 @@ export function DetailDrawer({ item, cabinets, sourceOn, valueSourceOn, marketpl
             {/* ---- Manual cover ---- */}
             <div className="fixblock">
               <label className="fixlabel">{t('drawer.manualCover')}</label>
+              {item.source_id && (
+                <button className="ghostbtn" style={{ marginBottom: 10 }} onClick={onChooseCover} disabled={busy}>🖼 {t('drawer.chooseCover')}</button>
+              )}
               <div className="rowfields" style={{ gap: 8, alignItems: 'flex-end' }}>
                 <div className="field" style={{ flex: 2, marginBottom: 0 }}>
                   <input ref={fileRef} type="file" accept="image/*" />

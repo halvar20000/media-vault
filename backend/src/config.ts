@@ -125,6 +125,9 @@ export const MEDIA_TYPES: MediaType[] = ['game', 'movie', 'series', 'lp', 'singl
 // consoles, which are added from a curated list with their own images).
 // Both movies and series use TMDB, but via different endpoints (/movie vs /tv);
 // enrich.ts branches on the media type to pick the right one.
+// Music lists Discogs as the *preferred* source; when no Discogs credentials are
+// configured, enrich.ts falls back to MusicBrainz (keyless) — use sourceForType()
+// there rather than reading this table directly.
 export const SOURCE_FOR_TYPE: Record<MediaType, 'igdb' | 'tmdb' | 'discogs' | null> = {
   game: 'igdb',
   movie: 'tmdb',

@@ -1,7 +1,7 @@
 // IGDB (games) provider. Auth is a Twitch client-credentials token.
 // Docs: https://api-docs.igdb.com/
 import { getApiKeys } from '../lib/apikeys';
-import type { EnrichmentResult, SearchHit } from '../types';
+import type { ArtworkOption, EnrichmentResult, SearchHit } from '../types';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
@@ -211,4 +211,55 @@ export async function igdbEnrich(title: string, hint?: IgdbHint): Promise<Enrich
     description: hit.description,
     payload: { ...hit, matchScore: bestScore },
   };
+}
+
+// ---- artwork picker -----------------------------------------------------------
+// The game's cover, any region-specific covers (game_localizations — e.g. the
+// Japanese box), then promo artworks. Screenshots are deliberately left out:
+// they make poor shelf covers.
+interface IgdbArtworkRow {
+  cover?: { image_id?: string };
+  artworks?: { image_id?: string }[];
+  game_localizations?: { name?: string; cover?: { image_id?: string }; region?: { name?: string } }[];
+}
+
+const igdbImg = (id: string, size: string) => `https://images.igdb.com/igdb/image/upload/${size}/${id}.jpg`;
+
+async function apiArtworkRows(id: string, withLocalizations: boolean): Promise<IgdbArtworkRow[]> {
+  const token = await getToken();
+  const fields = ['cover.image_id', 'artworks.image_id'];
+  if (withLocalizations) fields.push('game_localizations.name', 'game_localizations.cover.image_id', 'game_localizations.region.name');
+  const res = await fetch('https://api.igdb.com/v4/games', {
+    method: 'POST',
+    headers: { 'Client-ID': getApiKeys().igdbClientId, Authorization: `Bearer ${token}`, 'Content-Type': 'text/plain' },
+    body: `fields ${fields.join(', ')}; where id = ${parseInt(id, 10) || 0};`,
+  });
+  if (!res.ok) throw new Error(`IGDB artwork query failed: ${res.status} ${await res.text()}`);
+  return (await res.json()) as IgdbArtworkRow[];
+}
+
+export async function igdbArtwork(id: string): Promise<ArtworkOption[]> {
+  let rows: IgdbArtworkRow[];
+  try {
+    rows = await apiArtworkRows(id, true);
+  } catch {
+    // Localization expansion is the fragile part of that query; retry without it.
+    rows = await apiArtworkRows(id, false);
+  }
+  const g = rows[0];
+  if (!g) return [];
+  const out: ArtworkOption[] = [];
+  const seen = new Set<string>();
+  const push = (imageId: string | undefined, label: string, size: string, thumb: string) => {
+    if (!imageId || seen.has(imageId)) return;
+    seen.add(imageId);
+    out.push({ url: igdbImg(imageId, size), thumb: igdbImg(imageId, thumb), label, source: 'igdb' });
+  };
+  push(g.cover?.image_id, 'IGDB · cover', 't_cover_big', 't_cover_big');
+  for (const l of g.game_localizations ?? []) {
+    const region = l.region?.name || l.name || 'localized';
+    push(l.cover?.image_id, `IGDB · ${region}`, 't_cover_big', 't_cover_big');
+  }
+  for (const a of g.artworks ?? []) push(a.image_id, 'IGDB · artwork', 't_720p', 't_screenshot_med');
+  return out;
 }

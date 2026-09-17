@@ -1,5 +1,24 @@
 export type MediaType = 'game' | 'movie' | 'series' | 'lp' | 'single' | 'cd' | 'console';
 
+// Metadata providers. MusicBrainz is keyless and always on; it serves music
+// whenever Discogs isn't configured.
+export type Source = 'igdb' | 'tmdb' | 'discogs' | 'musicbrainz';
+export interface Sources {
+  igdb: boolean;
+  tmdb: boolean;
+  discogs: boolean;
+  musicbrainz: boolean;
+}
+
+// The source that serves a media type given what's configured (mirrors the
+// backend's sourceForType). null = no auto-enrichment (consoles).
+export function sourceForType(type: MediaType, sources: Sources): Source | null {
+  if (type === 'game') return 'igdb';
+  if (type === 'movie' || type === 'series') return 'tmdb';
+  if (type === 'console') return null;
+  return sources.discogs ? 'discogs' : 'musicbrainz';
+}
+
 export interface Item {
   id: string;
   user_id: string;
@@ -77,7 +96,7 @@ export interface EnrichJob {
 
 export interface EnrichStatus {
   job: EnrichJob | null;
-  sources: { igdb: boolean; tmdb: boolean; discogs: boolean };
+  sources: Sources;
 }
 
 export interface ValueStatus {
@@ -86,7 +105,7 @@ export interface ValueStatus {
 }
 
 export interface SearchHit {
-  source: 'igdb' | 'tmdb' | 'discogs';
+  source: Source;
   sourceId: string;
   title: string;
   year: number | null;
@@ -94,6 +113,14 @@ export interface SearchHit {
   coverUrl: string | null;
   rating: number | null;
   description: string | null;
+}
+
+// One alternate cover offered by the artwork picker.
+export interface ArtworkOption {
+  url: string;
+  thumb: string;
+  label: string;
+  source: Source | 'current';
 }
 
 export interface CustomShop {
