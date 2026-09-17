@@ -658,13 +658,27 @@ export function AddModal({ open, onClose, onAdded, sources }: Props) {
 }
 
 // Cross-platform barcode scanning via ZXing (works on iOS Safari too, unlike
-// the native BarcodeDetector API).
+// the native BarcodeDetector API). Two paths:
+//  1. Live camera (decodeFromVideoDevice) — needs a secure context, so it
+//     fails on a plain http://unraid:port LAN URL from a phone.
+//  2. Photo fallback — <input capture="environment"> opens the phone camera
+//     app, and we decode the still image. Works without HTTPS.
 function BarcodeScan({ onCode }: { onCode: (code: string) => void }) {
   const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [liveFailed, setLiveFailed] = useState(false);
+  const [decoding, setDecoding] = useState(false);
+  const secure = typeof window !== 'undefined' && window.isSecureContext;
 
   useEffect(() => {
+    // Don't even try getUserMedia on an insecure origin — it's guaranteed to
+    // fail, and some browsers surface a confusing generic error.
+    if (!secure) {
+      setLiveFailed(true);
+      setError(t('add.scanNeedsHttps'));
+      return;
+    }
     let controls: { stop: () => void } | null = null;
     let cancelled = false;
     const reader = new BrowserMultiFormatReader();
@@ -679,20 +693,55 @@ function BarcodeScan({ onCode }: { onCode: (code: string) => void }) {
           }
         });
       } catch (e: any) {
-        setError(e?.message || t('add.scanUnavailable'));
+        setLiveFailed(true);
+        setError(e?.name === 'NotAllowedError' ? t('add.scanDenied') : e?.message || t('add.scanUnavailable'));
       }
     })();
     return () => {
       cancelled = true;
       controls?.stop();
     };
-  }, [onCode]);
+  }, [onCode, secure, t]);
+
+  async function decodePhoto(file: File | undefined) {
+    if (!file) return;
+    setDecoding(true);
+    setError(null);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(String(fr.result || ''));
+        fr.onerror = () => reject(new Error(t('add.scanPhotoUnreadable')));
+        fr.readAsDataURL(file);
+      });
+      const result = await new BrowserMultiFormatReader().decodeFromImageUrl(dataUrl);
+      const code = result?.getText?.() || '';
+      if (!code) throw new Error(t('add.scanPhotoNoCode'));
+      onCode(code);
+    } catch (e: any) {
+      // ZXing throws NotFoundException when no barcode is in the frame.
+      setError(e?.name === 'NotFoundException' ? t('add.scanPhotoNoCode') : e?.message || t('add.scanPhotoNoCode'));
+    } finally {
+      setDecoding(false);
+    }
+  }
 
   return (
     <div>
-      <video ref={videoRef} style={{ width: '100%', borderRadius: 6, background: '#000' }} muted playsInline />
+      {!liveFailed && <video ref={videoRef} style={{ width: '100%', borderRadius: 6, background: '#000' }} muted playsInline />}
       {error && <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{error}</p>}
-      <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{t('add.scanHint')}</p>
+      <label className="ghostbtn" style={{ marginTop: 10, display: 'inline-block', cursor: decoding ? 'default' : 'pointer', opacity: decoding ? 0.5 : 1 }}>
+        📷 {decoding ? t('add.scanPhotoDecoding') : t('add.scanTakePhoto')}
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          disabled={decoding}
+          style={{ display: 'none' }}
+          onChange={(e) => { decodePhoto(e.target.files?.[0]); e.target.value = ''; }}
+        />
+      </label>
+      <p className="mnote" style={{ padding: '10px 0 0', border: 0 }}>{liveFailed ? t('add.scanPhotoHint') : t('add.scanHint')}</p>
     </div>
   );
 }

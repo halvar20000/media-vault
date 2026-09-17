@@ -10,6 +10,15 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.13.0',
+    date: '2026-09-17',
+    title: 'Barcode scanning without HTTPS',
+    changes: [
+      'New "Take a photo of the barcode" button in the scanner: it opens your phone\'s camera app and reads the barcode from the picture — no HTTPS needed.',
+      'Live camera scanning only works on HTTPS or localhost; on a plain http:// LAN address media-vault now says so up front and points you to the photo route instead. Clearer messages when camera permission is denied or no barcode is found in the photo.',
+    ],
+  },
+  {
     version: '1.12.0',
     date: '2026-08-17',
     title: 'Series seasons — a cover per box',

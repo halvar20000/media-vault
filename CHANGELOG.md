@@ -6,6 +6,17 @@ viewable inside the app — click the version badge in the header.
 The format follows [Keep a Changelog](https://keepachangelog.com/), and versions
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.13.0] — 2026-09-17
+
+### Added
+- **Barcode scanning without HTTPS** — the scanner now has a **"Take a photo of the
+  barcode"** button that opens the phone's camera app and decodes the barcode from
+  the still image. Live camera scanning requires a secure context (HTTPS or
+  localhost), so on a plain `http://server:port` LAN address from a phone it could
+  never start; media-vault now detects that up front, explains it, and offers the
+  photo route instead. Clearer messages when camera permission is denied or no
+  barcode is found in the photo.
+
 ## [1.12.0] — 2026-08-17
 
 ### Added
@@ -147,6 +158,7 @@ First release.
   store filter), GameStop, Craigslist, or your own custom shop.
 - **English & German** interface.
 
+[1.13.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.13.0
 [1.12.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.12.0
 [1.11.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.11.0
 [1.10.0]: https://github.com/halvar20000/media-vault/releases/tag/v1.10.0
