@@ -1,0 +1,68 @@
+name: Bug report
+description: A crash, a page that does not load, artwork that never arrives, a wrong match.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Version, media type and the exact title you were adding are what matter most — a bad metadata match is usually reproducible from the title alone.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Click the version badge in the app header, or check the image tag.
+      placeholder: "1.14.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How is it installed?
+      options:
+        - docker-compose (from the repo)
+        - Unraid / other Docker host
+        - Local development (npm)
+        - Other (say which below)
+    validations:
+      required: true
+  - type: dropdown
+    id: media
+    attributes:
+      label: Media type involved
+      options:
+        - Not specific to one
+        - Video game
+        - Movie / series
+        - Vinyl LP / single
+        - CD
+  - type: dropdown
+    id: source
+    attributes:
+      label: Metadata source involved
+      options:
+        - None / not sure
+        - IGDB
+        - TMDB
+        - Discogs
+        - MusicBrainz / Cover Art Archive
+        - eBay / PriceCharting (valuation)
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      placeholder: |
+        Added "Gran Turismo 4" (PS2). Search found it, but the cover that arrived is the PSP version and the rating is missing. Expected the PS2 box art.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log output
+      description: "`docker compose logs backend` around the time it happened, or the browser console (F12). Remove your API keys if they appear. Pasted text is formatted as code."
+      render: text
+  - type: textarea
+    id: shot
+    attributes:
+      label: Screenshot
+      description: Drag it in here.

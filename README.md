@@ -149,6 +149,23 @@ Pin a specific version by setting the container's repository to `…/media-vault
 - [`CHAT_SUMMARY.md`](CHAT_SUMMARY.md) — design reasoning.
 - [`media-vault-prototype.html`](media-vault-prototype.html) — original design prototype.
 
+## Feedback and ideas
+
+One shelf in one household is a narrow test. If your collection has a media type,
+a region, a format or a source this does not handle, that is exactly what is worth
+hearing.
+
+* **Crash, missing artwork, wrong match?**
+  [Open a bug report](https://github.com/halvar20000/media-vault/issues/new?template=bug_report.yml)
+  — version (click the badge in the header), media type, and the exact title.
+* **Want something?** Say so in
+  [Discussions → Ideas](https://github.com/halvar20000/media-vault/discussions/categories/ideas),
+  or 👍 an idea already there. The [**roadmap** thread](https://github.com/halvar20000/media-vault/discussions/1)
+  lists what is being considered, and the votes decide the order.
+* **Setup or API-key trouble?**
+  [Discussions → Q&A](https://github.com/halvar20000/media-vault/discussions/categories/q-a).
+* **Proud of your shelf?** Show and tell is there for it.
+
 ## License
 
 [AGPL-3.0](LICENSE) — anyone who offers this as a network service must share their changes
